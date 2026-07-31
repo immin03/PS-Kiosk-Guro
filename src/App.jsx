@@ -420,6 +420,18 @@ export default function KioskApp() {
     if (prod) setNav([{ page:"location", product:prod }]);
   }, []);
 
+  // 화면 폭에 맞춰 비율 확대 — 43/50/75인치 DID·웹에서 420px 기둥이 작게 보이지 않게
+  useEffect(() => {
+    const DESIGN_W = 420;
+    const fit = () => {
+      const s = Math.min(window.innerWidth / DESIGN_W, 2.6);
+      document.documentElement.style.zoom = s > 1 ? String(s) : "";
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+
   const navTo = (page, data) => push({ page, ...data });
   const tabTo = (tab) => { setActiveTab(tab); setNav([{ page:tab }]); };
   const goBack = () => { if (nav.length > 1) pop(); else if (activeTab !== "home") tabTo("home"); };
