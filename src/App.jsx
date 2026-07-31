@@ -72,11 +72,9 @@ const BANNERS = [
   { head:"건강기능식품 베스트 50 기획전", body:"오메가3 · 유산균 · 비타민 인기 TOP 브랜드 모음", bg:"https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=800&q=80", tag:"BEST" },
 ];
 const ZONES_MAP = [
-  { id:"A", label:"브랜드 존", color:"#01C0A4", desc:"A1~A15", catType:"health" },
-  { id:"B", label:"건강기능식품", color:"#2BCAB0", desc:"B1~B36", catType:"health" },
-  { id:"C", label:"뷰티", color:"#00978F", desc:"C1~C18", catType:"beauty" },
-  { id:"D", label:"라이프스타일", color:"#339999", desc:"D1~D15", catType:"beauty" },
-  { id:"E", label:"펫 존", color:"#7BAE7F", desc:"E1~E12", catType:"pet" },
+  { id:"B", label:"건강기능식품", color:"#159A87", desc:"A1~A33 · 펫 A31~A36", catType:"health" },
+  { id:"C", label:"화장품 · 뷰티", color:"#C98A8A", desc:"C1~C25 · D 브랜드존", catType:"beauty" },
+  { id:"E", label:"펫", color:"#D9A441", desc:"A31~A36", catType:"pet" },
 ];
 const ALL_PRODUCTS = [
   { name:"rTG 알티지 오메가3 골드 90캡슐", brand:"뉴트리디데이", cat:"오메가3/눈건강", price:"17,800", rack:"B2", en:"rTG Omega-3 Gold 90 Capsules", benefit:"혈중 중성지방 개선 · DHA/EPA 함유", spec:"90캡슐 (1일 1캡슐)", sale:256 },
@@ -303,86 +301,103 @@ function ProductCard({ p, onLocate }) {
 }
 
 function FloorPlan({ highlightZone, highlightRack, showPath, onZoneClick }) {
-  const hl = (z) => highlightZone === z;
-  const rackTargets = { A:{x:85,y:175}, B:{x:315,y:180}, C:{x:455,y:368}, D:{x:560,y:372}, E:{x:85,y:388} };
+  const clickable = !!onZoneClick;
+  const rose = "#C98A8A", amber = "#D9A441", faint = "#9AAAA5";
+  // 데이터 zone(A~E) → 새 지도 블록 좌표
+  const ZT = { A:{x:185,y:188}, B:{x:185,y:188}, C:{x:506,y:188}, D:{x:616,y:188}, E:{x:388,y:188} };
+  const target = highlightRack ? ZT[highlightRack[0]] : (highlightZone ? ZT[highlightZone] : null);
+  const active = highlightZone==="E" ? "pet"
+    : (highlightZone==="C"||highlightZone==="D") ? "beauty"
+    : (highlightZone==="A"||highlightZone==="B") ? "health" : null;
+  const fillOf = (on) => on ? "#EAF6F1" : C.wh;
+  const strokeOf = (on) => on ? C.pri : "#E6EEEA";
+  const wOf = (on) => on ? 2 : 1;
+  const clk = (z) => clickable ? { style:{cursor:"pointer"}, onClick:()=>onZoneClick(z) } : {};
   return (
-    <svg viewBox="0 0 620 520" style={{ width:"100%", display:"block" }}>
-      <rect x="0" y="0" width="620" height="520" rx="10" fill="#FFFFFF" />
-      <rect x="30" y="90" width="110" height="190" rx="6"
-        fill={hl("A")?"#01C0A430":"#01C0A40A"} stroke="#01C0A4" strokeWidth={hl("A")?2.5:0.8}
-        style={onZoneClick?{cursor:"pointer"}:{}} onClick={() => onZoneClick?.("A")} />
-      <text x="85" y="128" textAnchor="middle" fontSize="13" fontWeight="800" fill={C.priD}>A</text>
-      <text x="85" y="145" textAnchor="middle" fontSize="8" fill={C.t2}>브랜드 존</text>
-      <text x="85" y="158" textAnchor="middle" fontSize="7" fill={C.t3}>A1~A15</text>
-      <rect x="155" y="90" width="320" height="190" rx="6"
-        fill={hl("B")?"#2BCAB030":"#2BCAB00A"} stroke="#2BCAB0" strokeWidth={hl("B")?2.5:0.8}
-        style={onZoneClick?{cursor:"pointer"}:{}} onClick={() => onZoneClick?.("B")} />
-      <text x="315" y="148" textAnchor="middle" fontSize="13" fontWeight="800" fill={C.priD}>B</text>
-      <text x="315" y="165" textAnchor="middle" fontSize="8" fill={C.t2}>건강기능식품</text>
-      <text x="315" y="178" textAnchor="middle" fontSize="7" fill={C.t3}>B1~B36</text>
-      {[0,1,2].map(row=>(
-        <g key={`br${row}`}>{Array.from({length:10}).map((_,i)=>(
-          <rect key={`br${row}_${i}`} x={165+i*30} y={100+row*36} width={26} height={28} rx={3} fill="#2BCAB012" stroke="none"/>
-        ))}</g>
-      ))}
-      <rect x="390" y="300" width="130" height="150" rx="6"
-        fill={hl("C")?"#00978F30":"#00978F0A"} stroke="#00978F" strokeWidth={hl("C")?2.5:0.8}
-        style={onZoneClick?{cursor:"pointer"}:{}} onClick={() => onZoneClick?.("C")} />
-      <text x="455" y="356" textAnchor="middle" fontSize="13" fontWeight="800" fill={C.priD}>C</text>
-      <text x="455" y="373" textAnchor="middle" fontSize="8" fill={C.t2}>뷰티</text>
-      <text x="455" y="386" textAnchor="middle" fontSize="7" fill={C.t3}>C1~C18</text>
-      <rect x="535" y="300" width="50" height="150" rx="6"
-        fill={hl("D")?"#33999930":"#3399990A"} stroke="#339999" strokeWidth={hl("D")?2.5:0.8}
-        style={onZoneClick?{cursor:"pointer"}:{}} onClick={() => onZoneClick?.("D")} />
-      <text x="560" y="360" textAnchor="middle" fontSize="11" fontWeight="800" fill={C.priD}>D</text>
-      <text x="560" y="376" textAnchor="middle" fontSize="7" fill={C.t2}>라이프</text>
-      <text x="560" y="388" textAnchor="middle" fontSize="7" fill={C.t3}>D1~D15</text>
-      <rect x="30" y="300" width="110" height="150" rx="6"
-        fill={hl("E")?"#7BAE7F30":"#7BAE7F0A"} stroke="#7BAE7F" strokeWidth={hl("E")?2.5:0.8}
-        style={onZoneClick?{cursor:"pointer"}:{}} onClick={() => onZoneClick?.("E")} />
-      <text x="85" y="356" textAnchor="middle" fontSize="13" fontWeight="800" fill="#4A7A4E">E</text>
-      <text x="85" y="373" textAnchor="middle" fontSize="8" fill={C.t2}>펫 존</text>
-      <text x="85" y="386" textAnchor="middle" fontSize="7" fill={C.t3}>E1~E12</text>
-      <rect x="490" y="58" width="95" height="36" rx="4" fill="#E8F5F3" stroke="none"/>
-      <text x="537" y="80" textAnchor="middle" fontSize="8" fontWeight="600" fill={C.priD}>셀프카운터</text>
-      <rect x="490" y="24" width="95" height="30" rx="4" fill="#F5F7F6" stroke="none"/>
-      <text x="537" y="43" textAnchor="middle" fontSize="8" fill={C.t2}>사무실</text>
-      <rect x="350" y="26" width="120" height="32" rx="4" fill="#FFF8E1" stroke="none"/>
-      <text x="410" y="47" textAnchor="middle" fontSize="8" fontWeight="500" fill="#C08A20">음료냉장고</text>
-      <rect x="155" y="300" width="220" height="58" rx="4" fill="#F5F5F5" stroke="none"/>
-      <text x="265" y="333" textAnchor="middle" fontSize="8" fill="#999">적재공간</text>
-      <rect x="155" y="368" width="220" height="44" rx="4" fill="#F5F5F5" stroke="none"/>
-      <text x="265" y="394" textAnchor="middle" fontSize="8" fill="#999">계단 · EV홀</text>
-      <rect x="30" y="462" width="100" height="28" rx="6" fill="#E8F5F3" stroke={C.pri} strokeWidth="1.5"/>
-      <text x="80" y="480" textAnchor="middle" fontSize="10" fontWeight="700" fill={C.priD}>입구 · 현재위치</text>
-      <circle cx="80" cy="457" r="6" fill="#FF3B30"/>
-      <circle cx="80" cy="457" r="13" fill="#FF3B30" opacity="0.15"/>
-      {highlightRack && (() => {
-        const zone = highlightRack[0];
-        const t = rackTargets[zone] || rackTargets.B;
-        return (
-          <g>
-            {showPath && (
-              <path d={`M80 450 L80 ${Math.min(t.y+50,435)} L${t.x} ${Math.min(t.y+50,435)} L${t.x} ${t.y+18}`}
-                fill="none" stroke="#FF3B30" strokeWidth="3" strokeDasharray="8 5" opacity="0.7">
-                <animate attributeName="stroke-dashoffset" values="0;-26" dur="1s" repeatCount="indefinite"/>
-              </path>
-            )}
-            {showPath && (
-              <polygon points={`${t.x-9},${t.y+22} ${t.x+9},${t.y+22} ${t.x},${t.y+8}`} fill="#FF3B30" opacity="0.9"/>
-            )}
-            <circle cx={t.x} cy={t.y} r="13" fill="#FF3B30"/>
-            <circle cx={t.x} cy={t.y} r="22" fill="none" stroke="#FF3B30" strokeWidth="2.5" opacity="0.4">
-              <animate attributeName="r" values="15;24;15" dur="1.4s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.5;0.1;0.5" dur="1.4s" repeatCount="indefinite"/>
-            </circle>
-            <text x={t.x} y={t.y+5} textAnchor="middle" fontSize="10" fontWeight="900" fill="#fff">P</text>
-            <text x={t.x} y={t.y-20} textAnchor="middle" fontSize="11" fontWeight="800" fill="#FF3B30">{highlightRack}</text>
-          </g>
-        );
-      })()}
-      {onZoneClick && <text x="310" y="506" textAnchor="middle" fontSize="8" fill={C.t3}>구역을 터치하면 해당 상품을 볼 수 있어요</text>}
+    <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
+    <svg viewBox="0 0 680 396" style={{ width:"100%", minWidth:600, display:"block" }}>
+      <rect x="14" y="14" width="652" height="372" rx="18" fill={C.bgF} stroke="#D8EAE3" strokeWidth="1"/>
+
+      <g {...clk("B")}>
+        <rect x="32" y="34" width="184" height="52" rx="10" fill={C.wh} stroke="#E6EEEA" strokeWidth="1"/>
+        <text x="48" y="58" fill={C.t1} fontSize="14" fontWeight="600">B · 건강기능식품</text>
+        <text x="48" y="75" fill={C.t2} fontSize="11">어린이 간식 · B1–B8</text>
+      </g>
+      <rect x="228" y="34" width="110" height="52" rx="10" fill={C.wh} stroke="#E6EEEA" strokeWidth="1"/>
+      <text x="283" y="58" fill={C.t1} fontSize="14" fontWeight="600" textAnchor="middle">음료</text>
+      <text x="283" y="75" fill={C.t2} fontSize="11" textAnchor="middle">판매대</text>
+      <rect x="350" y="34" width="110" height="52" rx="10" fill={C.wh} stroke="#E6EEEA" strokeWidth="1"/>
+      <text x="405" y="58" fill={C.t1} fontSize="14" fontWeight="600" textAnchor="middle">이벤트존</text>
+      <text x="405" y="75" fill={C.t2} fontSize="11" textAnchor="middle">B9 · B10</text>
+      <rect x="472" y="34" width="176" height="52" rx="10" fill={C.wh} stroke="#E6EEEA" strokeWidth="1"/>
+      <text x="488" y="58" fill={C.t1} fontSize="14" fontWeight="600">계산대</text>
+      <text x="488" y="75" fill={C.t2} fontSize="11">SELF · CHECK-OUT</text>
+
+      <g {...clk("B")}>
+        <rect x="32" y="100" width="306" height="176" rx="12" fill={fillOf(active==="health")} stroke={strokeOf(active==="health")} strokeWidth={wOf(active==="health")}/>
+        <circle cx="46" cy="124" r="4" fill={C.pri}/>
+        <text x="56" y="128" fill={C.t1} fontSize="15" fontWeight="600">A · 건강기능식품</text>
+        <text x="46" y="152" fill={C.t2} fontSize="12">비타민 · 유산균 · 홍삼</text>
+        <text x="46" y="170" fill={faint} fontSize="11">A1 – A33</text>
+      </g>
+      <g {...clk("E")}>
+        <rect x="350" y="100" width="76" height="176" rx="12" fill={fillOf(active==="pet")} stroke={strokeOf(active==="pet")} strokeWidth={wOf(active==="pet")}/>
+        <circle cx="388" cy="126" r="4" fill={amber}/>
+        <text x="388" y="146" fill={C.t1} fontSize="14" fontWeight="600" textAnchor="middle">펫</text>
+        <text x="388" y="164" fill={C.t2} fontSize="11" textAnchor="middle">A31–A36</text>
+      </g>
+      <g {...clk("C")}>
+        <rect x="438" y="100" width="136" height="176" rx="12" fill={fillOf(active==="beauty")} stroke={strokeOf(active==="beauty")} strokeWidth={wOf(active==="beauty")}/>
+        <circle cx="452" cy="124" r="4" fill={rose}/>
+        <text x="462" y="128" fill={C.t1} fontSize="14" fontWeight="600">C · 화장품</text>
+        <text x="452" y="152" fill={C.t2} fontSize="12">스킨 · 메이크업</text>
+        <text x="452" y="170" fill={faint} fontSize="11">C1 – C25</text>
+      </g>
+      <g {...clk("C")}>
+        <rect x="586" y="100" width="60" height="176" rx="12" fill={fillOf(active==="beauty")} stroke={strokeOf(active==="beauty")} strokeWidth={wOf(active==="beauty")}/>
+        <circle cx="616" cy="122" r="4" fill={rose}/>
+        <text x="616" y="142" fill={C.t1} fontSize="15" fontWeight="600" textAnchor="middle">D</text>
+        <text x="616" y="160" fill={C.t2} fontSize="11" textAnchor="middle">브랜드</text>
+        <text x="616" y="176" fill={faint} fontSize="11" textAnchor="middle">D1–15</text>
+      </g>
+
+      <rect x="32" y="290" width="118" height="64" rx="10" fill={C.pri}/>
+      <text x="91" y="317" fill="#FFFFFF" fontSize="13" fontWeight="600" textAnchor="middle">엘리베이터</text>
+      <text x="91" y="335" fill="#CDEAE1" fontSize="11" textAnchor="middle">입구</text>
+      <rect x="162" y="290" width="176" height="64" rx="10" fill={C.wh} stroke="#E6EEEA" strokeWidth="1"/>
+      <text x="178" y="317" fill={C.t1} fontSize="14" fontWeight="600">PHAMA BEST</text>
+      <text x="178" y="335" fill={C.t2} fontSize="11">베스트 상품 진열</text>
+      <rect x="350" y="290" width="76" height="64" rx="10" fill={C.pri}/>
+      <text x="388" y="317" fill="#FFFFFF" fontSize="13" fontWeight="600" textAnchor="middle">계단</text>
+      <text x="388" y="335" fill="#CDEAE1" fontSize="11" textAnchor="middle">입구</text>
+      <rect x="438" y="290" width="208" height="64" rx="10" fill={C.wh} stroke="#E6EEEA" strokeWidth="1"/>
+      <text x="454" y="317" fill={C.t1} fontSize="14" fontWeight="600">체험존</text>
+      <text x="454" y="335" fill={C.t2} fontSize="11">체험 · D1–D5</text>
+
+      {target && (
+        <g>
+          {showPath && (
+            <path d={`M91 288 L91 ${target.y+40} L${target.x} ${target.y+40} L${target.x} ${target.y+16}`}
+              fill="none" stroke={C.pri} strokeWidth="3" strokeDasharray="8 5" opacity="0.75">
+              <animate attributeName="stroke-dashoffset" values="0;-26" dur="1s" repeatCount="indefinite"/>
+            </path>
+          )}
+          <circle cx={target.x} cy={target.y} r="12" fill={C.pri}/>
+          <circle cx={target.x} cy={target.y} r="20" fill="none" stroke={C.pri} strokeWidth="2.5" opacity="0.4">
+            <animate attributeName="r" values="14;22;14" dur="1.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.5;0.1;0.5" dur="1.4s" repeatCount="indefinite"/>
+          </circle>
+          <text x={target.x} y={target.y+4} textAnchor="middle" fontSize="10" fontWeight="800" fill="#fff">P</text>
+          {highlightRack && <text x={target.x} y={target.y-18} textAnchor="middle" fontSize="12" fontWeight="700" fill={C.priD}>{highlightRack}</text>}
+        </g>
+      )}
+
+      <circle cx="42" cy="372" r="5" fill={C.pri}/><text x="52" y="376" fill={C.t2} fontSize="11">건강기능식품</text>
+      <circle cx="168" cy="372" r="5" fill={rose}/><text x="178" y="376" fill={C.t2} fontSize="11">화장품·뷰티</text>
+      <circle cx="300" cy="372" r="5" fill={amber}/><text x="310" y="376" fill={C.t2} fontSize="11">펫</text>
+      <rect x="344" y="367" width="10" height="10" rx="2" fill={C.pri}/><text x="360" y="376" fill={C.t2} fontSize="11">입구 · 계단</text>
     </svg>
+    </div>
   );
 }
 
@@ -395,13 +410,16 @@ export default function KioskApp() {
   const [activeTab, setActiveTab] = useState("home");
   const [searchQ, setSearchQ] = useState("");
   const [brandQ, setBrandQ] = useState("");
-  const [bannerIdx, setBannerIdx] = useState(0);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [searchFacet, setSearchFacet] = useState("cat");
   const [recentSearch, setRecentSearch] = useState(["비타민C","오메가3","유산균","밀크씨슬"]);
 
   useEffect(() => {
-    const t = setInterval(() => setBannerIdx(i => (i+1)%3), 4000);
-    return () => clearInterval(t);
+    const q = new URLSearchParams(window.location.search).get("locate");
+    if (!q) return;
+    const prod = ALL_PRODUCTS.find(p => p.name === q)
+      || ALL_PRODUCTS.find(p => p.name.includes(q) || (p.en||"").toLowerCase().includes(q.toLowerCase()));
+    if (prod) setNav([{ page:"location", product:prod }]);
   }, []);
 
   const navTo = (page, data) => push({ page, ...data });
@@ -425,44 +443,13 @@ export default function KioskApp() {
 
   /* ── HOME ── */
   const renderHome = () => (
-    <div style={{ padding:"0 20px 24px" }}>
-      {/* 배너 */}
-      <div style={{ position:"relative", borderRadius:16, overflow:"hidden", marginBottom:18, height:175 }}>
-        {BANNERS.map((b,i) => (
-          <div key={i} style={{
-            position:"absolute", inset:0, transition:"opacity 0.6s",
-            opacity: i===bannerIdx?1:0, pointerEvents: i===bannerIdx?"auto":"none",
-            backgroundImage:`url(${b.bg})`, backgroundSize:"cover", backgroundPosition:"center"
-          }}>
-            <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(0,40,38,0.40)0%,rgba(0,40,38,0.78)100%)" }}/>
-            <div style={{ position:"relative", padding:"20px 22px", height:"100%", display:"flex", flexDirection:"column", justifyContent:"flex-end", paddingBottom:34 }}>
-              <span style={{ fontSize:9, fontWeight:700, color:C.pri, letterSpacing:"0.12em", marginBottom:6, display:"block" }}>{b.tag}</span>
-              <p style={{ margin:"0 0 5px", fontSize:17, fontWeight:800, color:C.wh, lineHeight:1.3 }}>{b.head}</p>
-              <p style={{ margin:0, fontSize:12, color:"rgba(255,255,255,0.82)", lineHeight:1.4 }}>{b.body}</p>
-            </div>
-          </div>
-        ))}
-        <div style={{ position:"absolute", top:12, right:12, background:"rgba(0,0,0,0.32)", backdropFilter:"blur(4px)",
-          borderRadius:8, padding:"5px 12px 5px 8px", display:"flex", alignItems:"center", gap:4, zIndex:10 }}>
-          <span style={{ fontSize:11, color:C.wh }}>📍</span>
-          <span style={{ fontSize:10, color:C.wh, fontWeight:700 }}>1F</span>
-        </div>
-        <div style={{ position:"absolute", bottom:12, left:"50%", transform:"translateX(-50%)", display:"flex", gap:6, zIndex:10 }}>
-          {BANNERS.map((_,i) => (
-            <div key={i} onClick={() => setBannerIdx(i)} style={{
-              width: i===bannerIdx?18:6, height:6, borderRadius:3, cursor:"pointer",
-              background: i===bannerIdx?C.wh:"rgba(255,255,255,0.38)", transition:"all 0.3s"
-            }}/>
-          ))}
-        </div>
-      </div>
-
-      {/* 검색바 — 인라인 드롭다운, 하단에 "전체 결과 보기" 버튼 */}
+    <div style={{ padding:"16px 20px 24px" }}>
+      {/* 통합 검색 */}
       <div style={{ marginBottom:24, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ}/>
         {searchQ && (
           <div style={{ marginTop:8, background:C.wh, borderRadius:12, border:`1px solid ${C.bd}`,
-            boxShadow:"0 6px 20px rgba(0,82,81,0.12)", overflow:"hidden", zIndex:50, position:"relative" }}>
+            boxShadow:"0 6px 20px rgba(20,60,54,0.10)", overflow:"hidden", position:"relative", zIndex:50 }}>
             {searchResults.length > 0 ? (
               <>
                 <p style={{ fontSize:11, color:C.t3, margin:"12px 20px 4px" }}>{searchResults.length}개 결과</p>
@@ -473,7 +460,6 @@ export default function KioskApp() {
                     }}/>
                   ))}
                 </div>
-                {/* 하단 "전체 결과 보기" 버튼 */}
                 <div style={{ padding:"8px 20px 16px" }}>
                   <button onClick={() => { doSearch(searchQ); tabTo("search"); }} style={{
                     width:"100%", padding:"14px", borderRadius:10,
@@ -489,7 +475,7 @@ export default function KioskApp() {
         )}
       </div>
 
-      {/* 카테고리 */}
+      {/* 카테고리 바로가기 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>카테고리 바로가기</p>
       <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:24 }}>
         {TOP_CATS.map(item => (
@@ -503,32 +489,6 @@ export default function KioskApp() {
               <p style={{ margin:0, fontSize:12, color:C.t2 }}>{item.sub}</p>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
-          </div>
-        ))}
-      </div>
-
-      {/* 베스트 상품 */}
-      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 12px", letterSpacing:"-0.01em" }}>베스트 상품</p>
-      <div style={{ display:"flex", gap:12, overflowX:"auto", marginLeft:-20, marginRight:-20,
-        paddingLeft:20, paddingRight:20, paddingBottom:12, paddingTop:2, marginBottom:24 }}>
-        {bestProducts.map((p,i) => (
-          <ThumbCard key={i} p={p} rank={i+1} onPress={() => {
-            window.scrollTo({ top:0, behavior:"instant" });
-            navTo("location",{product:p});
-          }}/>
-        ))}
-      </div>
-
-      {/* 인기 브랜드 */}
-      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>인기 브랜드</p>
-      <div style={{ display:"flex", gap:6, overflowX:"auto", paddingBottom:8, paddingTop:4, marginBottom:24,
-        marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20 }}>
-        {["뉴트리디데이","닥터루템","뉴트리가든","홀리데이즈","브이티","익스트림","대웅","HY"].map(b => (
-          <div key={b} onClick={() => navTo("brandDetail",{brandName:b})} className="kiosk-card" style={{
-            minWidth:72, background:C.wh, borderRadius:10, padding:"18px 12px",
-            textAlign:"center", border:`1px solid ${C.bd}`, cursor:"pointer", flexShrink:0
-          }}>
-            <p style={{ margin:0, fontSize:12, fontWeight:600, color:C.t1 }}>{b}</p>
           </div>
         ))}
       </div>
@@ -590,7 +550,7 @@ export default function KioskApp() {
           <IconChip name={catGroupIcon(cat)} d={52} s={26} />
           <div>
             <p style={{ margin:"0 0 2px", fontSize:18, fontWeight:700, color:C.t1 }}>{cat.name}</p>
-            <p style={{ margin:0, fontSize:13, color:C.t2 }}>{cat.count}개 상품 · {cat.zone}구역 · 랙 {cat.racks}</p>
+            <p style={{ margin:0, fontSize:13, color:C.t2 }}>{cat.count}개 상품 · {ZONES_MAP.find(z=>z.id===cat.zone)?.label||cat.zone} · 랙 {cat.racks}</p>
           </div>
         </div>
         <div style={{ background:C.wh, borderRadius:14, padding:14, border:`1px solid ${C.bd}`, marginBottom:16 }}>
@@ -747,20 +707,40 @@ export default function KioskApp() {
               </div>
             ))}
             <div style={{ height:1, background:C.bd, margin:"8px 0 16px" }}/>
-            <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px" }}>카테고리 바로가기</p>
-            {TOP_CATS.map(item => (
-              <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
-                display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:12,
-                padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
-              }}>
-                <IconChip name={TYPE_ICON[item.type]} d={44} s={22} />
-                <div style={{ flex:1 }}>
-                  <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{item.label}</p>
-                  <p style={{ margin:0, fontSize:12, color:C.t2 }}>{item.sub}</p>
+            <div style={{ display:"flex", gap:8, marginBottom:14 }}>
+              {[["cat","카테고리"],["brand","브랜드"]].map(([id,lb]) => (
+                <button key={id} onClick={() => setSearchFacet(id)} style={{
+                  flex:1, padding:"11px", borderRadius:10, cursor:"pointer", fontFamily:"inherit", fontSize:13,
+                  fontWeight:700, background: searchFacet===id ? C.priM : C.wh,
+                  color: searchFacet===id ? C.wh : C.t2,
+                  border:`1px solid ${searchFacet===id ? C.priM : C.bd}`
+                }}>{lb}</button>
+              ))}
+            </div>
+            {searchFacet==="cat" ? (
+              TOP_CATS.map(item => (
+                <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
+                  display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:12,
+                  padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
+                }}>
+                  <IconChip name={TYPE_ICON[item.type]} d={44} s={22} />
+                  <div style={{ flex:1 }}>
+                    <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{item.label}</p>
+                    <p style={{ margin:0, fontSize:12, color:C.t2 }}>{item.sub}</p>
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
+              ))
+            ) : (
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                {ALL_BRANDS.filter(b => ALL_PRODUCTS.some(p => p.brand===b)).map(b => (
+                  <span key={b} onClick={() => navTo("brandDetail",{brandName:b})} className="kiosk-tag" style={{
+                    background:C.wh, borderRadius:20, padding:"9px 15px", fontSize:13, color:C.t1,
+                    fontWeight:500, cursor:"pointer", border:`1px solid ${C.bd}`
+                  }}>{b}</span>
+                ))}
               </div>
-            ))}
+            )}
           </>
         )}
       </div>
@@ -848,7 +828,7 @@ export default function KioskApp() {
                   { label:"효능·효과", value:p.benefit||"-" },
                   { label:"용량·규격", value:p.spec||"-" },
                   { label:"카테고리", value:p.cat },
-                  { label:"위치", value:`${zone}구역 · 랙 ${p.rack}` },
+                  { label:"위치", value:`${zoneInfo?.label||zone} · 랙 ${p.rack}` },
                 ].map(info => (
                   <div key={info.label} style={{ display:"flex", fontSize:13, lineHeight:1.5 }}>
                     <span style={{ color:C.t3, minWidth:80, flexShrink:0 }}>{info.label}</span>
@@ -866,7 +846,7 @@ export default function KioskApp() {
           <div style={{ width:46, height:46, borderRadius:12, background:zoneInfo?.color||C.pri, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:18 }}>{zone}</div>
           <div style={{ flex:1 }}>
-            <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{zone}구역 · 랙 {p.rack}</p>
+            <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{zoneInfo?.label||zone} · 랙 {p.rack}</p>
             <p style={{ margin:0, fontSize:12, color:C.t2 }}>입구에서 {dist} · {zoneInfo?.label}</p>
           </div>
 
@@ -948,10 +928,8 @@ export default function KioskApp() {
 
   const tabs = [
     { id:"home", label:"홈" },
-    { id:"catList", label:"카테고리" },
-    { id:"brand", label:"브랜드" },
     { id:"search", label:"검색" },
-    { id:"map", label:"매장안내" },
+    { id:"map", label:"매장 안내도" },
   ];
 
   return (
@@ -982,13 +960,12 @@ export default function KioskApp() {
         width:"100%", maxWidth:420, background:C.wh,
         borderTop:`1px solid ${C.bd}`, display:"flex", zIndex:100 }}>
         {tabs.map(tab => {
-          const isA = activeTab===tab.id || (tab.id==="catList" && (cur.page==="catDetail"||cur.page==="catList"));
+          const isA = activeTab===tab.id;
           return (
             <button key={tab.id} onClick={() => {
               setActiveTab(tab.id);
-              setNav([{ page:tab.id, catType:tab.id==="catList"?"health":undefined }]);
+              setNav([{ page:tab.id }]);
               if(tab.id==="search") setSearchQ("");
-              if(tab.id==="brand") setBrandQ("");
             }} className="kiosk-nav-btn" style={{
               flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
               background:"none", border:"none", cursor:"pointer", padding:"14px 4px 18px",
