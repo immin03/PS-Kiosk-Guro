@@ -230,7 +230,7 @@ function TopBar({ title, onBack, isHome }) {
     <div style={{ display:"flex", alignItems:"center", padding: isHome ? "24px 20px" : "11px 16px", gap:10,
       background: isHome ? C.bgF : C.wh, position:"sticky", top:0, zIndex:100,
       borderBottom: isHome ? "none" : `1px solid ${C.bd}` }}>
-      {!isHome && (
+      {!isHome && onBack && (
         <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 8px", display:"flex", borderRadius:8 }}>
           <span style={{ fontSize:22, color:C.t1, lineHeight:1 }}>←</span>
         </button>
@@ -314,8 +314,7 @@ function FloorPlan({ highlightZone, highlightRack, showPath, onZoneClick }) {
   const wOf = (on) => on ? 2 : 1;
   const clk = (z) => clickable ? { style:{cursor:"pointer"}, onClick:()=>onZoneClick(z) } : {};
   return (
-    <div style={{ overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
-    <svg viewBox="0 0 680 396" style={{ width:"100%", minWidth:600, display:"block" }}>
+    <svg viewBox="0 0 680 396" style={{ width:"100%", display:"block" }}>
       <rect x="14" y="14" width="652" height="372" rx="18" fill={C.bgF} stroke="#D8EAE3" strokeWidth="1"/>
 
       <g {...clk("B")}>
@@ -397,7 +396,6 @@ function FloorPlan({ highlightZone, highlightRack, showPath, onZoneClick }) {
       <circle cx="300" cy="372" r="5" fill={amber}/><text x="310" y="376" fill={C.t2} fontSize="11">펫</text>
       <rect x="344" y="367" width="10" height="10" rx="2" fill={C.pri}/><text x="360" y="376" fill={C.t2} fontSize="11">입구 · 계단</text>
     </svg>
-    </div>
   );
 }
 
@@ -424,6 +422,7 @@ export default function KioskApp() {
 
   const navTo = (page, data) => push({ page, ...data });
   const tabTo = (tab) => { setActiveTab(tab); setNav([{ page:tab }]); };
+  const goBack = () => { if (nav.length > 1) pop(); else if (activeTab !== "home") tabTo("home"); };
   const doSearch = (q) => {
     if (!q.trim()) return;
     setRecentSearch(prev => [q, ...prev.filter(r => r !== q)].slice(0,8));
@@ -653,9 +652,6 @@ export default function KioskApp() {
   };
 
   const renderSearch = () => {
-    const POP_H = ["비타민C","오메가3","유산균","밀크씨슬","루테인","프로바이오틱스","콜라겐","마그네슘","아르기닌","체중관리"];
-    const POP_B = ["스킨케어","선크림","클렌징","마스크팩","리들샷","토너패드","바디워시","핸드크림"];
-    const POP_P = ["강아지사료","덴탈껌","펫샴푸","고양이간식","관절영양제"];
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ marginBottom:16 }}><SearchBar value={searchQ} onChange={setSearchQ}/></div>
@@ -674,39 +670,6 @@ export default function KioskApp() {
           )
         ) : (
           <>
-            {recentSearch.length>0 && (
-              <div style={{ marginBottom:20 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
-                  <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:0 }}>최근 검색어</p>
-                  <button onClick={() => setRecentSearch([])} style={{ background:"none", border:"none", fontSize:11, color:C.t3, cursor:"pointer", padding:0 }}>전체 삭제</button>
-                </div>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                  {recentSearch.map(t => (
-                    <div key={t} style={{ display:"flex", alignItems:"center", gap:6, background:C.wh, borderRadius:20, padding:"8px 14px", border:`1px solid ${C.bd}`, cursor:"pointer" }} onClick={() => setSearchQ(t)}>
-                      <span style={{ fontSize:11, color:C.t3 }}>🕐</span>
-                      <span style={{ fontSize:13, color:C.t1, fontWeight:500 }}>{t}</span>
-                      <button onClick={(e) => { e.stopPropagation(); setRecentSearch(prev => prev.filter(r=>r!==t)); }}
-                        style={{ background:"none", border:"none", color:C.t3, fontSize:13, cursor:"pointer", padding:0, lineHeight:1 }}>✕</button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 14px" }}>인기 검색어</p>
-            {[["건기식",POP_H],["뷰티",POP_B],["펫",POP_P]].map(([label,tags]) => (
-              <div key={label} style={{ marginBottom:16 }}>
-                <p style={{ fontSize:11, fontWeight:600, color:C.priD, margin:"0 0 8px" }}>{label}</p>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                  {tags.map(t => (
-                    <span key={t} onClick={() => setSearchQ(t)} className="kiosk-tag" style={{
-                      background:C.wh, borderRadius:20, padding:"8px 16px",
-                      fontSize:13, color:C.t1, cursor:"pointer", fontWeight:500, border:`1px solid ${C.bd}`
-                    }}>{t}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-            <div style={{ height:1, background:C.bd, margin:"8px 0 16px" }}/>
             <div style={{ display:"flex", gap:8, marginBottom:14 }}>
               {[["cat","카테고리"],["brand","브랜드"]].map(([id,lb]) => (
                 <button key={id} onClick={() => setSearchFacet(id)} style={{
@@ -952,7 +915,7 @@ export default function KioskApp() {
     `}</style>
     <div style={{ maxWidth:420, margin:"0 auto", background:C.bgF,
       minHeight:"100vh", fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR',sans-serif", color:C.t1, paddingBottom:100 }}>
-      <TopBar title={PAGE_TITLES[cur.page]} onBack={nav.length>1?pop:undefined} isHome={cur.page==="home"}/>
+      <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"}/>
       <div>{renderPage()}</div>
 
       {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline */}
