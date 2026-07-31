@@ -43,20 +43,6 @@ function ChevronIcon({ open, size=14, color }) {
   );
 }
 
-const THUMB_PALETTES = [
-  { bg:"#F0FAF8", fg:"#00897B", accent:"#B2DFDB" },
-  { bg:"#EEF2FF", fg:"#5C6BC0", accent:"#C5CAE9" },
-  { bg:"#FFF3E0", fg:"#EF6C00", accent:"#FFCC80" },
-  { bg:"#F3E5F5", fg:"#8E24AA", accent:"#CE93D8" },
-  { bg:"#E8F5E9", fg:"#388E3C", accent:"#A5D6A7" },
-  { bg:"#FBE9E7", fg:"#E64A19", accent:"#FFAB91" },
-  { bg:"#E0F7FA", fg:"#00838F", accent:"#80DEEA" },
-  { bg:"#FFF8E1", fg:"#F9A825", accent:"#FFE082" },
-];
-function getThumb(brand) {
-  return THUMB_PALETTES[(brand||"A").charCodeAt(0) % THUMB_PALETTES.length];
-}
-
 const CARD_W = 152;
 
 /* ── 라인 아이콘 (이모지 대체) ── */
@@ -88,40 +74,28 @@ const IconChip = ({ name, d=44, s=22, mb }) => (
   </span>
 );
 
-/* ── ThumbCard: 홈 베스트 & 위치 추천 공통 ── */
+/* ── ThumbCard: 홈 베스트 & 위치 추천 공통 (로고·가격 없이 텍스트만) ── */
 function ThumbCard({ p, onPress, rank }) {
-  const th = getThumb(p.brand);
   const sp = getSocialProof(p.sale);
   return (
     <div className="kiosk-card" onClick={onPress} style={{
-      width:CARD_W, minWidth:CARD_W, flexShrink:0, background:C.wh, borderRadius:14, padding:12,
-      border:`1px solid ${C.bd}`, cursor:"pointer", position:"relative"
+      width:CARD_W, minWidth:CARD_W, flexShrink:0, background:C.wh, borderRadius:14, padding:14,
+      border:`1px solid ${C.bd}`, cursor:"pointer", position:"relative",
+      display:"flex", flexDirection:"column", gap:6, minHeight:118
     }}>
-      {/* 순위 — 민트 계열 심플 넘버, 메달 없음 */}
       {rank && (
         <div style={{
-          position:"absolute", top:10, left:10, zIndex:2,
-          width:20, height:20, borderRadius:6,
+          width:20, height:20, borderRadius:6, flexShrink:0,
           background: rank===1 ? C.priD : rank<=3 ? C.priM : C.bgL,
           display:"flex", alignItems:"center", justifyContent:"center",
           fontSize:10, fontWeight:800,
           color: rank<=3 ? C.wh : C.t3,
         }}>{rank}</div>
       )}
-      <div style={{
-        width:"100%", height:90, borderRadius:10, marginBottom:10,
-        background:`linear-gradient(135deg, ${th.bg} 0%, ${th.accent}77 100%)`,
-        display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:3
-      }}>
-        <span style={{ fontSize:28, fontWeight:800, color:th.fg }}>{(p.brand||"?")[0]}</span>
-        <span style={{ fontSize:8, fontWeight:600, color:th.fg, opacity:0.55 }}>{p.brand?.slice(0,7)}</span>
-      </div>
-      <p style={{ margin:"0 0 2px", fontSize:12, fontWeight:600, color:C.t1, lineHeight:1.35,
-        overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</p>
-      <p style={{ margin:"0 0 6px", fontSize:10, color:C.t2 }}>{p.brand}</p>
-      <p style={{ margin:"0 0 5px", fontSize:13, fontWeight:700, color:C.priD }}>₩{p.price}</p>
-      {/* 소셜 프루프 */}
-      <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+      <p style={{ margin:0, fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.4,
+        display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{p.name}</p>
+      <p style={{ margin:0, fontSize:11, color:C.t2 }}>{p.brand}</p>
+      <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:"auto" }}>
         {sp.hot && <span style={{ fontSize:9 }}>🔥</span>}
         <span style={{ fontSize:9, color: sp.hot ? C.priM : C.t3, fontWeight: sp.hot ? 600 : 400 }}>{sp.label}</span>
       </div>
@@ -174,25 +148,14 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
 }
 
 function ProductCard({ p, onLocate }) {
-  const th = getThumb(p.brand);
   return (
     <div className="kiosk-product" onClick={() => onLocate?.(p)}
       style={{ display:"flex", gap:12, padding:"14px 0", borderBottom:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer" }}>
-      <div style={{
-        width:64, height:64, borderRadius:10, flexShrink:0,
-        background:`linear-gradient(135deg, ${th.bg} 0%, ${th.accent}66 100%)`,
-        display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:2
-      }}>
-        <span style={{ fontSize:22, fontWeight:800, color:th.fg }}>{(p.brand||"?")[0]}</span>
-        <span style={{ fontSize:6, fontWeight:600, color:th.fg, opacity:0.55 }}>{p.brand?.slice(0,5)}</span>
-      </div>
       <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.35,
+        <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600, color:C.t1, lineHeight:1.35,
           overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</p>
-        <p style={{ margin:"0 0 3px", fontSize:11, color:C.t2 }}>{p.brand} · {p.cat}</p>
-        <p style={{ margin:0, fontSize:14, fontWeight:700, color:C.priD }}>₩{p.price}</p>
+        <p style={{ margin:0, fontSize:12, color:C.t2 }}>{p.brand} · {p.cat}</p>
       </div>
-      {/* 위치 배지 — 화살표 강화 */}
       <div className="kiosk-loc" style={{
         background:C.wh, border:`1px solid ${C.bd}`, borderRadius:8,
         padding:"6px 10px", display:"flex", alignItems:"center", gap:4,
@@ -567,9 +530,7 @@ export default function KioskApp() {
     const prods = ALL_PRODUCTS.filter(p => p.brand===name);
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        <div style={{ textAlign:"center", padding:"24px 0 20px" }}>
-          <div style={{ width:72, height:72, borderRadius:18, background:C.bgL, margin:"0 auto 12px",
-            display:"flex", alignItems:"center", justifyContent:"center", fontSize:32 }}>🏪</div>
+        <div style={{ padding:"8px 0 16px" }}>
           <h2 style={{ margin:"0 0 4px", fontSize:20, fontWeight:700, color:C.t1 }}>{name}</h2>
           <p style={{ margin:0, fontSize:13, color:C.t2 }}>{prods.length>0?`${prods.length}개 상품 전시 중`:"상품 데이터 연동 예정"}</p>
         </div>
@@ -682,7 +643,6 @@ export default function KioskApp() {
       D:"입구에서 우측 끝 브랜드존(D)으로 이동",
       E:"입구에서 중앙 우측 펫(A31–A36) 구역으로 이동",
     };
-    const th = getThumb(p.brand);
     const related = ALL_PRODUCTS.filter(r => r.cat===p.cat && r.name!==p.name).slice(0,6);
     const steps = [
       { n:1, t:"입구에서 출발하세요", sub:"현재 위치 (빨간 점)" },
@@ -691,21 +651,10 @@ export default function KioskApp() {
     ];
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        {/* 제품 카드 — 상단 ▾ 제거, 하단 토글만 */}
         <div style={{ background:C.wh, borderRadius:14, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
-          <div style={{ display:"flex", gap:12, alignItems:"center", padding:16 }}>
-            <div style={{ width:56, height:56, borderRadius:10, flexShrink:0,
-              background:`linear-gradient(135deg, ${th.bg} 0%, ${th.accent}77 100%)`,
-              display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:1 }}>
-              <span style={{ fontSize:18, fontWeight:800, color:th.fg }}>{(p.brand||"?")[0]}</span>
-              <span style={{ fontSize:5, fontWeight:600, color:th.fg, opacity:0.55 }}>{p.brand?.slice(0,5)}</span>
-            </div>
-            <div style={{ flex:1 }}>
-              <p style={{ margin:"0 0 1px", fontSize:11, color:C.priD, fontWeight:600 }}>{p.brand}</p>
-              <p style={{ margin:"0 0 3px", fontSize:14, fontWeight:700, color:C.t1, lineHeight:1.3 }}>{p.name}</p>
-              {p.price ? <p style={{ margin:0, fontSize:15, fontWeight:700, color:C.priD }}>₩{p.price}</p> : null}
-            </div>
-            {/* 상단 토글 아이콘 제거 */}
+          <div style={{ padding:16 }}>
+            <p style={{ margin:"0 0 4px", fontSize:12, color:C.priD, fontWeight:600 }}>{p.brand}</p>
+            <p style={{ margin:0, fontSize:16, fontWeight:700, color:C.t1, lineHeight:1.35 }}>{p.name}</p>
           </div>
           {/* 하단 토글만 유지 */}
           <div onClick={() => setInfoOpen(!infoOpen)} style={{

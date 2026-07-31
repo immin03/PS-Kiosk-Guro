@@ -91,7 +91,6 @@ for line in tsv.read_text(encoding="utf-8").splitlines()[1:]:
         "cat": label,
         "rack": rack,
         "zone": zone,
-        "price": "",
         "en": "",
         "benefit": f"{label} · 섹션 {rack}",
         "spec": "",
