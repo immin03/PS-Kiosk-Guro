@@ -943,14 +943,15 @@ export default function KioskApp() {
               if(tab.id==="search") setSearchQ("");
             }} className="kiosk-nav-btn" style={{
               flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-              background:"none", border:"none", cursor:"pointer", padding:"14px 4px 18px",
-              fontFamily:"inherit",
+              background:"none", border:"none", cursor:"pointer", padding:"14px 6px 18px",
+              fontFamily:"inherit", minWidth:0,
               borderTop: isA ? `2.5px solid ${C.pri}` : "2.5px solid transparent",
             }}>
               <span style={{
                 fontSize:13, fontWeight: isA ? 700 : 500,
                 color: isA ? C.priD : C.t3,
-                letterSpacing:"-0.01em"
+                letterSpacing:"-0.01em",
+                whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"100%",
               }}>{tab.label}</span>
             </button>
           );
