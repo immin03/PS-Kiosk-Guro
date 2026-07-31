@@ -156,6 +156,35 @@ function getThumb(brand) {
 
 const CARD_W = 152;
 
+/* ── 라인 아이콘 (이모지 대체) ── */
+const CAT_ICONS = {
+  search:(<><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></>),
+  x:(<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>),
+  pill:(<g transform="rotate(-45 12 12)"><rect x="3" y="9" width="18" height="6" rx="3"/><line x1="12" y1="9" x2="12" y2="15"/></g>),
+  droplet:(<path d="M12 3.5s6 6 6 10.5a6 6 0 0 1-12 0C6 9.5 12 3.5 12 3.5z"/>),
+  paw:(<><circle cx="6.5" cy="11.5" r="1.7"/><circle cx="9.8" cy="8" r="1.7"/><circle cx="14.2" cy="8" r="1.7"/><circle cx="17.5" cy="11.5" r="1.7"/><path d="M8.6 15.2c1-1.7 5.8-1.7 6.8 0 .8 1.5-.7 3.3-3.4 3.3s-4.2-1.8-3.4-3.3z"/></>),
+  home:(<><path d="M4 11l8-6 8 6"/><path d="M6 10.5V19h12v-8.5"/></>),
+};
+function Icon({ name, size=22, color="currentColor", sw=1.7 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
+      strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{display:"block"}}>
+      {CAT_ICONS[name] || null}
+    </svg>
+  );
+}
+const TYPE_ICON = { health:"pill", beauty:"droplet", pet:"paw", life:"home" };
+const catGroupIcon = (cat) =>
+  PET_CATS.some(c=>c.id===cat.id) ? "paw"
+  : BEAUTY_CATS.some(c=>c.id===cat.id) ? "droplet"
+  : "pill";
+const IconChip = ({ name, d=44, s=22, mb }) => (
+  <span style={{ width:d, height:d, borderRadius:"50%", background:C.bgL, display:"inline-flex",
+    alignItems:"center", justifyContent:"center", flexShrink:0, marginBottom:mb }}>
+    <Icon name={name} size={s} color={C.priM} />
+  </span>
+);
+
 /* ── ThumbCard: 홈 베스트 & 위치 추천 공통 ── */
 function ThumbCard({ p, onPress, rank }) {
   const th = getThumb(p.brand);
@@ -226,16 +255,16 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
   return (
     <div style={{
       display:"flex", alignItems:"center", background:C.wh, borderRadius:14,
-      padding:"16px 16px", border:`1.5px solid ${C.bd}`, gap:10,
-      boxShadow:"0 2px 8px rgba(0,82,81,0.06)"
+      padding:"16px 16px", border:`1px solid ${C.bd}`, gap:10,
+      boxShadow:"0 2px 10px rgba(20,60,54,0.05)"
     }}>
-      <span style={{ fontSize:18, color:C.priM, flexShrink:0 }}>🔍</span>
+      <span style={{ color:C.priM, flexShrink:0, display:"flex" }}><Icon name="search" size={20} color={C.priM} /></span>
       <input type="text" placeholder={placeholder || "상품명, 브랜드, 성분 검색"}
         value={value} onChange={e => onChange(e.target.value)} onFocus={onFocus}
         style={{ border:"none", outline:"none", flex:1, fontSize:16, fontFamily:"inherit", background:"transparent", color:C.t1 }} />
       {value && (
         <button onClick={() => onChange("")} style={{ background:"none", border:"none", cursor:"pointer", padding:"2px 4px",
-          fontSize:16, color:C.t3, lineHeight:1 }}>✕</button>
+          display:"flex", color:C.t3 }}><Icon name="x" size={16} color={C.t3} /></button>
       )}
     </div>
   );
@@ -468,7 +497,7 @@ export default function KioskApp() {
             background:C.wh, borderRadius:14, padding:"14px 16px", border:`1px solid ${C.bd}`, cursor:"pointer",
             display:"flex", alignItems:"center", gap:14
           }}>
-            <span style={{ fontSize:30, marginLeft:4 }}>{item.emoji}</span>
+            <IconChip name={TYPE_ICON[item.type]} d={46} s={23} />
             <div style={{ flex:1 }}>
               <p style={{ margin:"0 0 2px", fontSize:15, fontWeight:700, color:C.t1 }}>{item.label}</p>
               <p style={{ margin:0, fontSize:12, color:C.t2 }}>{item.sub}</p>
@@ -542,7 +571,7 @@ export default function KioskApp() {
               background:C.wh, borderRadius:14, padding:"20px 10px", textAlign:"center",
               border:`1px solid ${C.bd}`, cursor:"pointer"
             }}>
-              <span style={{ fontSize:32, display:"block", marginBottom:10 }}>{cat.emoji}</span>
+              <IconChip name={catGroupIcon(cat)} d={46} s={22} mb={10} />
               <p style={{ margin:"0 0 3px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.3 }}>{cat.name}</p>
               <p style={{ margin:0, fontSize:11, color:C.t2 }}>{cat.count}개</p>
             </div>
@@ -558,7 +587,7 @@ export default function KioskApp() {
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:16 }}>
-          <span style={{ fontSize:36 }}>{cat.emoji}</span>
+          <IconChip name={catGroupIcon(cat)} d={52} s={26} />
           <div>
             <p style={{ margin:"0 0 2px", fontSize:18, fontWeight:700, color:C.t1 }}>{cat.name}</p>
             <p style={{ margin:0, fontSize:13, color:C.t2 }}>{cat.count}개 상품 · {cat.zone}구역 · 랙 {cat.racks}</p>
@@ -724,7 +753,7 @@ export default function KioskApp() {
                 display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:12,
                 padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
               }}>
-                <span style={{ fontSize:28, marginLeft:4 }}>{item.emoji}</span>
+                <IconChip name={TYPE_ICON[item.type]} d={44} s={22} />
                 <div style={{ flex:1 }}>
                   <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{item.label}</p>
                   <p style={{ margin:0, fontSize:12, color:C.t2 }}>{item.sub}</p>
