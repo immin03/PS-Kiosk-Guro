@@ -1,13 +1,17 @@
-# Generate storeData.js from Excel TSV + rack-sections.json
+# Generate storeData.js from Excel + rack-sections.json
 import json, re, sys
 from pathlib import Path
-from collections import Counter, defaultdict
+from collections import Counter
+from openpyxl import load_workbook
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-root = Path(r"C:\Users\immin\Projects\phama-kiosk\PS-Kiosk-Guro")
+root = Path(__file__).resolve().parent
 sections = json.loads((root / "rack-sections.json").read_text(encoding="utf-8"))
-tsv = Path(r"C:\Users\immin\Projects\phama-kiosk\_rack_xlsx_dump\시트1.tsv")
+xlsx = Path(r"C:\Users\user\OneDrive\Desktop\구로점 랙별 진열 SKU_260801.xlsx")
+if not xlsx.exists():
+    # fallback: copy beside repo
+    xlsx = root / "구로점 랙별 진열 SKU_260801.xlsx"
 
 # flatten labels
 LABELS = {}
@@ -62,19 +66,23 @@ def zone_for(rack: str) -> str:
         return "A"
     if letter in "BCDE":
         return letter
-    return "B"  # 음료 etc.
+    return "B"
 
 
 products = []
 rack_counts = Counter()
 brands = Counter()
 
-for line in tsv.read_text(encoding="utf-8").splitlines()[1:]:
-    parts = line.split("\t")
-    if len(parts) < 3:
+wb = load_workbook(xlsx, read_only=True, data_only=True)
+ws = wb[wb.sheetnames[0]]
+rows = list(ws.iter_rows(values_only=True))
+for r in rows[1:]:
+    if not r or len(r) < 3:
         continue
-    # Excel: Rack / Barcode / SKU — barcode is reference-only, omitted from app data
-    raw_rack, sku = parts[0].strip(), parts[2].strip()
+    raw_rack = str(r[0] or "").strip()
+    sku = str(r[2] or "").strip()
+    if not sku:
+        continue
     rack = ALIASES.get(raw_rack, raw_rack)
     m = re.match(r"^\[([^\]]+)\]\s*(.*)$", sku)
     if m:
@@ -100,7 +108,6 @@ for line in tsv.read_text(encoding="utf-8").splitlines()[1:]:
     if brand:
         brands[brand] += 1
 
-# categories
 health, beauty, pet, brand_top = [], [], [], []
 
 for rack, label in sections["A"].items():
@@ -145,16 +152,10 @@ for rack, label in sections["D"].items():
         "racks": rack,
     })
 
-# Merge B into health list as "상단 브랜드" categories OR keep separate via TOP type brand
-# App uses type health|beauty|pet|life — map brand_top to type "brand" and update App, OR append to health.
-# Append B cats to HEALTH_CATS so they appear under 건강기능식품 top? Better add TOP type brand.
-# Minimal App change: put B into HEALTH_CATS (zone B).
-
 HEALTH_CATS = health + brand_top
 BEAUTY_CATS = beauty
 PET_CATS = pet
 
-total = len(products)
 health_n = sum(1 for p in products if p["zone"] in ("A", "B"))
 beauty_n = sum(1 for p in products if p["zone"] in ("C", "D"))
 pet_n = sum(1 for p in products if p["zone"] == "E")
@@ -177,11 +178,11 @@ ZONES_MAP = [
 ALL_BRANDS = sorted(brands.keys(), key=lambda b: (-brands[b], b))
 
 out = root / "src" / "storeData.js"
-# write JS
+
 def dumps(obj):
     return json.dumps(obj, ensure_ascii=False, indent=2)
 
-js = f"""/* Auto-generated from 구로점 랙별 진열 SKU_260731.xlsx + latest floor map.
+js = f"""/* Auto-generated from 구로점 랙별 진열 SKU_260801.xlsx + latest floor map.
  * Do not edit by hand — regenerate via _gen_store_data.py
  */
 export const SECTION_LABELS = {dumps(LABELS)};
@@ -203,3 +204,4 @@ export const ALL_PRODUCTS = {dumps(products)};
 out.write_text(js, encoding="utf-8")
 print("wrote", out, "products", len(products), "brands", len(ALL_BRANDS))
 print("health cats", len(HEALTH_CATS), "beauty", len(BEAUTY_CATS), "pet", len(PET_CATS))
+print("A10", rack_counts.get("A10", 0), "A12", rack_counts.get("A12", 0), "C2", rack_counts.get("C2", 0), "C19", rack_counts.get("C19", 0))
