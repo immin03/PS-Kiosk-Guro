@@ -109,12 +109,12 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
 /* ── COMPONENTS ── */
 function LangToggle({ lang, setLang }) {
   return (
-    <div style={{ display:"inline-flex", alignItems:"center", gap:2, background:C.wh,
-      border:`1px solid ${C.bd}`, borderRadius:999, padding:3, flexShrink:0 }}>
+    <div style={{ display:"inline-flex", alignItems:"center", gap:1, background:C.wh,
+      border:`1px solid ${C.bd}`, borderRadius:999, padding:1, flexShrink:0, lineHeight:1 }}>
       {[["ko","KO"],["en","EN"],["zh","中"]].map(([id, lb]) => (
         <button key={id} type="button" onClick={() => setLang(id)} style={{
           border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:11, fontWeight:700,
-          letterSpacing:".04em", padding:"6px 9px", borderRadius:999,
+          letterSpacing:".04em", padding:"2px 8px", borderRadius:999, lineHeight:1.1, minHeight:0,
           background: lang===id ? C.pri : "transparent", color: lang===id ? C.wh : C.t2,
         }}>{lb}</button>
       ))}
