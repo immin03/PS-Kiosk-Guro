@@ -8,6 +8,7 @@ import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub,
 } from "./i18n.js";
 import FloorPlan, { FloorPlanLegend, routeSteps } from "./FloorPlan.jsx";
+import PromoBanner from "./PromoBanner.jsx";
 import { RACK_BY_CODE } from "./rackLayout.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
@@ -264,6 +265,9 @@ export default function KioskApp() {
   /* ── HOME ── */
   const renderHome = () => (
     <div style={{ padding:"16px 20px 24px" }}>
+      {/* 운영 중인 혜택 — 순서는 PS-OS 프로모션 정본이 정합니다 */}
+      <PromoBanner/>
+
       {/* 통합 검색 */}
       <div style={{ marginBottom:24, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>

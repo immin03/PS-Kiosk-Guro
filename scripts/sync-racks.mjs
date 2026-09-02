@@ -17,11 +17,13 @@ import os from "node:os";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(HERE, "..", "src", "rackLayout.js");
+const OUT_PROMO = resolve(HERE, "..", "src", "promotions.js");
 const STORE = "guro";
 
 const SOURCE =
   process.env.PS_OS_RACKS ||
   resolve(os.homedir(), "Projects", "ps-os", "catalog", "racks.json");
+const SOURCE_PROMO = resolve(dirname(SOURCE), "promotions.json");
 
 if (!existsSync(SOURCE)) {
   /* 배포 머신에는 PS-OS 저장소가 없습니다. 확인만 하는 실행이면 조용히 넘어갑니다. */
@@ -70,8 +72,33 @@ export const RACK_CAT = Object.fromEntries(RACKS.map((r) => [r.code, r.cat]));
 export const RACK_ZONE = Object.fromEntries(RACKS.map((r) => [r.code, r.zone]));
 `;
 
+/* 프로모션 — 무엇을 먼저 보여줄지는 정본이 정하고, 생김새는 화면이 정합니다. */
+let promoBody = null;
+if (existsSync(SOURCE_PROMO)) {
+  const pdoc = JSON.parse(readFileSync(SOURCE_PROMO, "utf8"));
+  const list = (pdoc.promotions || [])
+    .filter((p) => p.status === "live")
+    .filter((p) => (p.channels || []).includes("kiosk"))
+    .filter((p) => !p.stores || p.stores.includes(STORE))
+    .sort((a, b) => (a.rank || 99) - (b.rank || 99));
+  promoBody = `/* 자동 생성 — 직접 고치지 마세요.
+ * 정본: PS-OS catalog/promotions.json (${pdoc.meta?.updated || "날짜 미상"} 기준)
+ * 갱신: node scripts/sync-racks.mjs
+ *
+ * 노출 순서(rank)는 이벤트 페이지 · 홈페이지와 같습니다. 생김새만 화면마다 다릅니다.
+ */
+export const PROMOTIONS = ${JSON.stringify(list, null, 2)};
+`;
+}
+
 if (process.argv.includes("--check")) {
   const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
+  const curP = existsSync(OUT_PROMO) ? readFileSync(OUT_PROMO, "utf8") : "";
+  if (promoBody && curP !== promoBody) {
+    console.error("src/promotions.js 가 PS-OS 정본과 어긋났습니다.");
+    console.error("  node scripts/sync-racks.mjs 를 돌려 맞추세요.");
+    process.exit(1);
+  }
   if (cur !== body) {
     console.error("src/rackLayout.js 가 PS-OS 정본과 어긋났습니다.");
     console.error("  node scripts/sync-racks.mjs 를 돌려 맞추세요.");
@@ -82,6 +109,13 @@ if (process.argv.includes("--check")) {
 }
 
 writeFileSync(OUT, body);
+if (promoBody) writeFileSync(OUT_PROMO, promoBody);
 console.log(
   `src/rackLayout.js 갱신 — ${store.name} · 랙 ${racks.length}개 · 집기 ${store.marks.length}개 · 격자 ${store.grid.rows}x${store.grid.cols}`
 );
+if (promoBody) {
+  const n = (promoBody.match(/"id":/g) || []).length;
+  console.log(`src/promotions.js 갱신 — 키오스크에 걸 프로모션 ${n}건`);
+} else {
+  console.log(`프로모션 정본이 없어 건너뜁니다: ${SOURCE_PROMO}`);
+}
