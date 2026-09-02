@@ -1,0 +1,365 @@
+import { useMemo, useRef, useEffect } from "react";
+import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
+import { zoneLabel } from "./i18n.js";
+
+/* 매장 배치도.
+ *
+ * 좌표는 PS-OS catalog/racks.json 이 정본입니다(scripts/sync-racks.mjs 로 가져옵니다).
+ * 예전 배치도는 존마다 좌표가 하나뿐이라 A1 과 A30 이 같은 자리에 찍혔습니다.
+ * 이제 랙 하나하나가 제 자리에 그려지고, 경로는 실제로 비어 있는 칸만 밟습니다.
+ */
+
+const ZONE_COLOR = {
+  "건기식": "#159A87",
+  "뷰티": "#C98A8A",
+  "브랜드존": "#0E6E60",
+  "펫": "#D9A441",
+  "라이프": "#6E8CA0",
+  "식품·음료": "#3E93B8",
+  "프로모션": "#B07070",
+  "기타": "#9AAAA5",
+};
+const FALLBACK = "#9AAAA5";
+const YOU = "#E5484D";           // 현재 위치 — 브랜드 초록과 섞이지 않게 붉은색
+const MARK_FILL = "#ECF2F0";
+const MARK_LINE = "#D3DFDC";
+const MARK_TEXT = "#687977";
+
+/* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 배치도의 집기 이름과 같아야 합니다. */
+export const ORIGIN_MARK = "엘리베이터 입구";
+
+/* 길 안내에 이름을 댈 만한 집기. 앤드1~4 같은 내부 용어는 제외합니다. */
+const WAYPOINT = /입구|계산|PHAMA BEST|체험존|행사|음료/;
+
+const zc = (zone) => ZONE_COLOR[zone] || FALLBACK;
+const cx = (o) => o.c + o.w / 2;
+const cy = (o) => o.r + o.h / 2;
+
+/* ── 통로 찾기 ──
+ * 랙과 집기가 깔린 칸을 막고, 남은 칸으로만 너비우선탐색을 합니다.
+ * 격자가 63x180 이라 매번 새로 풀어도 부담이 없습니다. */
+function buildBlocked() {
+  const { rows, cols } = GRID;
+  const g = new Uint8Array(rows * cols);
+  const put = (o) => {
+    for (let r = o.r; r < o.r + o.h; r++) {
+      for (let c = o.c; c < o.c + o.w; c++) {
+        if (r >= 0 && r < rows && c >= 0 && c < cols) g[r * cols + c] = 1;
+      }
+    }
+  };
+  RACKS.forEach(put);
+  MARKS.forEach(put);
+  return g;
+}
+
+/* 막힌 칸 안이나 근처에서 가장 가까운 빈 칸을 찾습니다. */
+function nearestFree(blocked, c0, r0) {
+  const { rows, cols } = GRID;
+  const free = (c, r) => c >= 0 && c < cols && r >= 0 && r < rows && !blocked[r * cols + c];
+  const c = Math.round(c0), r = Math.round(r0);
+  if (free(c, r)) return [c, r];
+  for (let d = 1; d < Math.max(rows, cols); d++) {
+    for (let dc = -d; dc <= d; dc++) {
+      for (const dr of [-d, d]) if (free(c + dc, r + dr)) return [c + dc, r + dr];
+    }
+    for (let dr = -d + 1; dr <= d - 1; dr++) {
+      for (const dc of [-d, d]) if (free(c + dc, r + dr)) return [c + dc, r + dr];
+    }
+  }
+  return null;
+}
+
+function simplify(pts) {
+  if (pts.length < 3) return pts;
+  const out = [pts[0]];
+  for (let i = 1; i < pts.length - 1; i++) {
+    const a = out[out.length - 1], b = pts[i], n = pts[i + 1];
+    const straight = (a[0] === b[0] && b[0] === n[0]) || (a[1] === b[1] && b[1] === n[1]);
+    if (!straight) out.push(b);
+  }
+  out.push(pts[pts.length - 1]);
+  return out;
+}
+
+/* 출발 집기 → 목표 랙에 붙은 빈 칸까지의 최단 경로. 없으면 null. */
+function findRoute(originMark, target) {
+  if (!originMark || !target) return null;
+  const { rows, cols } = GRID;
+  const blocked = buildBlocked();
+
+  const start = nearestFree(blocked, cx(originMark), cy(originMark));
+  if (!start) return null;
+
+  const goal = new Uint8Array(rows * cols);
+  let anyGoal = false;
+  for (let r = target.r - 1; r <= target.r + target.h; r++) {
+    for (let c = target.c - 1; c <= target.c + target.w; c++) {
+      const inside = r >= target.r && r < target.r + target.h && c >= target.c && c < target.c + target.w;
+      if (inside) continue;
+      if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+      if (blocked[r * cols + c]) continue;
+      goal[r * cols + c] = 1;
+      anyGoal = true;
+    }
+  }
+  if (!anyGoal) return null;
+
+  const prev = new Int32Array(rows * cols).fill(-1);
+  const seen = new Uint8Array(rows * cols);
+  const queue = new Int32Array(rows * cols);
+  let head = 0, tail = 0;
+  const s = start[1] * cols + start[0];
+  seen[s] = 1; queue[tail++] = s;
+  let hit = -1;
+
+  while (head < tail) {
+    const cur = queue[head++];
+    if (goal[cur]) { hit = cur; break; }
+    const r = (cur / cols) | 0, c = cur % cols;
+    if (c > 0) { const n = cur - 1; if (!seen[n] && !blocked[n]) { seen[n] = 1; prev[n] = cur; queue[tail++] = n; } }
+    if (c < cols - 1) { const n = cur + 1; if (!seen[n] && !blocked[n]) { seen[n] = 1; prev[n] = cur; queue[tail++] = n; } }
+    if (r > 0) { const n = cur - cols; if (!seen[n] && !blocked[n]) { seen[n] = 1; prev[n] = cur; queue[tail++] = n; } }
+    if (r < rows - 1) { const n = cur + cols; if (!seen[n] && !blocked[n]) { seen[n] = 1; prev[n] = cur; queue[tail++] = n; } }
+  }
+  if (hit < 0) return null;
+
+  const back = [];
+  for (let n = hit; n !== -1; n = prev[n]) back.push([n % cols, (n / cols) | 0]);
+  back.reverse();
+
+  const pts = back.map(([c, r]) => [c + 0.5, r + 0.5]);
+  pts.unshift([cx(originMark), cy(originMark)]);
+  pts.push([cx(target), cy(target)]);
+  return simplify(pts);
+}
+
+/* 경로가 지나는 집기를 순서대로 집어 안내 문구를 만듭니다.
+ * 예전에는 존마다 "약 10m" 를 박아뒀는데, 축척 도면이 아니라 미터는 근거가 없습니다.
+ * 대신 손님이 실제로 지나치는 지점을 알려줍니다. */
+export function routeSteps(rackCode) {
+  const target = RACK_BY_CODE[rackCode];
+  const origin = MARKS.find((m) => m.kind === ORIGIN_MARK);
+  if (!target) return null;
+  const route = findRoute(origin, target);
+  const passed = [];
+  if (route) {
+    /* 경로를 촘촘히 훑어 가까이 스치는 집기를 순서대로 모읍니다. */
+    const seen = new Set();
+    for (let i = 0; i < route.length - 1; i++) {
+      const [c1, r1] = route[i], [c2, r2] = route[i + 1];
+      const n = Math.max(Math.abs(c2 - c1), Math.abs(r2 - r1));
+      for (let k = 0; k <= n; k++) {
+        const c = c1 + ((c2 - c1) * k) / n, r = r1 + ((r2 - r1) * k) / n;
+        for (const m of MARKS) {
+          if (m.kind === ORIGIN_MARK || seen.has(m.kind)) continue;
+          if (!WAYPOINT.test(m.kind)) continue;   /* 앤드매대는 손님이 모르는 이름이라 뺍니다 */
+          const near =
+            c >= m.c - 3 && c <= m.c + m.w + 3 && r >= m.r - 3 && r <= m.r + m.h + 3;
+          if (near) { seen.add(m.kind); passed.push(m.kind); }
+        }
+      }
+    }
+  }
+  return {
+    origin: origin ? origin.kind : null,
+    passed: passed.slice(0, 2),
+    rack: target.code,
+    cat: target.cat,
+    zone: target.zone,
+    reachable: !!route,
+  };
+}
+
+export default function FloorPlan({
+  lang = "ko",
+  highlightZone,
+  highlightRack,
+  showPath = false,
+  detail = "all",       // "all" 모든 랙에 코드 표시 · "target" 목표와 주변만
+  onRackClick,
+  minWidth,
+}) {
+  /* 위치 안내는 한눈에 들어와야 해서 화면에 맞춥니다.
+     매장 안내도는 훑어보는 화면이라 넓게 펴고 가로로 밀 수 있게 둡니다. */
+  const fit = detail === "target";
+  const wide = minWidth != null ? minWidth : fit ? 0 : 880;
+  const { rows, cols } = GRID;
+  const pad = 3;
+  const target = highlightRack ? RACK_BY_CODE[highlightRack] : null;
+  const origin = useMemo(() => MARKS.find((m) => m.kind === ORIGIN_MARK), []);
+  const route = useMemo(
+    () => (showPath && target ? findRoute(origin, target) : null),
+    [showPath, target, origin]
+  );
+
+  /* 좁은 화면에서는 지도가 가로로 넘칩니다. 목표 랙이 보이도록 스스로 밀어줍니다. */
+  const scroller = useRef(null);
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el || !target) return;
+    const full = el.scrollWidth;
+    const want = ((target.c + target.w / 2 + pad) / (cols + pad * 2)) * full - el.clientWidth / 2;
+    el.scrollTo({ left: Math.max(0, want), behavior: "smooth" });
+  }, [target, cols]);
+
+  /* 목표 주변 랙만 코드를 적을 때 쓰는 판정 */
+  const near = (r) => {
+    if (!target) return false;
+    return (
+      r.c < target.c + target.w + 14 && r.c + r.w > target.c - 14 &&
+      r.r < target.r + target.h + 10 && r.r + r.h > target.r - 10
+    );
+  };
+
+  const labelled = (r) => {
+    if (detail === "all" || !target) return true;
+    return r.code === target.code;
+  };
+
+  return (
+    <div ref={scroller} style={{ overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
+      <svg
+        viewBox={`${-pad} ${-pad} ${cols + pad * 2} ${rows + pad * 2}`}
+        style={{ display: "block", width: "100%", minWidth: wide }}
+        role="img"
+        aria-label={
+          target
+            ? `매장 배치도 — ${target.code} ${target.cat} 위치`
+            : "파마스퀘어 구로점 매장 배치도"
+        }
+      >
+        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="2" fill="#F7FAF9" />
+
+        {/* 집기 — 상품이 놓이지 않는 자리 */}
+        {MARKS.map((m, i) => {
+          const isDoor = m.kind.includes("입구");
+          return (
+            <g key={`m${i}`}>
+              <rect
+                x={m.c} y={m.r} width={m.w} height={m.h} rx="1"
+                fill={isDoor ? "#DDEDE8" : MARK_FILL}
+                stroke={isDoor ? "#9CC9BE" : MARK_LINE}
+                strokeWidth="0.3"
+              />
+              {m.kind !== ORIGIN_MARK && (
+                <text
+                  x={cx(m)} y={cy(m) + 0.62} textAnchor="middle"
+                  fontSize={Math.min(1.9, m.h * 0.72)} fill={isDoor ? "#2C6B60" : MARK_TEXT}
+                  fontWeight={isDoor ? 700 : 500}
+                >
+                  {m.kind}
+                </text>
+              )}
+            </g>
+          );
+        })}
+
+        {/* 랙 */}
+        {RACKS.map((r) => {
+          const color = zc(r.zone);
+          const isTarget = target && r.code === target.code;
+          const zoneOn = !target && highlightZone && r.zone === highlightZone;
+          const dim = target && !isTarget;
+          return (
+            <g
+              key={r.code}
+              onClick={onRackClick ? () => onRackClick(r) : undefined}
+              style={onRackClick ? { cursor: "pointer" } : undefined}
+            >
+              <rect
+                x={r.c} y={r.r} width={r.w} height={r.h} rx="0.8"
+                fill={isTarget ? color : color}
+                fillOpacity={isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
+                stroke={color}
+                strokeOpacity={isTarget ? 1 : dim ? 0.3 : 0.55}
+                strokeWidth={isTarget ? 0.7 : 0.3}
+              />
+              {labelled(r) && !isTarget && (
+                <text
+                  x={cx(r)} y={cy(r) + 0.62}
+                  textAnchor="middle" fontSize="1.75" fontWeight="600"
+                  fill={color} fillOpacity={dim ? 0.55 : 1}
+                >
+                  {r.code}
+                </text>
+              )}
+            </g>
+          );
+        })}
+
+        {/* 걸어가는 길 — 빈 칸만 밟은 경로 */}
+        {route && (
+          <polyline
+            points={route.map(([c, r]) => `${c},${r}`).join(" ")}
+            fill="none" stroke={YOU} strokeWidth="0.9"
+            strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray="2.4 1.8" opacity="0.85"
+          >
+            <animate attributeName="stroke-dashoffset" values="0;-8.4" dur="1s" repeatCount="indefinite" />
+          </polyline>
+        )}
+
+        {/* 현재 위치 */}
+        {origin && (
+          <g>
+            <circle cx={cx(origin)} cy={cy(origin)} r="1.5" fill={YOU} />
+            <circle cx={cx(origin)} cy={cy(origin)} r="2.6" fill="none" stroke={YOU} strokeWidth="0.5" opacity="0.45">
+              <animate attributeName="r" values="1.9;3.6;1.9" dur="1.8s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.8s" repeatCount="indefinite" />
+            </circle>
+            <text x={cx(origin)} y={cy(origin) + 5.4} textAnchor="middle" fontSize="2.6" fontWeight="800" fill={YOU}>
+              현재 위치
+            </text>
+          </g>
+        )}
+
+        {/* 목표 랙 말풍선 */}
+        {target && (() => {
+          const above = target.r > 9;
+          return (
+          <g>
+            <circle cx={cx(target)} cy={cy(target)} r="3.4" fill="none" stroke={zc(target.zone)} strokeWidth="0.6" opacity="0.5">
+              <animate attributeName="r" values="2.6;4.6;2.6" dur="1.4s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.55;0.05;0.55" dur="1.4s" repeatCount="indefinite" />
+            </circle>
+            {/* 위쪽 끝에 붙은 랙은 말풍선을 아래로 내립니다 — 위로 두면 잘립니다 */}
+            <text
+              x={cx(target)} y={above ? target.r - 4.6 : target.r + target.h + 4.2}
+              textAnchor="middle" fontSize="4.2" fontWeight="800" fill={zc(target.zone)}
+            >
+              {target.code}
+            </text>
+            <text
+              x={cx(target)} y={above ? target.r - 1.4 : target.r + target.h + 7.4}
+              textAnchor="middle" fontSize="2.8" fontWeight="600" fill="#4A625E"
+            >
+              {target.cat}
+            </text>
+          </g>
+          );
+        })()}
+      </svg>
+    </div>
+  );
+}
+
+/* 범례는 지도 밖에 둡니다 — SVG 안에 넣으면 지도가 좁아질수록 같이 뭉개집니다. */
+export function FloorPlanLegend({ lang = "ko" }) {
+  const used = [];
+  RACKS.forEach((r) => { if (!used.includes(r.zone)) used.push(r.zone); });
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", marginTop: 10 }}>
+      {used.map((z) => (
+        <span key={z} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#5C7570" }}>
+          <span style={{ width: 9, height: 9, borderRadius: 3, background: zc(z) }} />
+          {zoneLabel(lang, z) || z}
+        </span>
+      ))}
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#5C7570" }}>
+        <span style={{ width: 9, height: 9, borderRadius: 999, background: YOU }} />
+        현재 위치
+      </span>
+    </div>
+  );
+}

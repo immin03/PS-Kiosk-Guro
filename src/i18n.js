@@ -856,7 +856,11 @@ export function catLabel(lang, cat) {
 }
 
 export function zoneLabel(lang, zoneId) {
-  return t(lang, "zone." + zoneId);
+  /* 존 이름은 PS-OS 배치 정본에서 옵니다(건기식 · 뷰티 · 라이프 …).
+     아직 번역이 없는 이름은 키를 노출하지 말고 정본 이름을 그대로 씁니다. */
+  const key = "zone." + zoneId;
+  const v = t(lang, key);
+  return v === key ? zoneId : v;
 }
 
 export function topCatLabel(lang, type) {
