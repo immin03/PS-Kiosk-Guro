@@ -12,6 +12,10 @@ import PromoBanner from "./PromoBanner.jsx";
 import { RACK_BY_CODE } from "./rackLayout.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
+/* 화면 폭. 세로 키오스크(보통 540 CSS px)는 꽉 채우고, 넓은 화면에서는 적당히 멈춥니다.
+   예전 420px 은 휴대폰 기준이라 키오스크에서 양옆 120px 이 비었습니다. */
+const SHELL_MAX = "min(100%, 640px)";
+
 const legacyZoneOf = (code) => {
   const c = String(code || "");
   if (c[0] === "A" && parseInt(c.slice(1), 10) >= 31) return "E";
@@ -80,6 +84,14 @@ const catGroupIcon = (cat) =>
   PET_CATS.some(c=>c.id===cat.id) ? "paw"
   : BEAUTY_CATS.some(c=>c.id===cat.id) ? "droplet"
   : "pill";
+/* v3 프로토타입의 이모지 방식. 데이터에는 계속 emoji 가 있었는데 v8 이
+   단색 아이콘으로 바꾸면서 안 쓰고 있었습니다. 카테고리는 이모지가 훨씬 빨리 읽힙니다. */
+const EmojiChip = ({ e, d = 46, s = 30, mb }) => (
+  <span style={{ width:d, height:d, display:"inline-flex", alignItems:"center",
+    justifyContent:"center", flexShrink:0, marginBottom:mb, fontSize:s, lineHeight:1 }}
+    aria-hidden="true">{e}</span>
+);
+
 const IconChip = ({ name, d=44, s=22, mb }) => (
   <span style={{ width:d, height:d, borderRadius:"50%", background:C.bgL, display:"inline-flex",
     alignItems:"center", justifyContent:"center", flexShrink:0, marginBottom:mb }}>
@@ -307,7 +319,7 @@ export default function KioskApp() {
             background:C.wh, borderRadius:14, padding:"14px 16px", border:`1px solid ${C.bd}`, cursor:"pointer",
             display:"flex", alignItems:"center", gap:14
           }}>
-            <IconChip name={TYPE_ICON[item.type]} d={46} s={23} />
+            <EmojiChip e={item.emoji} d={46} s={30} />
             <div style={{ flex:1 }}>
               <p style={{ margin:"0 0 2px", fontSize:15, fontWeight:700, color:C.t1 }}>{topCatLabel(lang,item.type)}</p>
               <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topCatSub(lang,item.type)}</p>
@@ -356,7 +368,7 @@ export default function KioskApp() {
               background:C.wh, borderRadius:14, padding:"20px 10px", textAlign:"center",
               border:`1px solid ${C.bd}`, cursor:"pointer"
             }}>
-              <IconChip name={catGroupIcon(cat)} d={46} s={22} mb={10} />
+              <EmojiChip e={cat.emoji} d={46} s={30} mb={10} />
               <p style={{ margin:"0 0 3px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.3 }}>{catLabel(lang,cat)}</p>
               <p style={{ margin:0, fontSize:11, color:C.t2 }}>{t(lang,"productsCount",{n:cat.count})}</p>
             </div>
@@ -372,7 +384,7 @@ export default function KioskApp() {
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:16 }}>
-          <IconChip name={catGroupIcon(cat)} d={52} s={26} />
+          <EmojiChip e={cat.emoji} d={52} s={34} />
           <div>
             <p style={{ margin:"0 0 2px", fontSize:18, fontWeight:700, color:C.t1 }}>{catLabel(lang,cat)}</p>
             <p style={{ margin:0, fontSize:13, color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
@@ -510,7 +522,7 @@ export default function KioskApp() {
                   display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:12,
                   padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
                 }}>
-                  <IconChip name={TYPE_ICON[item.type]} d={44} s={22} />
+                  <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
                     <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{topCatLabel(lang,item.type)}</p>
                     <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topCatSub(lang,item.type)}</p>
@@ -639,8 +651,9 @@ export default function KioskApp() {
         </div>
 
         {/* 지도 */}
-        <div style={{ background:C.wh, borderRadius:14, padding:14, border:`1px solid ${C.bd}`, marginBottom:14 }}>
-          <p style={{ margin:"0 0 10px", fontSize:13, fontWeight:700, color:C.t1 }}>{t(lang,"directions")}</p>
+        {/* 지도가 곧 답이라 카드 안쪽 여백을 줄여 폭을 최대한 씁니다 */}
+        <div style={{ background:C.wh, borderRadius:14, padding:"14px 6px", border:`1px solid ${C.bd}`, marginBottom:14 }}>
+          <p style={{ margin:"0 0 10px 8px", fontSize:13, fontWeight:700, color:C.t1 }}>{t(lang,"directions")}</p>
           <FloorPlan lang={lang} highlightRack={p.rack} showPath detail="target"/>
         </div>
 
@@ -741,14 +754,14 @@ export default function KioskApp() {
       .kiosk-loc{transition:background 0.15s,border-color 0.15s!important}
       .kiosk-loc:hover{background:${C.bgF}!important;border-color:${C.bd}!important}
     `}</style>
-    <div style={{ maxWidth:420, margin:"0 auto", background:C.bgF,
+    <div style={{ maxWidth:SHELL_MAX, margin:"0 auto", background:C.bgF,
       minHeight:"100vh", fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:100 }}>
       <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}/>
       <div>{renderPage()}</div>
 
       {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline */}
       <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
-        width:"100%", maxWidth:420, background:C.wh,
+        width:"100%", maxWidth:SHELL_MAX, background:C.wh,
         borderTop:`1px solid ${C.bd}`, display:"flex", zIndex:100 }}>
         {tabs.map(tab => {
           const isA = activeTab===tab.id;
