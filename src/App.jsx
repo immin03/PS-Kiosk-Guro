@@ -9,12 +9,28 @@ import {
 } from "./i18n.js";
 import FloorPlan, { FloorPlanLegend, routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
+import { categoriesOf, countOf, productsOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
 /* 화면 폭. 세로 키오스크(보통 540 CSS px)는 꽉 채우고, 넓은 화면에서는 적당히 멈춥니다.
    예전 420px 은 휴대폰 기준이라 키오스크에서 양옆 120px 이 비었습니다. */
 const SHELL_MAX = "min(100%, 640px)";
+
+/* 아무도 만지지 않으면 처음 화면으로 되돌리기까지의 시간. 0 이면 끕니다.
+   매장에서 재보고 조정하세요 — 너무 짧으면 읽는 중에 화면이 날아갑니다. */
+const IDLE_RESET_MS = 90_000;
+const DEFAULT_LANG = "ko";
+
+/* 홈 카테고리 부제. 예전 문구는 "A·B 섹션 · 796종" 처럼 옛 구역 표기라
+   지금 랙 코드와 맞지 않았습니다. 정본에서 센 숫자를 씁니다. */
+const topSub = (type) =>
+  `${countOf(type).toLocaleString()}개 상품 · ${categoriesOf(type).length}개 분류`;
+
+/* 홈 카테고리 카드. 브랜드존은 예전에 건기식 목록에 섞여 있었는데,
+   정본 기준으로 갈라내면 갈 곳이 없어져서 자기 자리를 줍니다. */
+const BRAND_CARD = { label: "브랜드존", emoji: "🏬", type: "brand" };
+const HOME_CATS = [...TOP_CATS, BRAND_CARD];
 
 const legacyZoneOf = (code) => {
   const c = String(code || "");
@@ -257,6 +273,31 @@ export default function KioskApp() {
   const navTo = (page, data) => push({ page, ...data });
   const tabTo = (tab) => { setActiveTab(tab); setNav([{ page:tab }]); };
   const goBack = () => { if (nav.length > 1) pop(); else if (activeTab !== "home") tabTo("home"); };
+
+  /* 매장에 놓인 공용 단말입니다. 손님이 떠난 자리에 앞사람이 보던 화면이
+     남아 있으면 다음 손님은 그 화면부터 시작하게 됩니다.
+     한동안 아무도 만지지 않으면 처음으로 되돌립니다. 언어도 함께 돌립니다. */
+  useEffect(() => {
+    if (IDLE_RESET_MS <= 0) return;
+    let timer;
+    const atHome = () => nav.length === 1 && nav[0].page === "home" && !searchQ;
+    const reset = () => {
+      if (atHome()) return;
+      setNav([{ page: "home" }]);
+      setActiveTab("home");
+      setSearchQ("");
+      setLang(DEFAULT_LANG);
+      window.scrollTo({ top: 0 });
+    };
+    const arm = () => { clearTimeout(timer); timer = setTimeout(reset, IDLE_RESET_MS); };
+    const events = ["pointerdown", "keydown", "wheel", "touchstart"];
+    events.forEach((e) => window.addEventListener(e, arm, { passive: true }));
+    arm();
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, arm));
+    };
+  }, [nav, searchQ]);
   const doSearch = (q) => {
     if (!q.trim()) return;
     setRecentSearch(prev => [q, ...prev.filter(r => r !== q)].slice(0,8));
@@ -314,15 +355,15 @@ export default function KioskApp() {
       {/* 카테고리 바로가기 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
       <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:24 }}>
-        {TOP_CATS.map(item => (
+        {HOME_CATS.map(item => (
           <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
             background:C.wh, borderRadius:14, padding:"14px 16px", border:`1px solid ${C.bd}`, cursor:"pointer",
             display:"flex", alignItems:"center", gap:14
           }}>
             <EmojiChip e={item.emoji} d={46} s={30} />
             <div style={{ flex:1 }}>
-              <p style={{ margin:"0 0 2px", fontSize:15, fontWeight:700, color:C.t1 }}>{topCatLabel(lang,item.type)}</p>
-              <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topCatSub(lang,item.type)}</p>
+              <p style={{ margin:"0 0 2px", fontSize:15, fontWeight:700, color:C.t1 }}>{item.type === "brand" ? item.label : topCatLabel(lang,item.type)}</p>
+              <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topSub(item.type)}</p>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
           </div>
@@ -358,7 +399,10 @@ export default function KioskApp() {
 
   const renderCatList = () => {
     const type = cur.catType;
-    const cats = type==="health"?HEALTH_CATS:type==="beauty"?BEAUTY_CATS:type==="pet"?PET_CATS:BEAUTY_CATS.filter(c=>/위생|탈취|프레시|생리|제모|성인|핸드크림/.test(c.name));
+    /* 카테고리는 배치 정본에서 옵니다. 예전에는 뷰티 목록을 정규식으로 걸러
+       '생활·위생'을 만들었는데, 구강용품이 건기식에 들어가고 브랜드존 매대가
+       카테고리에 섞이는 문제가 있었습니다. */
+    const cats = categoriesOf(type);
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <p style={{ fontSize:13, color:C.t2, margin:"0 0 16px" }}>{t(lang,"productsCount",{n:cats.reduce((s,c)=>s+c.count,0).toLocaleString()})}</p>
@@ -380,7 +424,7 @@ export default function KioskApp() {
 
   const renderCatDetail = () => {
     const cat = cur.cat;
-    const prods = ALL_PRODUCTS.filter(p => p.cat === cat.name || p.rack === cat.racks || String(cat.racks||"").split(",").includes(p.rack));
+    const prods = productsOf(cat);
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:16 }}>
@@ -517,15 +561,15 @@ export default function KioskApp() {
               ))}
             </div>
             {searchFacet==="cat" ? (
-              TOP_CATS.map(item => (
+              HOME_CATS.map(item => (
                 <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
                   display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:12,
                   padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
                 }}>
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
-                    <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{topCatLabel(lang,item.type)}</p>
-                    <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topCatSub(lang,item.type)}</p>
+                    <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{item.type === "brand" ? item.label : topCatLabel(lang,item.type)}</p>
+                    <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topSub(item.type)}</p>
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
@@ -707,7 +751,7 @@ export default function KioskApp() {
 
   const PAGE_TITLES = {
     home:"",
-    catList: topCatLabel(lang, cur.catType || "life"),
+    catList: cur.catType === "brand" ? BRAND_CARD.label : topCatLabel(lang, cur.catType || "life"),
     catDetail: cur.cat ? catLabel(lang, cur.cat) : "",
     brand: t(lang,"filterBrand"),
     brandDetail: cur.brandName || "",
