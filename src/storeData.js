@@ -700,7 +700,7 @@ export const TOP_CATS = [
   {
     "label": "뷰티",
     "sub": "C·D 섹션 · 723종",
-    "emoji": "💄",
+    "emoji": "💅",
     "type": "beauty"
   },
   {

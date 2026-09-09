@@ -164,7 +164,7 @@ pet_n = sum(1 for p in products if p["zone"] == "E")
 
 TOP_CATS = [
     {"label": "건강기능식품", "sub": f"A·B 섹션 · {health_n}종", "emoji": "💊", "type": "health"},
-    {"label": "뷰티 · 라이프 스타일", "sub": f"C·D 섹션 · {beauty_n}종", "emoji": "💄", "type": "beauty"},
+    {"label": "뷰티 · 라이프 스타일", "sub": f"C·D 섹션 · {beauty_n}종", "emoji": "💅", "type": "beauty"},
     {"label": "펫", "sub": f"A31–A36 · {pet_n}종", "emoji": "🐾", "type": "pet"},
     {"label": "라이프 스타일", "sub": "프레시케어 · 위생 · 탈취 등", "emoji": "🧴", "type": "life"},
 ]
