@@ -590,25 +590,34 @@ export default function FloorPlan({
           );
         })}
 
-        {/* 블록 이름 — 덩어리로 볼 때만 크게 얹습니다 */}
-        {grouped && BLOCKS.map((b) => (
-          <g key={`b${b.id}`} style={{ pointerEvents: "none" }}>
-            <text
-              x={b.lx} y={b.ly - 0.2} textAnchor="middle"
-              fontSize="4.6" fontWeight="800" fill={zc(b.zone)}
-              stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke"
-            >
-              {zoneLabel(lang, b.zone) || b.zone}
-            </text>
-            <text
-              x={b.lx} y={b.ly + 4.4} textAnchor="middle"
-              fontSize="3" fontWeight="600" fill="#2D373D"
-              stroke="#FFFFFF" strokeWidth="0.9" paintOrder="stroke"
-            >
-              {b.range}
-            </text>
-          </g>
-        ))}
+        {/* 구역 이름.
+            전에는 큰 글자에 흰 테두리를 둘러 매대 위에 겹쳐 놓았습니다.
+            글자가 매대를 파먹는 것처럼 보여서, 지도 라벨답게 구역 색을 채운
+            표 하나로 바꿉니다. 이름과 랙 범위를 한 줄에 담습니다. */}
+        {grouped && BLOCKS.map((b) => {
+          const name = zoneLabel(lang, b.zone) || b.zone;
+          const FS = 3;
+          const padX = FS * 0.75;
+          const w = (runWidth(name) + runWidth(b.range) * 0.72 + 0.6) * FS + padX * 2;
+          const h = FS * 1.85;
+          /* 오른쪽 끝 구역은 표가 판매장 밖으로 삐져나갑니다. 안쪽으로 붙입니다. */
+          const x = Math.min(Math.max(b.lx - w / 2, -pad + 1), cols + pad - w - 1);
+          return (
+            <g key={`b${b.id}`} style={{ pointerEvents: "none" }}>
+              <rect
+                x={x} y={b.ly - h / 2} width={w} height={h} rx={h / 2}
+                fill={zc(b.zone)}
+              />
+              <text
+                x={x + w / 2} y={b.ly + FS * 0.36} textAnchor="middle"
+                fontSize={FS} fontWeight="700" fill="#FFFFFF"
+              >
+                {name}
+                <tspan fontSize={FS * 0.72} fillOpacity="0.75">{`  ${b.range}`}</tspan>
+              </text>
+            </g>
+          );
+        })}
 
         {/* 걸어가는 길 — 빈 칸만 밟은 경로 */}
         {route && (
