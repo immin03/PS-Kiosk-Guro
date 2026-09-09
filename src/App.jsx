@@ -195,7 +195,7 @@ function TopBar({ title, onBack, isHome, lang, setLang }) {
 function SearchBar({ value, onChange, placeholder, onFocus }) {
   return (
     <div style={{
-      display:"flex", alignItems:"center", background:C.wh, borderRadius:14,
+      display:"flex", alignItems:"center", background:C.wh, borderRadius:8,
       padding:"16px 16px", border:`1px solid ${C.bd}`, gap:10,
       boxShadow:"0 2px 10px rgba(20,60,54,0.05)"
     }}>
@@ -516,7 +516,7 @@ export default function KioskApp() {
                 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:14, fontWeight:hasProd?600:400, color:hasProd?C.t1:C.t2 }}>{b}</span>
-                    {hasProd && <span style={{ fontSize:10, color:C.pri, fontWeight:600, background:C.bgL, padding:"2px 7px", borderRadius:8 }}>{t(lang,"productsCount",{n:cnt})}</span>}
+                    {hasProd && <span style={{ fontSize:10, color:C.pri, fontWeight:600, background:C.bgL, padding:"2px 7px", borderRadius:999 }}>{t(lang,"productsCount",{n:cnt})}</span>}
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.45}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
@@ -575,14 +575,23 @@ export default function KioskApp() {
             </div>
             {searchFacet==="cat" ? (
               HOME_CATS.map(item => (
-                <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
-                  display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:8,
-                  padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
-                }}>
+                <div
+                  key={item.label}
+                  onClick={() => item.type === "findBrand" ? setSearchFacet("brand") : navTo("catList",{catType:item.type})}
+                  className="kiosk-card"
+                  style={{
+                    display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:8,
+                    padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
+                  }}
+                >
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
-                    <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{item.type === "brand" ? item.label : topCatLabel(lang,item.type)}</p>
-                    <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topSub(lang, item.type)}</p>
+                    <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>
+                      {item.type === "brand" ? item.label : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
+                    </p>
+                    <p style={{ margin:0, fontSize:12, color:C.t3 }}>
+                      {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
+                    </p>
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
@@ -591,7 +600,7 @@ export default function KioskApp() {
               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
                 {ALL_BRANDS.filter(b => ALL_PRODUCTS.some(p => p.brand===b)).map(b => (
                   <span key={b} onClick={() => navTo("brandDetail",{brandName:b})} className="kiosk-tag" style={{
-                    background:C.wh, borderRadius:14, padding:"9px 15px", fontSize:13, color:C.t1,
+                    background:C.wh, borderRadius:999, padding:"9px 15px", fontSize:13, color:C.t1,
                     fontWeight:500, cursor:"pointer", border:`1px solid ${C.bd}`
                   }}>{b}</span>
                 ))}
@@ -745,7 +754,7 @@ export default function KioskApp() {
           ))}
         </div>
 
-        <button onClick={pop} className="kiosk-btn" style={{ width:"100%", marginBottom:24, padding:"15px", borderRadius:14,
+        <button onClick={pop} className="kiosk-btn" style={{ width:"100%", marginBottom:24, padding:"15px", borderRadius:8,
           background:C.pri, color:C.wh, border:"none", fontSize:15, fontWeight:700, fontFamily:"inherit", cursor:"pointer" }}>
           {t(lang,"seeOther")}
         </button>
