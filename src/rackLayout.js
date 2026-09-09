@@ -48,10 +48,10 @@ export const MARKS = [
   },
   {
     "kind": "계단 입구",
-    "c": 86,
-    "r": 26,
-    "w": 12,
-    "h": 3
+    "c": 108,
+    "r": 44,
+    "w": 14,
+    "h": 5
   },
   {
     "kind": "엘리베이터 입구",
@@ -437,7 +437,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "농협 · 한삼인",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B2",
@@ -446,7 +446,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "대상 웰라이프",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B3",
@@ -455,7 +455,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "대상 웰라이프",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B4",
@@ -464,7 +464,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "네이처가든",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B5",
@@ -473,7 +473,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "익스트림",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B6",
@@ -482,7 +482,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "있나요 · 뉴핏",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B7",
@@ -491,7 +491,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "어린이 간식",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B8",
@@ -500,7 +500,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "어린이 간식",
-    "zone": "브랜드존"
+    "zone": "브랜드"
   },
   {
     "code": "B9",

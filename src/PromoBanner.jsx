@@ -30,7 +30,7 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
   if (!items.length) return null;
 
   return (
-    <div style={{ position: "relative", borderRadius: 4, overflow: "hidden", marginBottom: 20, height: 172 }}>
+    <div style={{ position: "relative", borderRadius: 8, overflow: "hidden", marginBottom: 20, height: 172 }}>
       {items.map((p, n) => (
         <div
           key={p.id}
@@ -71,7 +71,7 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
               onClick={() => setI(n)}
               aria-label={`${n + 1}번째 혜택 보기`}
               style={{
-                width: n === i ? 18 : 6, height: 6, borderRadius: 4, padding: 0,
+                width: n === i ? 18 : 6, height: 6, borderRadius: 8, padding: 0,
                 border: "none", cursor: "pointer", transition: "width .3s, background .3s",
                 background: n === i ? "#fff" : "rgba(255,255,255,.42)",
               }}

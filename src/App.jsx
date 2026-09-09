@@ -25,12 +25,12 @@ const DEFAULT_LANG = "ko";
 
 /* 홈 카테고리 부제. 예전 문구는 "A·B 섹션 · 796종" 처럼 옛 구역 표기라
    지금 랙 코드와 맞지 않았습니다. 정본에서 센 숫자를 씁니다. */
-const topSub = (type) =>
-  `${countOf(type).toLocaleString()}개 상품 · ${categoriesOf(type).length}개 분류`;
+const topSub = (lang, type) =>
+  t(lang, "topSub", { n: countOf(type).toLocaleString(), c: categoriesOf(type).length });
 
 /* 홈 카테고리 카드. 브랜드존은 예전에 건기식 목록에 섞여 있었는데,
    정본 기준으로 갈라내면 갈 곳이 없어져서 자기 자리를 줍니다. */
-const BRAND_CARD = { label: "브랜드존", emoji: "🏬", type: "brand" };
+const BRAND_CARD = { label: "브랜드 존", emoji: "💎", type: "brand" };
 const HOME_CATS = [...TOP_CATS, BRAND_CARD];
 
 const legacyZoneOf = (code) => {
@@ -128,7 +128,7 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
     }}>
       {rank && (
         <div style={{
-          width:20, height:20, borderRadius:4, flexShrink:0,
+          width:20, height:20, borderRadius:8, flexShrink:0,
           background: rank===1 ? C.priD : rank<=3 ? C.priM : C.bgL,
           display:"flex", alignItems:"center", justifyContent:"center",
           fontSize:10, fontWeight:800,
@@ -168,7 +168,7 @@ function TopBar({ title, onBack, isHome, lang, setLang }) {
       background: isHome ? C.bgF : C.wh, position:"sticky", top:0, zIndex:100,
       borderBottom: isHome ? "none" : `1px solid ${C.bd}` }}>
       {!isHome && onBack && (
-        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 8px", display:"flex", borderRadius:4 }}>
+        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 8px", display:"flex", borderRadius:8 }}>
           <span style={{ fontSize:22, color:C.t1, lineHeight:1 }}>←</span>
         </button>
       )}
@@ -200,6 +200,7 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
       <span style={{ color:C.priM, flexShrink:0, display:"flex" }}><Icon name="search" size={20} color={C.priM} /></span>
       <input type="text" placeholder={placeholder || "Search"}
         value={value} onChange={e => onChange(e.target.value)} onFocus={onFocus}
+        className="kiosk-input"
         style={{ border:"none", outline:"none", flex:1, fontSize:16, fontFamily:"inherit", background:"transparent", color:C.t1 }} />
       {value && (
         <button onClick={() => onChange("")} style={{ background:"none", border:"none", cursor:"pointer", padding:"2px 4px",
@@ -219,7 +220,7 @@ function ProductCard({ p, onLocate }) {
         <p style={{ margin:0, fontSize:12, color:C.t2 }}>{p.brand} · {p.cat}</p>
       </div>
       <div className="kiosk-loc" style={{
-        background:C.wh, border:`1px solid ${C.bd}`, borderRadius:4,
+        background:C.wh, border:`1px solid ${C.bd}`, borderRadius:8,
         padding:"6px 10px", display:"flex", alignItems:"center", gap:4,
         flexShrink:0, marginLeft:8
       }}>
@@ -327,7 +328,7 @@ export default function KioskApp() {
       <div style={{ marginBottom:24, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
         {searchQ && (
-          <div style={{ marginTop:8, background:C.wh, borderRadius:4, border:`1px solid ${C.bd}`,
+          <div style={{ marginTop:8, background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`,
             boxShadow:"0 6px 20px rgba(20,60,54,0.10)", overflow:"hidden", position:"relative", zIndex:50 }}>
             {searchResults.length > 0 ? (
               <>
@@ -341,7 +342,7 @@ export default function KioskApp() {
                 </div>
                 <div style={{ padding:"8px 20px 16px" }}>
                   <button onClick={() => { doSearch(searchQ); tabTo("search"); }} style={{
-                    width:"100%", padding:"14px", borderRadius:4,
+                    width:"100%", padding:"14px", borderRadius:8,
                     background:C.bgL, border:`1px solid ${C.bd}`, cursor:"pointer", fontFamily:"inherit",
                     fontSize:13, fontWeight:600, color:C.priD
                   }}>{t(lang,"viewAllResults",{n:searchResults.length})}</button>
@@ -356,18 +357,17 @@ export default function KioskApp() {
 
       {/* 카테고리 바로가기 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
-      <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(0, 1fr))", gap:8, marginBottom:24 }}>
         {HOME_CATS.map(item => (
           <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
-            background:C.wh, borderRadius:14, padding:"14px 16px", border:`1px solid ${C.bd}`, cursor:"pointer",
-            display:"flex", alignItems:"center", gap:14
+            background:C.wh, borderRadius:14, padding:"16px 14px", border:`1px solid ${C.bd}`, cursor:"pointer",
+            display:"flex", flexDirection:"column", alignItems:"flex-start", gap:10
           }}>
-            <EmojiChip e={item.emoji} d={46} s={30} />
-            <div style={{ flex:1 }}>
-              <p style={{ margin:"0 0 2px", fontSize:15, fontWeight:700, color:C.t1 }}>{item.type === "brand" ? item.label : topCatLabel(lang,item.type)}</p>
-              <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topSub(item.type)}</p>
+            <EmojiChip e={item.emoji} d={40} s={26} />
+            <div>
+              <p style={{ margin:"0 0 4px", fontSize:15, fontWeight:700, color:C.t1, lineHeight:1.35 }}>{item.type === "brand" ? item.label : topCatLabel(lang,item.type)}</p>
+              <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.5 }}>{topSub(lang, item.type)}</p>
             </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
           </div>
         ))}
       </div>
@@ -384,10 +384,10 @@ export default function KioskApp() {
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
         {ZONES_MAP.map(z => (
           <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-            display:"flex", gap:10, background:C.wh, borderRadius:4, padding:"10px 12px",
+            display:"flex", gap:10, background:C.wh, borderRadius:8, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
-            <div style={{ width:30, height:30, borderRadius:4, background:z.color, flexShrink:0,
+            <div style={{ width:30, height:30, borderRadius:8, background:z.color, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
               <p style={{ margin:0, fontSize:11, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -505,7 +505,7 @@ export default function KioskApp() {
                 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:14, fontWeight:hasProd?600:400, color:hasProd?C.t1:C.t2 }}>{b}</span>
-                    {hasProd && <span style={{ fontSize:10, color:C.pri, fontWeight:600, background:C.bgL, padding:"2px 7px", borderRadius:4 }}>{t(lang,"productsCount",{n:cnt})}</span>}
+                    {hasProd && <span style={{ fontSize:10, color:C.pri, fontWeight:600, background:C.bgL, padding:"2px 7px", borderRadius:8 }}>{t(lang,"productsCount",{n:cnt})}</span>}
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.45}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
@@ -555,7 +555,7 @@ export default function KioskApp() {
             <div style={{ display:"flex", gap:8, marginBottom:14 }}>
               {[["cat",t(lang,"filterCat")],["brand",t(lang,"filterBrand")]].map(([id,lb]) => (
                 <button key={id} onClick={() => setSearchFacet(id)} style={{
-                  flex:1, padding:"11px", borderRadius:4, cursor:"pointer", fontFamily:"inherit", fontSize:13,
+                  flex:1, padding:"11px", borderRadius:8, cursor:"pointer", fontFamily:"inherit", fontSize:13,
                   fontWeight:700, background: searchFacet===id ? C.priM : C.wh,
                   color: searchFacet===id ? C.wh : C.t2,
                   border:`1px solid ${searchFacet===id ? C.priM : C.bd}`
@@ -565,13 +565,13 @@ export default function KioskApp() {
             {searchFacet==="cat" ? (
               HOME_CATS.map(item => (
                 <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
-                  display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:4,
+                  display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:8,
                   padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
                 }}>
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
                     <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>{item.type === "brand" ? item.label : topCatLabel(lang,item.type)}</p>
-                    <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topSub(item.type)}</p>
+                    <p style={{ margin:0, fontSize:12, color:C.t2 }}>{topSub(lang, item.type)}</p>
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
@@ -604,10 +604,10 @@ export default function KioskApp() {
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:4,
+          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
-          <div style={{ width:38, height:38, borderRadius:4, background:z.color, flexShrink:0,
+          <div style={{ width:38, height:38, borderRadius:8, background:z.color, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 1px", fontSize:14, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -697,7 +697,7 @@ export default function KioskApp() {
         {/* 위치 배지 — 인터랙션 추가 */}
         <div className="kiosk-card" style={{ background:C.wh, borderRadius:14, padding:"14px 16px", marginBottom:14,
           display:"flex", alignItems:"center", gap:12, border:`1px solid ${zoneInfo?.color||C.pri}`, cursor:"default" }}>
-          <div style={{ width:46, height:46, borderRadius:4, background:zoneInfo?.color||C.pri, flexShrink:0,
+          <div style={{ width:46, height:46, borderRadius:8, background:zoneInfo?.color||C.pri, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:18 }}>{zone}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
@@ -723,7 +723,7 @@ export default function KioskApp() {
             }}>
               {/* 넘버 — 크고 명확하게 */}
               <div style={{
-                width:32, height:32, borderRadius:4, flexShrink:0,
+                width:32, height:32, borderRadius:8, flexShrink:0,
                 background: s.n===3 ? C.pri : s.n===2 ? C.priM : C.bgL,
                 display:"flex", alignItems:"center", justifyContent:"center",
                 color: s.n>=2 ? C.wh : C.priD, fontSize:14, fontWeight:700,

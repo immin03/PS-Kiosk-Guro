@@ -700,7 +700,7 @@ export const TOP_CATS = [
   {
     "label": "뷰티",
     "sub": "C·D 섹션 · 723종",
-    "emoji": "🧴",
+    "emoji": "💄",
     "type": "beauty"
   },
   {
@@ -712,7 +712,7 @@ export const TOP_CATS = [
   {
     "label": "라이프스타일",
     "sub": "프레시케어 · 위생 · 탈취 등",
-    "emoji": "🏡",
+    "emoji": "🧴",
     "type": "life"
   }
 ];
@@ -936,21 +936,21 @@ export const ZONES_MAP = [
   {
     "id": "B",
     "label": "브랜드 · 간식 · 음료",
-    "color": "#005251",
+    "color": "#9B7BE0",
     "desc": "B1~B10",
     "catType": "health"
   },
   {
     "id": "C",
     "label": "뷰티 · 라이프스타일",
-    "color": "#01C0A4",
+    "color": "#EF7BA4",
     "desc": "C1~C25",
     "catType": "beauty"
   },
   {
     "id": "D",
-    "label": "브랜드존",
-    "color": "#63CAC1",
+    "label": "브랜드 존",
+    "color": "#5BB8E8",
     "desc": "D1~D15",
     "catType": "beauty"
   },
