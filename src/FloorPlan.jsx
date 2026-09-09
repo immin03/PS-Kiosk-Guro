@@ -40,8 +40,8 @@ const BAR_SHORT = 0.2;
 /* 매대는 네모난 집기입니다. 모서리를 굴리면 알약이 됩니다. */
 const BAR_RADIUS = 0.25;
 
-/* 계단 그림과 글자 사이 */
-const FS_ICON_GAP = 0.5;
+/* 집기 상자 안쪽 여백. 그림과 글자가 테두리에 붙지 않게 합니다. */
+const MARK_PAD = 0.9;
 
 /* 랙 이름을 칸 안에 앉힙니다.
  *
@@ -50,7 +50,10 @@ const FS_ICON_GAP = 0.5;
  * 글자를 줄입니다. 한글은 글자폭이 글자크기와 거의 같고 나머지는 그 절반으로
  * 잡습니다. */
 const runWidth = (line) =>
-  [...line].reduce((n, ch) => n + (/[\u3131-\uD79D\u4E00-\u9FFF]/.test(ch) ? 1 : 0.5), 0);
+  [...line].reduce((n, ch) => {
+    if (/\s/.test(ch)) return n + 0.25;
+    return n + (/[\u3131-\uD79D\u4E00-\u9FFF]/.test(ch) ? 0.88 : 0.5);
+  }, 0);
 
 function fitLabel(text, boxW, boxH) {
   /* 가운뎃점은 앞말에 붙여 둡니다. 떼어 놓으면 「단백질 / · 아미노산」 처럼
@@ -540,39 +543,44 @@ export default function FloorPlan({
                 strokeOpacity={color ? 0.9 : 0}
                 strokeWidth={color ? 0.12 : 0}
               />
-              {/* 계단은 디딤판을 그려 무엇인지 보이게 합니다. 회색 상자에
-                  글자만 있으면 계산대·체험존과 구분되지 않습니다. */}
-              {isStair && (() => {
-                const side = Math.min(m.h - iy * 2, m.w - ix * 2) * 0.62;
-                const ox = m.c + ix + FS_ICON_GAP;
-                const oy = cy(m) - side / 2;
+              {/* 그림과 글자를 한 덩어리로 묶어 상자 한가운데에 놓습니다.
+                  전에는 그림을 왼쪽 끝에 붙이고 글자만 어림잡아 밀어서,
+                  둘이 서로 붙고 덩어리는 한쪽으로 쏠려 있었습니다. */}
+              {m.kind !== ORIGIN_MARK && (() => {
+                const label = markLabel(lang, m.kind);
+                const boxW = m.w - ix * 2;
+                const boxH = m.h - iy * 2;
+                const inner = boxW - MARK_PAD * 2;
+
+                const icon = isStair ? Math.min(boxH * 0.5, 2.4) : 0;
+                const gap = isStair ? icon * 0.55 : 0;
+                const fs = Math.min(1.9, boxH * 0.62, (inner - icon - gap) / runWidth(label));
+                const textW = runWidth(label) * fs;
+
+                const x0 = cx(m) - (icon + gap + textW) / 2;
                 const pts = [[0, 1], [0, 0.66], [0.34, 0.66], [0.34, 0.33],
                              [0.67, 0.33], [0.67, 0], [1, 0]];
                 return (
-                  <polyline
-                    points={pts.map(([px, py]) => `${ox + px * side},${oy + py * side}`).join(" ")}
-                    fill="none" stroke={MARK_TEXT} strokeWidth="0.22"
-                    strokeLinejoin="round" strokeLinecap="round" opacity="0.75"
-                  />
+                  <>
+                    {isStair && (
+                      <polyline
+                        points={pts
+                          .map(([px, py]) => `${x0 + px * icon},${cy(m) - icon / 2 + py * icon}`)
+                          .join(" ")}
+                        fill="none" stroke={MARK_TEXT} strokeWidth="0.22"
+                        strokeLinejoin="round" strokeLinecap="round" opacity="0.75"
+                      />
+                    )}
+                    <text
+                      x={x0 + icon + gap} y={cy(m) + fs * 0.36}
+                      fontSize={fs} fill={color || MARK_TEXT}
+                      fontWeight={color ? 600 : 500}
+                    >
+                      {label}
+                    </text>
+                  </>
                 );
               })()}
-              {m.kind !== ORIGIN_MARK && (
-                <text
-                  x={isStair ? cx(m) + (m.h - iy * 2) * 0.31 : cx(m)}
-                  y={cy(m) + 0.62} textAnchor="middle"
-                  /* 이름이 상자보다 길면 넘칩니다 — 「셀프 계산대」가 옆
-                     「계산대」로 흘러나왔습니다. 폭에도 맞춥니다. */
-                  fontSize={Math.min(
-                    1.9,
-                    m.h * 0.72,
-                    ((m.w - ix * 2) * (isStair ? 0.66 : 1) - 0.6) /
-                      runWidth(markLabel(lang, m.kind))
-                  )}
-                  fill={color || MARK_TEXT} fontWeight={color ? 600 : 500}
-                >
-                  {markLabel(lang, m.kind)}
-                </text>
-              )}
             </g>
           );
         })}
@@ -736,7 +744,7 @@ export default function FloorPlan({
       <div style={{ display: "flex", alignItems: "center",
         gap: 6, marginTop: 10, marginBottom: 2, paddingLeft: 6, paddingRight: 6 }}>
         {/* 층은 지도 옆에 둡니다. 버튼과 같은 줄이라 자리를 더 먹지 않습니다. */}
-        <span style={{ fontSize: 13, fontWeight: 700, color: BRAND.text, marginRight: "auto" }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: BRAND.gray, marginRight: "auto" }}>
           {t(lang, "floorName")}
         </span>
         {/* 되돌리기는 왼쪽에 붙이고 늘 자리를 지킵니다. 나타났다 사라지면
