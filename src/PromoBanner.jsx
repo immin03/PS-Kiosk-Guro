@@ -10,8 +10,11 @@ import { STORE_PHOTO } from "./storePhoto.js";
  */
 
 /* 배경은 정본에 등록된 슬라이드 이미지(running[].image)를 먼저 쓰고,
-   없으면 매장 사진을 깝니다. 글자가 얹히므로 위에 어둡게 덮습니다. */
-const bgOf = (p) => `url(${p.image || STORE_PHOTO})`;
+   없으면 매장 사진을 깝니다. 글자가 얹히므로 위에 어둡게 덮습니다.
+   정본에는 파일 이름만 두고, 번들에 실린 주소는 여기서 찾습니다. */
+const SLIDES = import.meta.glob("./promo/*", { eager: true, query: "?url", import: "default" });
+const slideUrl = (name) => SLIDES[`./promo/${name}`];
+const bgOf = (p) => `url(${(p.image && slideUrl(p.image)) || STORE_PHOTO})`;
 
 export default function PromoBanner({ onPress, interval = 5000 }) {
   const items = PROMOTIONS;
@@ -45,7 +48,12 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
             cursor: onPress ? "pointer" : "default",
           }}
         >
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,40,38,.30) 0%,rgba(0,40,38,.74) 100%)" }} />
+          {/* 슬라이드 이미지에는 문구가 이미 들어 있습니다. 위에 글자를 또 얹으면
+              겹치므로, 이미지가 있는 슬라이드는 이미지만 보여줍니다. */}
+          {!p.image && (
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,40,38,.30) 0%,rgba(0,40,38,.74) 100%)" }} />
+          )}
+          {!p.image && (
           <div style={{ position: "relative", height: "100%", padding: "22px 22px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
             {p.tag && (
               <span style={{
@@ -60,6 +68,7 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
               <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(255,255,255,.7)" }}>{p.limit}</p>
             )}
           </div>
+          )}
         </div>
       ))}
 

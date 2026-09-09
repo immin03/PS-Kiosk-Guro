@@ -164,15 +164,15 @@ pet_n = sum(1 for p in products if p["zone"] == "E")
 
 TOP_CATS = [
     {"label": "건강기능식품", "sub": f"A·B 섹션 · {health_n}종", "emoji": "💊", "type": "health"},
-    {"label": "뷰티 · 라이프스타일", "sub": f"C·D 섹션 · {beauty_n}종", "emoji": "💄", "type": "beauty"},
+    {"label": "뷰티 · 라이프 스타일", "sub": f"C·D 섹션 · {beauty_n}종", "emoji": "💄", "type": "beauty"},
     {"label": "펫", "sub": f"A31–A36 · {pet_n}종", "emoji": "🐾", "type": "pet"},
-    {"label": "라이프스타일", "sub": "프레시케어 · 위생 · 탈취 등", "emoji": "🧴", "type": "life"},
+    {"label": "라이프 스타일", "sub": "프레시케어 · 위생 · 탈취 등", "emoji": "🧴", "type": "life"},
 ]
 
 ZONES_MAP = [
     {"id": "A", "label": "건강기능식품", "color": "#00978F", "desc": "A1~A30", "catType": "health"},
     {"id": "B", "label": "브랜드 · 간식 · 음료", "color": "#9B7BE0", "desc": "B1~B10", "catType": "health"},
-    {"id": "C", "label": "뷰티 · 라이프스타일", "color": "#EF7BA4", "desc": "C1~C25", "catType": "beauty"},
+    {"id": "C", "label": "뷰티 · 라이프 스타일", "color": "#EF7BA4", "desc": "C1~C25", "catType": "beauty"},
     {"id": "D", "label": "브랜드 존", "color": "#5BB8E8", "desc": "D1~D15", "catType": "beauty"},
     {"id": "E", "label": "펫", "color": "#FF9F43", "desc": "A31~A36", "catType": "pet"},
 ]

@@ -710,7 +710,7 @@ export const TOP_CATS = [
     "type": "pet"
   },
   {
-    "label": "라이프스타일",
+    "label": "라이프 스타일",
     "sub": "프레시케어 · 위생 · 탈취 등",
     "emoji": "🧴",
     "type": "life"
@@ -942,7 +942,7 @@ export const ZONES_MAP = [
   },
   {
     "id": "C",
-    "label": "뷰티 · 라이프스타일",
+    "label": "뷰티 · 라이프 스타일",
     "color": "#EF7BA4",
     "desc": "C1~C25",
     "catType": "beauty"
