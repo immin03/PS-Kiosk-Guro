@@ -405,7 +405,7 @@ export default function KioskApp() {
         ))}
       </div>
 
-      {/* 매장 안내도 */}
+      {/* 매장 지도 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"storeMap")}</p>
       <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:12 }}>
         <FloorPlan lang={lang} onRackClick={(rack) => {
@@ -631,9 +631,11 @@ export default function KioskApp() {
   };
 
   const renderMap = () => (
-    <div style={{ padding:"16px 20px 24px" }}>
-      <p style={{ fontSize:13, fontWeight:500, color:C.t2, margin:"0 0 14px" }}>{t(lang,"storeFloor")}</p>
-      <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:14 }}>
+    /* 지도는 이 화면의 본체입니다. 바깥 여백과 카드 안쪽 여백을 줄여
+       테두리 사이를 지도가 다 쓰게 합니다. */
+    <div style={{ padding:"12px 12px 24px" }}>
+      <p style={{ fontSize:13, fontWeight:500, color:C.t2, margin:"0 0 8px 4px" }}>{t(lang,"storeFloor")}</p>
+      <div style={{ background:C.wh, borderRadius:8, padding:"8px 6px 6px", border:`1px solid ${C.bd}`, marginBottom:12 }}>
         <FloorPlan lang={lang} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id===legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
@@ -641,7 +643,7 @@ export default function KioskApp() {
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
+          display:"flex", gap:12, marginBottom:8, marginLeft:8, marginRight:8, background:C.wh, borderRadius:8,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
           <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z), flexShrink:0,

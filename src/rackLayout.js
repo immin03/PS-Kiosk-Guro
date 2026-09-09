@@ -45,7 +45,7 @@ export const MARKS = [
     "zone": "프로모션"
   },
   {
-    "kind": "PHAMA BEST",
+    "kind": "파마베스트",
     "c": 46,
     "r": 31,
     "w": 28,

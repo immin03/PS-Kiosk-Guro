@@ -3,21 +3,21 @@ import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel, markLabel, t } from "./i18n.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
 
-/* 매장 배치도.
+/* 매장 지도.
  *
  * 좌표는 PS-OS catalog/racks.json 이 정본입니다(scripts/sync-racks.mjs 로 가져옵니다).
- * 예전 배치도는 존마다 좌표가 하나뿐이라 A1 과 A30 이 같은 자리에 찍혔습니다.
+ * 예전 지도는 존마다 좌표가 하나뿐이라 A1 과 A30 이 같은 자리에 찍혔습니다.
  * 이제 랙 하나하나가 제 자리에 그려지고, 경로는 실제로 비어 있는 칸만 밟습니다.
  */
 
 const MARK_FILL = "#E5E5E5";
 const MARK_TEXT = "#2D373D";
 
-/* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 배치도의 집기 이름과 같아야 합니다. */
+/* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 지도의 집기 이름과 같아야 합니다. */
 export const ORIGIN_MARK = "엘리베이터 입구";
 
 /* 길 안내에 이름을 댈 만한 집기. 앤드1~4 같은 내부 용어는 제외합니다. */
-const WAYPOINT = /입구|계산|PHAMA BEST|체험존|행사|음료/;
+const WAYPOINT = /입구|계산|파마베스트|체험존|행사|음료/;
 
 const zc = (zone) => ZONE_COLOR[zone] || FALLBACK;
 
@@ -39,6 +39,9 @@ const BAR_SHORT = 0.2;
 
 /* 매대는 네모난 집기입니다. 모서리를 굴리면 알약이 됩니다. */
 const BAR_RADIUS = 0.25;
+
+/* 계단 그림과 글자 사이 */
+const FS_ICON_GAP = 0.5;
 
 /* 랙 이름을 칸 안에 앉힙니다.
  *
@@ -145,6 +148,18 @@ function buildBlocks() {
 }
 
 const BLOCKS = buildBlocks();
+
+/* 매대와 집기가 실제로 놓인 범위 */
+const BOUNDS = (() => {
+  const all = [...RACKS, ...MARKS];
+  const x = Math.min(...all.map((o) => o.c));
+  const y = Math.min(...all.map((o) => o.r));
+  return {
+    x, y,
+    w: Math.max(...all.map((o) => o.c + o.w)) - x,
+    h: Math.max(...all.map((o) => o.r + o.h)) - y,
+  };
+})();
 
 /* 랙마다 막대 비례와 이름 배치를 미리 계산해 둡니다. 정본이 바뀌지 않는 한
    그릴 때마다 다시 셀 이유가 없습니다. 세로로 선 매대는 이름도 세워 씁니다. */
@@ -322,7 +337,9 @@ export default function FloorPlan({
      자기가 무엇을 놓쳤는지 알 수 없습니다. */
   const wide = minWidth != null ? minWidth : 0;
   const { rows, cols } = GRID;
-  const pad = 3;
+  /* 판매장 둘레 여백. 3칸이면 카드 안에서 지도가 그만큼 작아집니다.
+     매대가 카드 테두리에 닿지 않을 만큼만 둡니다. */
+  const pad = 1.2;
   const target = highlightRack ? RACK_BY_CODE[highlightRack] : null;
   const origin = useMemo(() => MARKS.find((m) => m.kind === ORIGIN_MARK), []);
   const route = useMemo(
@@ -336,7 +353,7 @@ export default function FloorPlan({
     const el = scroller.current;
     if (!el || !target) return;
     const full = el.scrollWidth;
-    const want = ((target.c + target.w / 2 + pad) / (cols + pad * 2)) * full - el.clientWidth / 2;
+    const want = ((target.c + target.w / 2 - FULL.x) / FULL.w) * full - el.clientWidth / 2;
     el.scrollTo({ left: Math.max(0, want), behavior: "smooth" });
   }, [target, cols]);
 
@@ -399,8 +416,9 @@ export default function FloorPlan({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openBlock]);
 
-  /* 그릴 범위. 카드 높이가 들쭉날쭉하지 않게 전체 지도와 같은 비율로 넓힙니다. */
-  const FULL = { x: -pad, y: -pad, w: cols + pad * 2, h: rows + pad * 2 };
+  /* 그릴 범위. 격자는 180×63 인데 매대와 집기는 6~176 · 4~57 만 씁니다.
+     격자를 통째로 그리면 쓰지 않는 둘레만큼 지도가 작아집니다. */
+  const FULL = { x: BOUNDS.x - pad, y: BOUNDS.y - pad, w: BOUNDS.w + pad * 2, h: BOUNDS.h + pad * 2 };
   const ratio = FULL.w / FULL.h;
   const vb = (() => {
     if (!openBlock) return FULL;
@@ -493,11 +511,11 @@ export default function FloorPlan({
         role="img"
         aria-label={
           target
-            ? `매장 배치도 — ${target.code} ${target.cat} 위치`
-            : "파마스퀘어 구로점 매장 배치도"
+            ? `매장 지도 — ${target.code} ${target.cat} 위치`
+            : "파마스퀘어 구로점 매장 지도"
         }
       >
-        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="1.5" fill="#FFFFFF" />
+        <rect x={FULL.x} y={FULL.y} width={FULL.w} height={FULL.h} rx="1.5" fill="#FFFFFF" />
 
         {/* 집기 — 상품이 놓이지 않는 자리.
             매대와 같은 규칙으로 그립니다. 여기만 알약처럼 굴려 두면
@@ -507,6 +525,7 @@ export default function FloorPlan({
              있습니다. 그런 자리는 매대와 같은 색으로 그리고, 나머지 시설은
              테두리 없는 회색 상자 하나로 통일합니다. */
           const color = m.zone ? zc(m.zone) : null;
+          const isStair = m.kind.includes("계단");
           const ix = m.h > m.w ? BAR_SHORT : BAR_LONG;
           const iy = m.h > m.w ? BAR_LONG : BAR_SHORT;
           return (
@@ -521,10 +540,34 @@ export default function FloorPlan({
                 strokeOpacity={color ? 0.9 : 0}
                 strokeWidth={color ? 0.12 : 0}
               />
+              {/* 계단은 디딤판을 그려 무엇인지 보이게 합니다. 회색 상자에
+                  글자만 있으면 계산대·체험존과 구분되지 않습니다. */}
+              {isStair && (() => {
+                const side = Math.min(m.h - iy * 2, m.w - ix * 2) * 0.62;
+                const ox = m.c + ix + FS_ICON_GAP;
+                const oy = cy(m) - side / 2;
+                const pts = [[0, 1], [0, 0.66], [0.34, 0.66], [0.34, 0.33],
+                             [0.67, 0.33], [0.67, 0], [1, 0]];
+                return (
+                  <polyline
+                    points={pts.map(([px, py]) => `${ox + px * side},${oy + py * side}`).join(" ")}
+                    fill="none" stroke={MARK_TEXT} strokeWidth="0.22"
+                    strokeLinejoin="round" strokeLinecap="round" opacity="0.75"
+                  />
+                );
+              })()}
               {m.kind !== ORIGIN_MARK && (
                 <text
-                  x={cx(m)} y={cy(m) + 0.62} textAnchor="middle"
-                  fontSize={Math.min(1.9, m.h * 0.72)}
+                  x={isStair ? cx(m) + (m.h - iy * 2) * 0.31 : cx(m)}
+                  y={cy(m) + 0.62} textAnchor="middle"
+                  /* 이름이 상자보다 길면 넘칩니다 — 「셀프 계산대」가 옆
+                     「계산대」로 흘러나왔습니다. 폭에도 맞춥니다. */
+                  fontSize={Math.min(
+                    1.9,
+                    m.h * 0.72,
+                    ((m.w - ix * 2) * (isStair ? 0.66 : 1) - 0.6) /
+                      runWidth(markLabel(lang, m.kind))
+                  )}
                   fill={color || MARK_TEXT} fontWeight={color ? 600 : 500}
                 >
                   {markLabel(lang, m.kind)}
@@ -601,7 +644,7 @@ export default function FloorPlan({
           const w = (runWidth(name) + runWidth(b.range) * 0.72 + 0.6) * FS + padX * 2;
           const h = FS * 1.85;
           /* 오른쪽 끝 구역은 표가 판매장 밖으로 삐져나갑니다. 안쪽으로 붙입니다. */
-          const x = Math.min(Math.max(b.lx - w / 2, -pad + 1), cols + pad - w - 1);
+          const x = Math.min(Math.max(b.lx - w / 2, FULL.x + 0.5), FULL.x + FULL.w - w - 0.5);
           return (
             <g key={`b${b.id}`} style={{ pointerEvents: "none" }}>
               <rect
