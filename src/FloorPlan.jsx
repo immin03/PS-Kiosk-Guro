@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel } from "./i18n.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
@@ -205,8 +205,58 @@ export default function FloorPlan({
     return r.code === target.code;
   };
 
+  /* 지도는 화면에 다 들어오지만 랙 이름이 작습니다. 손님이 직접 키워 볼 수 있게
+     두 손가락 확대와 버튼을 답니다. 키운 상태에서는 끌어서 옮깁니다. */
+  const [view, setView] = useState({ k: 1, x: 0, y: 0 });
+  const box = useRef(null);
+  const gesture = useRef(null);
+
+  const clamp = (v) => {
+    const el = box.current;
+    if (!el) return v;
+    const k = Math.min(Math.max(v.k, 1), 4);
+    const w = el.clientWidth, h = el.clientHeight;
+    const mx = (w * k - w) / 2, my = (h * k - h) / 2;
+    return { k, x: Math.min(mx, Math.max(-mx, v.x)), y: Math.min(my, Math.max(-my, v.y)) };
+  };
+  const zoomBy = (f) => setView((v) => clamp({ ...v, k: v.k * f, x: v.x * f, y: v.y * f }));
+  const resetView = () => setView({ k: 1, x: 0, y: 0 });
+
+  const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const onTouchStart = (e) => {
+    if (e.touches.length === 2) gesture.current = { d: dist(e.touches), k: view.k };
+    else if (e.touches.length === 1 && view.k > 1)
+      gesture.current = { px: e.touches[0].clientX, py: e.touches[0].clientY, x: view.x, y: view.y };
+  };
+  const onTouchMove = (e) => {
+    const g = gesture.current;
+    if (!g) return;
+    if (e.touches.length === 2 && g.d) {
+      setView((v) => clamp({ ...v, k: g.k * (dist(e.touches) / g.d) }));
+    } else if (e.touches.length === 1 && g.px != null) {
+      setView((v) => clamp({ ...v, x: g.x + (e.touches[0].clientX - g.px), y: g.y + (e.touches[0].clientY - g.py) }));
+    }
+  };
+  const onTouchEnd = () => { gesture.current = null; };
+
+  const btn = {
+    width: 34, height: 34, borderRadius: 10, border: `1px solid ${BRAND.border}`,
+    background: BRAND.surface, color: BRAND.text, fontSize: 16, fontWeight: 700,
+    lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+  };
+
   return (
-    <div ref={scroller} style={{ overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch" }}>
+    <div style={{ position: "relative" }}>
+    <div
+      ref={box}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      style={{ overflow: "hidden", touchAction: "none", cursor: view.k > 1 ? "grab" : "default" }}
+    >
+    <div ref={scroller} style={{ overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch",
+      transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})`,
+      transformOrigin: "center center", transition: gesture.current ? "none" : "transform 0.18s ease" }}>
       <svg
         viewBox={`${-pad} ${-pad} ${cols + pad * 2} ${rows + pad * 2}`}
         style={{ display: "block", width: "100%", minWidth: wide }}
@@ -328,6 +378,18 @@ export default function FloorPlan({
           );
         })()}
       </svg>
+    </div>
+    </div>
+
+      <div style={{ position: "absolute", right: 8, bottom: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+        <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
+        <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
+        {view.k > 1 && (
+          <button type="button" aria-label="지도 원래대로" style={{ ...btn, fontSize: 11, fontWeight: 600 }} onClick={resetView}>
+            원래
+          </button>
+        )}
+      </div>
     </div>
   );
 }
