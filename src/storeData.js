@@ -698,19 +698,19 @@ export const TOP_CATS = [
     "type": "health"
   },
   {
-    "label": "화장품 · 뷰티",
+    "label": "뷰티",
     "sub": "C·D 섹션 · 723종",
     "emoji": "🧴",
     "type": "beauty"
   },
   {
-    "label": "펫용품",
+    "label": "펫",
     "sub": "A31–A36 · 87종",
     "emoji": "🐾",
     "type": "pet"
   },
   {
-    "label": "생활 · 위생",
+    "label": "라이프스타일",
     "sub": "프레시케어 · 위생 · 탈취 등",
     "emoji": "🏡",
     "type": "life"

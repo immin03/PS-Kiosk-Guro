@@ -62,7 +62,7 @@ export const ZONE_COLOR = {
  */
 export const RADIUS = {
   xs: 4,     /* 배지 · 지도 칸 */
-  sm: 10,    /* 버튼 · 입력칸 · CTA */
+  sm: 4,     /* 버튼 · 입력칸 · CTA */
   md: 14,    /* 카드 */
   pill: 999, /* 토글 · 점 */
 };

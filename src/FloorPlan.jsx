@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
-import { zoneLabel } from "./i18n.js";
+import { zoneLabel, markLabel, t } from "./i18n.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
 
 /* 매장 배치도.
@@ -348,7 +348,7 @@ export default function FloorPlan({
   }, []);
 
   const btn = {
-    width: 34, height: 34, borderRadius: 10, border: `1px solid ${BRAND.border}`,
+    width: 34, height: 34, borderRadius: 4, border: `1px solid ${BRAND.border}`,
     background: BRAND.surface, color: BRAND.text, fontSize: 16, fontWeight: 700,
     lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   };
@@ -395,7 +395,7 @@ export default function FloorPlan({
                   fontSize={Math.min(1.9, m.h * 0.72)} fill={isDoor ? "#005251" : MARK_TEXT}
                   fontWeight={isDoor ? 700 : 500}
                 >
-                  {m.kind}
+                  {markLabel(lang, m.kind)}
                 </text>
               )}
             </g>
@@ -448,7 +448,7 @@ export default function FloorPlan({
               fontSize="4.6" fontWeight="800" fill={zc(b.zone)}
               stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke"
             >
-              {zoneLabel("ko", b.zone) || b.zone}
+              {zoneLabel(lang, b.zone) || b.zone}
             </text>
             <text
               x={b.lx} y={b.ly + 4.4} textAnchor="middle"
@@ -485,7 +485,7 @@ export default function FloorPlan({
               fontSize="2.6" fontWeight="800" fill={YOU}
               stroke="#FFFFFF" strokeWidth="0.9" paintOrder="stroke"
             >
-              현재 위치
+              {t(lang, "youAreHere")}
             </text>
           </g>
         )}
@@ -549,7 +549,7 @@ export function FloorPlanLegend({ lang = "ko" }) {
       ))}
       <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#2D373D" }}>
         <span style={{ width: 9, height: 9, borderRadius: 999, background: YOU }} />
-        현재 위치
+        {t(lang, "youAreHere")}
       </span>
     </div>
   );

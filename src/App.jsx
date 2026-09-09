@@ -5,8 +5,7 @@ import {
   ALL_BRANDS, ZONES_MAP, ALL_PRODUCTS,
 } from "./storeData.js";
 import {
-  detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub,
-} from "./i18n.js";
+  detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
 import FloorPlan, { FloorPlanLegend, routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
 import { categoriesOf, countOf, productsOf } from "./categories.js";
@@ -169,7 +168,7 @@ function TopBar({ title, onBack, isHome, lang, setLang }) {
       background: isHome ? C.bgF : C.wh, position:"sticky", top:0, zIndex:100,
       borderBottom: isHome ? "none" : `1px solid ${C.bd}` }}>
       {!isHome && onBack && (
-        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 8px", display:"flex", borderRadius:10 }}>
+        <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 8px", display:"flex", borderRadius:4 }}>
           <span style={{ fontSize:22, color:C.t1, lineHeight:1 }}>←</span>
         </button>
       )}
@@ -220,7 +219,7 @@ function ProductCard({ p, onLocate }) {
         <p style={{ margin:0, fontSize:12, color:C.t2 }}>{p.brand} · {p.cat}</p>
       </div>
       <div className="kiosk-loc" style={{
-        background:C.wh, border:`1px solid ${C.bd}`, borderRadius:10,
+        background:C.wh, border:`1px solid ${C.bd}`, borderRadius:4,
         padding:"6px 10px", display:"flex", alignItems:"center", gap:4,
         flexShrink:0, marginLeft:8
       }}>
@@ -328,7 +327,7 @@ export default function KioskApp() {
       <div style={{ marginBottom:24, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
         {searchQ && (
-          <div style={{ marginTop:8, background:C.wh, borderRadius:10, border:`1px solid ${C.bd}`,
+          <div style={{ marginTop:8, background:C.wh, borderRadius:4, border:`1px solid ${C.bd}`,
             boxShadow:"0 6px 20px rgba(20,60,54,0.10)", overflow:"hidden", position:"relative", zIndex:50 }}>
             {searchResults.length > 0 ? (
               <>
@@ -342,7 +341,7 @@ export default function KioskApp() {
                 </div>
                 <div style={{ padding:"8px 20px 16px" }}>
                   <button onClick={() => { doSearch(searchQ); tabTo("search"); }} style={{
-                    width:"100%", padding:"14px", borderRadius:10,
+                    width:"100%", padding:"14px", borderRadius:4,
                     background:C.bgL, border:`1px solid ${C.bd}`, cursor:"pointer", fontFamily:"inherit",
                     fontSize:13, fontWeight:600, color:C.priD
                   }}>{t(lang,"viewAllResults",{n:searchResults.length})}</button>
@@ -385,10 +384,10 @@ export default function KioskApp() {
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
         {ZONES_MAP.map(z => (
           <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-            display:"flex", gap:10, background:C.wh, borderRadius:10, padding:"10px 12px",
+            display:"flex", gap:10, background:C.wh, borderRadius:4, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
-            <div style={{ width:30, height:30, borderRadius:10, background:z.color, flexShrink:0,
+            <div style={{ width:30, height:30, borderRadius:4, background:z.color, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
               <p style={{ margin:0, fontSize:11, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -473,7 +472,7 @@ export default function KioskApp() {
         <p style={{ fontSize:11, color:C.t3, margin:"0 0 12px" }}>{t(lang,"brandsTotal",{n:filtered.length})}</p>
         <style>{`.brand-nav-wrap::-webkit-scrollbar{display:none}`}</style>
         <div className="brand-nav-wrap" style={{
-          display:"flex", overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20,
+          display:"flex", overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20, paddingTop:8, paddingBottom:12,
           WebkitOverflowScrolling:"touch", msOverflowStyle:"none", scrollbarWidth:"none",
           borderBottom:`1px solid ${C.bd}`, background:C.wh, position:"sticky", top:44, zIndex:50
         }}>
@@ -506,7 +505,7 @@ export default function KioskApp() {
                 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:14, fontWeight:hasProd?600:400, color:hasProd?C.t1:C.t2 }}>{b}</span>
-                    {hasProd && <span style={{ fontSize:10, color:C.pri, fontWeight:600, background:C.bgL, padding:"2px 7px", borderRadius:10 }}>{t(lang,"productsCount",{n:cnt})}</span>}
+                    {hasProd && <span style={{ fontSize:10, color:C.pri, fontWeight:600, background:C.bgL, padding:"2px 7px", borderRadius:4 }}>{t(lang,"productsCount",{n:cnt})}</span>}
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.45}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
@@ -556,7 +555,7 @@ export default function KioskApp() {
             <div style={{ display:"flex", gap:8, marginBottom:14 }}>
               {[["cat",t(lang,"filterCat")],["brand",t(lang,"filterBrand")]].map(([id,lb]) => (
                 <button key={id} onClick={() => setSearchFacet(id)} style={{
-                  flex:1, padding:"11px", borderRadius:10, cursor:"pointer", fontFamily:"inherit", fontSize:13,
+                  flex:1, padding:"11px", borderRadius:4, cursor:"pointer", fontFamily:"inherit", fontSize:13,
                   fontWeight:700, background: searchFacet===id ? C.priM : C.wh,
                   color: searchFacet===id ? C.wh : C.t2,
                   border:`1px solid ${searchFacet===id ? C.priM : C.bd}`
@@ -566,7 +565,7 @@ export default function KioskApp() {
             {searchFacet==="cat" ? (
               HOME_CATS.map(item => (
                 <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
-                  display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:10,
+                  display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:4,
                   padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
                 }}>
                   <EmojiChip e={item.emoji} d={44} s={28} />
@@ -605,10 +604,10 @@ export default function KioskApp() {
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:10,
+          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:4,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
-          <div style={{ width:38, height:38, borderRadius:10, background:z.color, flexShrink:0,
+          <div style={{ width:38, height:38, borderRadius:4, background:z.color, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 1px", fontSize:14, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -640,13 +639,14 @@ export default function KioskApp() {
     /* 안내는 경로에서 뽑습니다. 예전에는 존마다 "약 10m" 를 박아뒀는데
        축척 도면이 아니라 근거가 없었고, 같은 존이면 전부 같은 문구가 나왔습니다. */
     const steps = [];
-    steps.push({ n:1, t:"여기서 출발하세요", sub: guide?.origin ? guide.origin + " · 지도의 빨간 점" : "지도의 빨간 점" });
+    const redDot = t(lang, "step.redDot");
+    steps.push({ n:1, t: t(lang, "step.start"), sub: guide?.origin ? markLabel(lang, guide.origin) + " · " + redDot : redDot });
     (guide?.passed || []).forEach((mark) => {
-      steps.push({ n: steps.length + 1, t: mark + " 방향으로 이동", sub: "지나가는 지점이에요" });
+      steps.push({ n: steps.length + 1, t: t(lang, "step.pass", { mark: markLabel(lang, mark) }), sub: t(lang, "step.passSub") });
     });
     steps.push({
       n: steps.length + 1,
-      t: "랙 " + p.rack + "에서 찾으세요",
+      t: t(lang, "step.arrive", { rack: p.rack }),
       sub: rackInfo ? rackInfo.cat + " · " + (zoneLabel(lang, rackInfo.zone) || rackInfo.zone) : undefined,
     });
     /* 상세 항목은 값이 실제로 있는 것만 남깁니다. 지금 데이터에서 en·spec 은
@@ -695,9 +695,9 @@ export default function KioskApp() {
         </div>
 
         {/* 위치 배지 — 인터랙션 추가 */}
-        <div className="kiosk-card" style={{ background:C.wh, borderRadius:10, padding:"14px 16px", marginBottom:14,
+        <div className="kiosk-card" style={{ background:C.wh, borderRadius:14, padding:"14px 16px", marginBottom:14,
           display:"flex", alignItems:"center", gap:12, border:`1px solid ${zoneInfo?.color||C.pri}`, cursor:"default" }}>
-          <div style={{ width:46, height:46, borderRadius:10, background:zoneInfo?.color||C.pri, flexShrink:0,
+          <div style={{ width:46, height:46, borderRadius:4, background:zoneInfo?.color||C.pri, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:18 }}>{zone}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
@@ -723,7 +723,7 @@ export default function KioskApp() {
             }}>
               {/* 넘버 — 크고 명확하게 */}
               <div style={{
-                width:32, height:32, borderRadius:10, flexShrink:0,
+                width:32, height:32, borderRadius:4, flexShrink:0,
                 background: s.n===3 ? C.pri : s.n===2 ? C.priM : C.bgL,
                 display:"flex", alignItems:"center", justifyContent:"center",
                 color: s.n>=2 ? C.wh : C.priD, fontSize:14, fontWeight:700,
@@ -746,7 +746,7 @@ export default function KioskApp() {
         {related.length>0 && (
           <div>
             <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 12px" }}>{t(lang,"relatedAlso")}</p>
-            <div style={{ display:"flex", gap:12, overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20, paddingBottom:8 }}>
+            <div style={{ display:"flex", gap:12, overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20, paddingTop:8, paddingBottom:12 }}>
               {related.map((r,i) => (
                 <ThumbCard key={i} lang={lang} p={r} onPress={() => {
                   setInfoOpen(false);
