@@ -36,10 +36,10 @@ const BLOCK_GAP = 10;
    그려 칸이 구분되게 합니다. */
 const INSET = 0.35;
 
-/* 랙은 도면처럼 그립니다 — 긴 축은 거의 붙여 한 줄의 매대로 이어 보이게 하고,
-   짧은 축만 들여 칸이 구분되게 합니다. 7×3 칸이 6.8×2.6 으로 그려집니다.
-   전에는 2.0 이라 이름 두 줄이 안 들어가고 알약처럼 보였습니다. */
-const BAR_LONG = 0.12;
+/* 랙은 도면처럼 그립니다. 7×3 칸이 6.4×2.6 으로 그려집니다.
+   전에 긴 축을 0.12 만 들였더니 옆 칸과 선이 맞닿아 한 덩어리로 보였습니다.
+   어느 방향이든 칸과 칸 사이에 최소 0.6 칸(150mm)이 뜹니다. */
+const BAR_LONG = 0.3;
 const BAR_SHORT = 0.2;
 
 /* 매대는 네모난 집기입니다. 모서리를 굴리면 알약이 됩니다. */
@@ -530,8 +530,8 @@ export default function FloorPlan({
                 fill={color}
                 fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
                 stroke={color}
-                strokeOpacity={isTarget ? 1 : dim ? 0.3 : 0.55}
-                strokeWidth={isTarget ? 0.7 : 0.3}
+                strokeOpacity={isTarget ? 1 : dim ? 0.4 : 0.9}
+                strokeWidth={isTarget ? 0.3 : 0.12}
               />
               {labelled(r) && !isTarget && bar.label && (
                 <g
