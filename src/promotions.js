@@ -61,7 +61,8 @@ export const PROMOTIONS = [
       "event",
       "kiosk"
     ],
-    "link": "https://www.phamasquare.com/event.html"
+    "link": "https://www.phamasquare.com/event.html",
+    "image": "store-exterior.jpg"
   },
   {
     "id": "guro-stamp",
@@ -79,6 +80,7 @@ export const PROMOTIONS = [
       "event",
       "kiosk"
     ],
-    "link": "https://www.phamasquare.com/event.html"
+    "link": "https://www.phamasquare.com/event.html",
+    "image": "store-c.jpg"
   }
 ];

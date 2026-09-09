@@ -36,6 +36,45 @@ const BLOCK_GAP = 10;
    그려 칸이 구분되게 합니다. */
 const INSET = 0.35;
 
+/* 랙은 도면처럼 그립니다 — 긴 축은 거의 붙여 한 줄의 매대로 이어 보이게 하고,
+   짧은 축만 넉넉히 들여 얇고 긴 막대가 되게 합니다. 7×3 칸이 6.8×2.0 으로
+   그려져 도면의 매대 비례에 가까워집니다. */
+const BAR_LONG = 0.12;
+const BAR_SHORT = 0.5;
+
+/* 랙 이름을 칸 안에 앉힙니다.
+ *
+ * 「A1」 대신 「콘드로이친」이 읽혀야 손님이 지도만 보고 매대를 찾습니다.
+ * 이름은 칸보다 길어서, 띄어쓰기와 가운뎃점에서 두 줄까지 나누고 남은 만큼
+ * 글자를 줄입니다. 한글은 글자폭이 글자크기와 거의 같고 나머지는 그 절반으로
+ * 잡습니다. */
+const runWidth = (line) =>
+  [...line].reduce((n, ch) => n + (/[\u3131-\uD79D\u4E00-\u9FFF]/.test(ch) ? 1 : 0.5), 0);
+
+function fitLabel(text, boxW, boxH) {
+  /* 가운뎃점은 앞말에 붙여 둡니다. 떼어 놓으면 「단백질 / · 아미노산」 처럼
+     둘째 줄이 점으로 시작합니다. */
+  const words = text
+    .split(/\s+/)
+    .filter(Boolean)
+    .reduce((acc, w) => {
+      if (w === "·" && acc.length) acc[acc.length - 1] += " ·";
+      else acc.push(w);
+      return acc;
+    }, []);
+  const candidates = [[text]];
+  for (let i = 1; i < words.length; i += 1)
+    candidates.push([words.slice(0, i).join(" "), words.slice(i).join(" ")]);
+
+  let best = null;
+  candidates.forEach((lines) => {
+    const longest = Math.max(...lines.map(runWidth));
+    const size = Math.min(boxW / longest, (boxH / lines.length) * 0.82, 2.2);
+    if (!best || size > best.size) best = { lines, size };
+  });
+  return best;
+}
+
 function buildBlocks() {
   const byLetter = {};
   RACKS.forEach((r) => {
@@ -108,6 +147,30 @@ function buildBlocks() {
 }
 
 const BLOCKS = buildBlocks();
+
+/* 랙마다 막대 비례와 이름 배치를 미리 계산해 둡니다. 정본이 바뀌지 않는 한
+   그릴 때마다 다시 셀 이유가 없습니다. 세로로 선 매대는 이름도 세워 씁니다. */
+const BAR = (() => {
+  const rows = RACKS.map((r) => {
+    const upright = r.h > r.w;
+    const ix = upright ? BAR_SHORT : BAR_LONG;
+    const iy = upright ? BAR_LONG : BAR_SHORT;
+    const boxW = (upright ? r.h : r.w) - (upright ? iy : ix) * 2 - 0.3;
+    const boxH = (upright ? r.w : r.h) - (upright ? ix : iy) * 2;
+    return { code: r.code, upright, ix, iy, label: r.cat ? fitLabel(r.cat, boxW, boxH) : null };
+  });
+
+  /* 칸마다 제 이름에 맞춰 글자를 키우면 「식품」만 크고 「식이섬유 · 효소」는
+     작아져 지도가 들쭉날쭉해집니다. 대부분이 소화할 수 있는 한 크기로 맞추고,
+     그보다도 이름이 긴 몇 칸만 더 줄입니다. */
+  const sizes = rows.filter((b) => b.label).map((b) => b.label.size).sort((a, b) => a - b);
+  const common = sizes[Math.floor(sizes.length * 0.5)];
+
+  rows.forEach((b) => {
+    if (b.label) b.label = { ...b.label, size: Math.min(b.label.size, common) };
+  });
+  return Object.fromEntries(rows.map((b) => [b.code, b]));
+})();
 
 const cx = (o) => o.c + o.w / 2;
 const cy = (o) => o.r + o.h / 2;
@@ -405,6 +468,7 @@ export default function FloorPlan({
         {/* 랙 */}
         {RACKS.map((r) => {
           const color = zc(r.zone);
+          const bar = BAR[r.code];
           const isTarget = target && r.code === target.code;
           const zoneOn = !target && highlightZone && r.zone === highlightZone;
           const dim = target && !isTarget;
@@ -419,22 +483,39 @@ export default function FloorPlan({
               style={grouped || onRackClick ? { cursor: "pointer" } : undefined}
             >
               <rect
-                x={r.c + INSET} y={r.r + INSET}
-                width={r.w - INSET * 2} height={r.h - INSET * 2} rx="1"
-                fill={isTarget ? color : color}
+                x={r.c + bar.ix} y={r.r + bar.iy}
+                width={r.w - bar.ix * 2} height={r.h - bar.iy * 2} rx="0.5"
+                fill={color}
                 fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
                 stroke={color}
                 strokeOpacity={isTarget ? 1 : dim ? 0.3 : 0.55}
                 strokeWidth={isTarget ? 0.7 : 0.3}
               />
-              {labelled(r) && !isTarget && (
-                <text
-                  x={cx(r)} y={cy(r) + 0.62}
-                  textAnchor="middle" fontSize="1.75" fontWeight="600"
-                  fill={color} fillOpacity={dim ? 0.55 : 1}
+              {labelled(r) && !isTarget && bar.label && (
+                <g
+                  transform={
+                    bar.upright
+                      ? `rotate(-90 ${cx(r)} ${cy(r)})`
+                      : undefined
+                  }
+                  style={{ pointerEvents: "none" }}
                 >
-                  {r.code}
-                </text>
+                  {bar.label.lines.map((line, i) => (
+                    <text
+                      key={i}
+                      x={cx(r)}
+                      y={
+                        cy(r) +
+                        bar.label.size * 0.36 +
+                        (i - (bar.label.lines.length - 1) / 2) * bar.label.size * 1.12
+                      }
+                      textAnchor="middle" fontSize={bar.label.size} fontWeight="600"
+                      fill={color} fillOpacity={dim ? 0.55 : 1}
+                    >
+                      {line}
+                    </text>
+                  ))}
+                </g>
               )}
             </g>
           );
