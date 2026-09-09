@@ -1,6 +1,7 @@
 import { useMemo, useRef, useEffect } from "react";
 import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel } from "./i18n.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
 
 /* 매장 배치도.
  *
@@ -9,21 +10,9 @@ import { zoneLabel } from "./i18n.js";
  * 이제 랙 하나하나가 제 자리에 그려지고, 경로는 실제로 비어 있는 칸만 밟습니다.
  */
 
-const ZONE_COLOR = {
-  "건기식": "#159A87",
-  "뷰티": "#C98A8A",
-  "브랜드존": "#0E6E60",
-  "펫": "#D9A441",
-  "라이프": "#6E8CA0",
-  "식품·음료": "#3E93B8",
-  "프로모션": "#B07070",
-  "기타": "#9AAAA5",
-};
-const FALLBACK = "#9AAAA5";
-const YOU = "#E5484D";           // 현재 위치 — 브랜드 초록과 섞이지 않게 붉은색
-const MARK_FILL = "#ECF2F0";
-const MARK_LINE = "#D3DFDC";
-const MARK_TEXT = "#687977";
+const MARK_FILL = "#EDF3F1";
+const MARK_LINE = "#D8E1E2";
+const MARK_TEXT = "#6E7A7D";
 
 /* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 배치도의 집기 이름과 같아야 합니다. */
 export const ORIGIN_MARK = "엘리베이터 입구";
@@ -180,10 +169,9 @@ export default function FloorPlan({
   onRackClick,
   minWidth,
 }) {
-  /* 위치 안내는 한눈에 들어와야 해서 화면에 맞춥니다.
-     매장 안내도는 훑어보는 화면이라 넓게 펴고 가로로 밀 수 있게 둡니다. */
-  const fit = detail === "target";
-  const wide = minWidth != null ? minWidth : fit ? 0 : 880;
+  /* 지도는 언제나 화면 폭에 맞춥니다. 가로로 밀어야 보이는 지도는 손님이
+     자기가 무엇을 놓쳤는지 알 수 없습니다. */
+  const wide = minWidth != null ? minWidth : 0;
   const { rows, cols } = GRID;
   const pad = 3;
   const target = highlightRack ? RACK_BY_CODE[highlightRack] : null;
@@ -229,7 +217,7 @@ export default function FloorPlan({
             : "파마스퀘어 구로점 매장 배치도"
         }
       >
-        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="2" fill="#F7FAF9" />
+        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="2" fill="#F6FAF9" />
 
         {/* 집기 — 상품이 놓이지 않는 자리 */}
         {MARKS.map((m, i) => {
@@ -238,14 +226,14 @@ export default function FloorPlan({
             <g key={`m${i}`}>
               <rect
                 x={m.c} y={m.r} width={m.w} height={m.h} rx="1"
-                fill={isDoor ? "#DDEDE8" : MARK_FILL}
-                stroke={isDoor ? "#9CC9BE" : MARK_LINE}
+                fill={isDoor ? "#C8E8E2" : MARK_FILL}
+                stroke={isDoor ? "#63CAC1" : MARK_LINE}
                 strokeWidth="0.3"
               />
               {m.kind !== ORIGIN_MARK && (
                 <text
                   x={cx(m)} y={cy(m) + 0.62} textAnchor="middle"
-                  fontSize={Math.min(1.9, m.h * 0.72)} fill={isDoor ? "#2C6B60" : MARK_TEXT}
+                  fontSize={Math.min(1.9, m.h * 0.72)} fill={isDoor ? "#005251" : MARK_TEXT}
                   fontWeight={isDoor ? 700 : 500}
                 >
                   {m.kind}
@@ -332,7 +320,7 @@ export default function FloorPlan({
             </text>
             <text
               x={cx(target)} y={above ? target.r - 1.4 : target.r + target.h + 7.4}
-              textAnchor="middle" fontSize="2.8" fontWeight="600" fill="#4A625E"
+              textAnchor="middle" fontSize="2.8" fontWeight="600" fill="#2D373D"
             >
               {target.cat}
             </text>
@@ -351,12 +339,12 @@ export function FloorPlanLegend({ lang = "ko" }) {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", marginTop: 10 }}>
       {used.map((z) => (
-        <span key={z} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#5C7570" }}>
+        <span key={z} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#2D373D" }}>
           <span style={{ width: 9, height: 9, borderRadius: 3, background: zc(z) }} />
           {zoneLabel(lang, z) || z}
         </span>
       ))}
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#5C7570" }}>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#2D373D" }}>
         <span style={{ width: 9, height: 9, borderRadius: 999, background: YOU }} />
         현재 위치
       </span>

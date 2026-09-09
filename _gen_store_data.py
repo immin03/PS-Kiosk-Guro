@@ -1,4 +1,6 @@
 # Generate storeData.js from Excel + rack-sections.json
+# 주의: 랙 카테고리 정본은 PS-OS catalog/racks.json 입니다.
+#      여기서 만드는 라벨은 화면에 쓰지 않습니다 (src/rackLayout.js 가 정본 사본).
 import json, re, sys
 from pathlib import Path
 from collections import Counter
@@ -185,7 +187,6 @@ def dumps(obj):
 js = f"""/* Auto-generated from 구로점 랙별 진열 SKU_260801.xlsx + latest floor map.
  * Do not edit by hand — regenerate via _gen_store_data.py
  */
-export const SECTION_LABELS = {dumps(LABELS)};
 
 export const HEALTH_CATS = {dumps(HEALTH_CATS)};
 

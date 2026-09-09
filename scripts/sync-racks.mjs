@@ -26,9 +26,11 @@ const SOURCE =
 const SOURCE_PROMO = resolve(dirname(SOURCE), "promotions.json");
 
 if (!existsSync(SOURCE)) {
-  /* 배포 머신에는 PS-OS 저장소가 없습니다. 확인만 하는 실행이면 조용히 넘어갑니다. */
-  if (process.argv.includes("--check")) {
-    console.log(`정본이 없어 확인을 건너뜁니다: ${SOURCE}`);
+  /* 조용히 넘어가면 배치가 어긋나도 아무도 모릅니다. 실제로 손님을 네 칸 떨어진
+     매대로 보내고 있었는데 확인은 계속 통과하고 있었습니다. 넘어가려면 그렇게
+     하겠다고 적어야 합니다. */
+  if (process.argv.includes("--allow-missing")) {
+    console.log(`정본이 없어 확인을 건너뜁니다(--allow-missing): ${SOURCE}`);
     process.exit(0);
   }
   console.error(`정본을 찾을 수 없습니다: ${SOURCE}`);
@@ -76,7 +78,7 @@ export const RACK_ZONE = Object.fromEntries(RACKS.map((r) => [r.code, r.zone]));
 let promoBody = null;
 if (existsSync(SOURCE_PROMO)) {
   const pdoc = JSON.parse(readFileSync(SOURCE_PROMO, "utf8"));
-  const list = (pdoc.promotions || [])
+  const list = (pdoc.running || pdoc.promotions || [])
     .filter((p) => p.status === "live")
     .filter((p) => (p.channels || []).includes("kiosk"))
     .filter((p) => !p.stores || p.stores.includes(STORE))

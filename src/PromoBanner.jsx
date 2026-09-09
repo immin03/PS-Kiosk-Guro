@@ -9,10 +9,10 @@ import { PROMOTIONS } from "./promotions.js";
  */
 
 const TONE = [
-  "linear-gradient(135deg,#00302F 0%,#00786F 100%)",
+  "linear-gradient(135deg,#10181E 0%,#00978F 100%)",
   "linear-gradient(135deg,#005251 0%,#01C0A4 100%)",
-  "linear-gradient(135deg,#0E6E60 0%,#2BCAB0 100%)",
-  "linear-gradient(135deg,#004B47 0%,#159A87 100%)",
+  "linear-gradient(135deg,#005251 0%,#2BCAB0 100%)",
+  "linear-gradient(135deg,#005251 0%,#00978F 100%)",
 ];
 
 export default function PromoBanner({ onPress, interval = 5000 }) {
