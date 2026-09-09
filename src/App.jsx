@@ -436,12 +436,10 @@ export default function KioskApp() {
     const prods = productsOf(cat);
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:16 }}>
-          <EmojiChip e={cat.emoji} d={52} s={34} />
-          <div>
-            <p style={{ margin:"0 0 2px", fontSize:18, fontWeight:700, color:C.t1 }}>{catLabel(lang,cat)}</p>
-            <p style={{ margin:0, fontSize:13, color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
-          </div>
+        {/* 이름은 헤더가 답니다. 여기서 또 적으면 같은 말이 두 줄로 겹칩니다. */}
+        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+          <EmojiChip e={cat.emoji} d={44} s={28} />
+          <p style={{ margin:0, fontSize:13, color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
         </div>
         <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:16 }}>
           <p style={{ margin:"0 0 8px", fontSize:13, fontWeight:700, color:C.t1 }}>{t(lang,"inStoreLocation")}</p>
@@ -529,8 +527,7 @@ export default function KioskApp() {
     const prods = ALL_PRODUCTS.filter(p => p.brand===name);
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        <div style={{ padding:"8px 0 16px" }}>
-          <h2 style={{ margin:"0 0 4px", fontSize:20, fontWeight:700, color:C.t1 }}>{name}</h2>
+        <div style={{ padding:"0 0 12px" }}>
           <p style={{ margin:0, fontSize:13, color:C.t2 }}>{prods.length>0?t(lang,"showingProducts",{n:prods.length}):t(lang,"dataPending")}</p>
         </div>
         <div style={{ height:1, background:C.bd, margin:"0 0 8px" }}/>
