@@ -130,7 +130,7 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
     }}>
       {rank && (
         <div style={{
-          width:20, height:20, borderRadius:8, flexShrink:0,
+          width:20, height:20, borderRadius:4, flexShrink:0,
           background: rank===1 ? C.priD : rank<=3 ? C.priM : C.bgL,
           display:"flex", alignItems:"center", justifyContent:"center",
           fontSize:10, fontWeight:800,
@@ -151,12 +151,13 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
 /* ── COMPONENTS ── */
 function LangToggle({ lang, setLang }) {
   return (
-    <div style={{ display:"inline-flex", alignItems:"center", gap:1, background:C.wh,
-      border:`1px solid ${C.bd}`, borderRadius:999, padding:1, flexShrink:0, lineHeight:1 }}>
+    <div style={{ display:"inline-flex", alignItems:"center", gap:2, background:C.wh,
+      border:`1px solid ${C.bd}`, borderRadius:999, padding:3, flexShrink:0, lineHeight:1 }}>
       {[["ko","KO"],["en","EN"],["zh","中"]].map(([id, lb]) => (
         <button key={id} type="button" onClick={() => setLang(id)} style={{
           border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:11, fontWeight:700,
-          letterSpacing:".04em", padding:"2px 8px", borderRadius:999, lineHeight:1.1, minHeight:0,
+          letterSpacing:".04em", padding:"3px 0", width:30, textAlign:"center",
+          borderRadius:999, lineHeight:1.1, minHeight:0,
           background: lang===id ? C.pri : "transparent", color: lang===id ? C.wh : C.t2,
         }}>{lb}</button>
       ))}
@@ -373,7 +374,7 @@ export default function KioskApp() {
             <EmojiChip e={item.emoji} d={34} s={22} />
             <div>
               <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:700, color:C.t1, lineHeight:1.3 }}>
-                {item.type === "brand" ? item.label : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
+                {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
               </p>
               <p style={{ margin:0, fontSize:11, color:C.t3, lineHeight:1.45 }}>
                 {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
@@ -398,7 +399,7 @@ export default function KioskApp() {
             display:"flex", gap:10, background:C.wh, borderRadius:14, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
-            <div style={{ width:30, height:30, borderRadius:8, background:z.color, flexShrink:0,
+            <div style={{ width:30, height:30, borderRadius:4, background:z.color, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
               <p style={{ margin:0, fontSize:11, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -587,7 +588,7 @@ export default function KioskApp() {
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
                     <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>
-                      {item.type === "brand" ? item.label : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
+                      {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
                     </p>
                     <p style={{ margin:0, fontSize:12, color:C.t3 }}>
                       {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
@@ -627,7 +628,7 @@ export default function KioskApp() {
           display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:14,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
-          <div style={{ width:38, height:38, borderRadius:8, background:z.color, flexShrink:0,
+          <div style={{ width:38, height:38, borderRadius:4, background:z.color, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 1px", fontSize:14, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -717,7 +718,7 @@ export default function KioskApp() {
         {/* 위치와 지도는 같은 답이라 한 상자에 담고 선으로만 나눕니다. */}
         <div style={{ background:C.wh, borderRadius:14, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px" }}>
-            <div style={{ width:42, height:42, borderRadius:8, background:zoneInfo?.color||C.pri, flexShrink:0,
+            <div style={{ width:42, height:42, borderRadius:4, background:zoneInfo?.color||C.pri, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:17 }}>{zone}</div>
             <div style={{ flex:1 }}>
               <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
@@ -741,7 +742,7 @@ export default function KioskApp() {
             }}>
               {/* 넘버 — 크고 명확하게 */}
               <div style={{
-                width:32, height:32, borderRadius:8, flexShrink:0,
+                width:32, height:32, borderRadius:4, flexShrink:0,
                 background: C.pri,
                 display:"flex", alignItems:"center", justifyContent:"center",
                 color: C.wh, fontSize:14, fontWeight:700
