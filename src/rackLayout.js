@@ -680,7 +680,7 @@ export const RACKS = [
     "w": 8,
     "h": 3,
     "cat": "여성 위생용품",
-    "zone": "건기식"
+    "zone": "라이프"
   },
   {
     "code": "C20",
