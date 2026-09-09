@@ -348,8 +348,8 @@ export default function FloorPlan({
   }, []);
 
   const btn = {
-    width: 34, height: 34, borderRadius: 4, border: `1px solid ${BRAND.border}`,
-    background: BRAND.surface, color: BRAND.text, fontSize: 16, fontWeight: 700,
+    width: 30, height: 30, borderRadius: 8, border: `1px solid ${BRAND.border}`,
+    background: BRAND.surface, color: BRAND.text, fontSize: 15, fontWeight: 600,
     lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   };
 
@@ -522,7 +522,7 @@ export default function FloorPlan({
     </div>
 
       {/* 지도 위에 얹으면 오른쪽 끝 블록 이름을 가립니다. 지도 아래에 둡니다. */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8 }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8, paddingRight: 6 }}>
         <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
         <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
         {(view.k > 1 || openBlock) && (

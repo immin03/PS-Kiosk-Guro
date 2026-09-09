@@ -705,23 +705,21 @@ export default function KioskApp() {
           )}
         </div>
 
-        {/* 위치 배지 — 인터랙션 추가 */}
-        <div className="kiosk-card" style={{ background:C.wh, borderRadius:14, padding:"14px 16px", marginBottom:14,
-          display:"flex", alignItems:"center", gap:12, border:`1px solid ${zoneInfo?.color||C.pri}`, cursor:"default" }}>
-          <div style={{ width:46, height:46, borderRadius:8, background:zoneInfo?.color||C.pri, flexShrink:0,
-            display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:18 }}>{zone}</div>
-          <div style={{ flex:1 }}>
-            <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
-            <p style={{ margin:0, fontSize:12, color:C.t2 }}>{rackInfo ? rackInfo.cat : zLbl}</p>
+        {/* 위치와 지도는 같은 답이라 한 상자에 담고 선으로만 나눕니다. */}
+        <div style={{ background:C.wh, borderRadius:14, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px" }}>
+            <div style={{ width:42, height:42, borderRadius:8, background:zoneInfo?.color||C.pri, flexShrink:0,
+              display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:17 }}>{zone}</div>
+            <div style={{ flex:1 }}>
+              <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
+              <p style={{ margin:0, fontSize:12, color:C.t2 }}>{rackInfo ? rackInfo.cat : zLbl}</p>
+            </div>
           </div>
 
-        </div>
-
-        {/* 지도 */}
-        {/* 지도가 곧 답이라 카드 안쪽 여백을 줄여 폭을 최대한 씁니다 */}
-        <div style={{ background:C.wh, borderRadius:14, padding:"14px 6px", border:`1px solid ${C.bd}`, marginBottom:14 }}>
-          <p style={{ margin:"0 0 10px 8px", fontSize:13, fontWeight:700, color:C.t1 }}>{t(lang,"directions")}</p>
-          <FloorPlan lang={lang} highlightRack={p.rack} showPath detail="target"/>
+          <div style={{ borderTop:`1px solid ${C.bd}`, padding:"12px 10px 10px" }}>
+            <p style={{ margin:"0 0 8px 6px", fontSize:12, fontWeight:600, color:C.t2 }}>{t(lang,"directions")}</p>
+            <FloorPlan lang={lang} highlightRack={p.rack} showPath detail="target"/>
+          </div>
         </div>
 
         {/* 3단계 안내 — 각 step kiosk-card 인터랙션 */}
@@ -729,16 +727,15 @@ export default function KioskApp() {
           {steps.map((s,idx) => (
             <div key={s.n} className="kiosk-card" style={{
               display:"flex", gap:14, alignItems:"center", padding:"16px 18px",
-              borderBottom: idx<2 ? `1px solid ${C.bd}` : "none",
+              borderBottom: idx < steps.length - 1 ? `1px solid ${C.bd}` : "none",
               cursor:"default", borderRadius:0
             }}>
               {/* 넘버 — 크고 명확하게 */}
               <div style={{
                 width:32, height:32, borderRadius:8, flexShrink:0,
-                background: s.n===3 ? C.pri : s.n===2 ? C.priM : C.bgL,
+                background: C.pri,
                 display:"flex", alignItems:"center", justifyContent:"center",
-                color: s.n>=2 ? C.wh : C.priD, fontSize:14, fontWeight:700,
-                boxShadow: s.n>=2 ? `0 2px 6px ${s.n===3?C.pri:C.priM}44` : "none"
+                color: C.wh, fontSize:14, fontWeight:700
               }}>{s.n}</div>
               <div style={{ flex:1 }}>
                 <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:600, color:C.t1 }}>{s.t}</p>
@@ -749,7 +746,7 @@ export default function KioskApp() {
         </div>
 
         <button onClick={pop} className="kiosk-btn" style={{ width:"100%", marginBottom:24, padding:"15px", borderRadius:14,
-          background:C.priD, color:C.wh, border:"none", fontSize:15, fontWeight:700, fontFamily:"inherit", cursor:"pointer" }}>
+          background:C.pri, color:C.wh, border:"none", fontSize:15, fontWeight:700, fontFamily:"inherit", cursor:"pointer" }}>
           {t(lang,"seeOther")}
         </button>
 

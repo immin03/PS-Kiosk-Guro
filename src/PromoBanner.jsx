@@ -33,7 +33,7 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
   if (!items.length) return null;
 
   return (
-    <div style={{ position: "relative", borderRadius: 8, overflow: "hidden", marginBottom: 20, height: 172 }}>
+    <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", marginBottom: 20, aspectRatio: "16 / 9" }}>
       {items.map((p, n) => (
         <div
           key={p.id}
