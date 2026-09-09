@@ -30,7 +30,7 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
   if (!items.length) return null;
 
   return (
-    <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", marginBottom: 20, height: 172 }}>
+    <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", marginBottom: 20, height: 172 }}>
       {items.map((p, n) => (
         <div
           key={p.id}
@@ -49,7 +49,7 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
           <div style={{ position: "relative", height: "100%", padding: "22px 22px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
             {p.tag && (
               <span style={{
-                alignSelf: "flex-start", marginBottom: 9, padding: "4px 10px", borderRadius: 40,
+                alignSelf: "flex-start", marginBottom: 9, padding: "4px 10px", borderRadius: 999,
                 background: "rgba(255,255,255,.2)", color: "#fff",
                 fontSize: 11, fontWeight: 700, letterSpacing: ".04em",
               }}>{p.tag}</span>
@@ -71,7 +71,7 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
               onClick={() => setI(n)}
               aria-label={`${n + 1}번째 혜택 보기`}
               style={{
-                width: n === i ? 18 : 6, height: 6, borderRadius: 3, padding: 0,
+                width: n === i ? 18 : 6, height: 6, borderRadius: 4, padding: 0,
                 border: "none", cursor: "pointer", transition: "width .3s, background .3s",
                 background: n === i ? "#fff" : "rgba(255,255,255,.42)",
               }}

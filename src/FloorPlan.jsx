@@ -10,9 +10,9 @@ import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from ".
  * 이제 랙 하나하나가 제 자리에 그려지고, 경로는 실제로 비어 있는 칸만 밟습니다.
  */
 
-const MARK_FILL = "#EDF3F1";
+const MARK_FILL = "#E5E5E5";
 const MARK_LINE = "#D8E1E2";
-const MARK_TEXT = "#6E7A7D";
+const MARK_TEXT = "#2D373D";
 
 /* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 배치도의 집기 이름과 같아야 합니다. */
 export const ORIGIN_MARK = "엘리베이터 입구";
@@ -31,6 +31,10 @@ const zc = (zone) => ZONE_COLOR[zone] || FALLBACK;
  * 아래 줄로 나뉩니다) 따로 묶습니다.
  */
 const BLOCK_GAP = 10;
+
+/* 매대는 실제로 맞붙어 있습니다. 좌표는 그대로 두고 그릴 때만 살짝 들여
+   그려 칸이 구분되게 합니다. */
+const INSET = 0.35;
 
 function buildBlocks() {
   const byLetter = {};
@@ -371,7 +375,7 @@ export default function FloorPlan({
             : "파마스퀘어 구로점 매장 배치도"
         }
       >
-        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="2" fill="#F6FAF9" />
+        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="2" fill="#FFFFFF" />
 
         {/* 집기 — 상품이 놓이지 않는 자리 */}
         {MARKS.map((m, i) => {
@@ -379,8 +383,9 @@ export default function FloorPlan({
           return (
             <g key={`m${i}`}>
               <rect
-                x={m.c} y={m.r} width={m.w} height={m.h} rx="1"
-                fill={isDoor ? "#C8E8E2" : MARK_FILL}
+                x={m.c + INSET} y={m.r + INSET}
+                width={m.w - INSET * 2} height={m.h - INSET * 2} rx="1"
+                fill={isDoor ? "#D9E4E3" : MARK_FILL}
                 stroke={isDoor ? "#63CAC1" : MARK_LINE}
                 strokeWidth="0.3"
               />
@@ -414,7 +419,8 @@ export default function FloorPlan({
               style={grouped || onRackClick ? { cursor: "pointer" } : undefined}
             >
               <rect
-                x={r.c} y={r.r} width={r.w} height={r.h} rx="0.8"
+                x={r.c + INSET} y={r.r + INSET}
+                width={r.w - INSET * 2} height={r.h - INSET * 2} rx="0.8"
                 fill={isTarget ? color : color}
                 fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
                 stroke={color}
@@ -458,11 +464,11 @@ export default function FloorPlan({
         {route && (
           <polyline
             points={route.map(([c, r]) => `${c},${r}`).join(" ")}
-            fill="none" stroke={YOU} strokeWidth="0.9"
+            fill="none" stroke={YOU} strokeWidth="0.45"
             strokeLinecap="round" strokeLinejoin="round"
-            strokeDasharray="2.4 1.8" opacity="0.85"
+            strokeDasharray="0.9 1.6" opacity="0.7"
           >
-            <animate attributeName="stroke-dashoffset" values="0;-8.4" dur="1s" repeatCount="indefinite" />
+            <animate attributeName="stroke-dashoffset" values="0;-5" dur="1.1s" repeatCount="indefinite" />
           </polyline>
         )}
 
@@ -474,7 +480,11 @@ export default function FloorPlan({
               <animate attributeName="r" values="1.9;3.6;1.9" dur="1.8s" repeatCount="indefinite" />
               <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.8s" repeatCount="indefinite" />
             </circle>
-            <text x={cx(origin)} y={cy(origin) + 5.4} textAnchor="middle" fontSize="2.6" fontWeight="800" fill={YOU}>
+            <text
+              x={cx(origin)} y={cy(origin) + 5.4} textAnchor="middle"
+              fontSize="2.6" fontWeight="800" fill={YOU}
+              stroke="#FFFFFF" strokeWidth="0.9" paintOrder="stroke"
+            >
               현재 위치
             </text>
           </g>
@@ -493,12 +503,14 @@ export default function FloorPlan({
             <text
               x={cx(target)} y={above ? target.r - 4.6 : target.r + target.h + 4.2}
               textAnchor="middle" fontSize="4.2" fontWeight="800" fill={zc(target.zone)}
+              stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke"
             >
               {target.code}
             </text>
             <text
               x={cx(target)} y={above ? target.r - 1.4 : target.r + target.h + 7.4}
               textAnchor="middle" fontSize="2.8" fontWeight="600" fill="#2D373D"
+              stroke="#FFFFFF" strokeWidth="0.9" paintOrder="stroke"
             >
               {target.cat}
             </text>
