@@ -375,7 +375,7 @@ export default function FloorPlan({
             : "파마스퀘어 구로점 매장 배치도"
         }
       >
-        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="2" fill="#FFFFFF" />
+        <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="1.5" fill="#FFFFFF" />
 
         {/* 집기 — 상품이 놓이지 않는 자리 */}
         {MARKS.map((m, i) => {
@@ -420,7 +420,7 @@ export default function FloorPlan({
             >
               <rect
                 x={r.c + INSET} y={r.r + INSET}
-                width={r.w - INSET * 2} height={r.h - INSET * 2} rx="0.8"
+                width={r.w - INSET * 2} height={r.h - INSET * 2} rx="1"
                 fill={isTarget ? color : color}
                 fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
                 stroke={color}

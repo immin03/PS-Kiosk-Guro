@@ -113,7 +113,7 @@ const EmojiChip = ({ e, d = 46, s = 30, mb }) => (
 );
 
 const IconChip = ({ name, d=44, s=22, mb }) => (
-  <span style={{ width:d, height:d, borderRadius:"50%", background:C.bgL, display:"inline-flex",
+  <span style={{ width:d, height:d, borderRadius:999, background:C.bgL, display:"inline-flex",
     alignItems:"center", justifyContent:"center", flexShrink:0, marginBottom:mb }}>
     <Icon name={name} size={s} color={C.priM} />
   </span>
@@ -395,7 +395,7 @@ export default function KioskApp() {
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
         {ZONES_MAP.map(z => (
           <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-            display:"flex", gap:10, background:C.wh, borderRadius:8, padding:"10px 12px",
+            display:"flex", gap:10, background:C.wh, borderRadius:14, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
             <div style={{ width:30, height:30, borderRadius:8, background:z.color, flexShrink:0,
@@ -580,7 +580,7 @@ export default function KioskApp() {
                   onClick={() => item.type === "findBrand" ? setSearchFacet("brand") : navTo("catList",{catType:item.type})}
                   className="kiosk-card"
                   style={{
-                    display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:8,
+                    display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:14,
                     padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
                   }}
                 >
@@ -624,7 +624,7 @@ export default function KioskApp() {
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
+          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:14,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
           <div style={{ width:38, height:38, borderRadius:8, background:z.color, flexShrink:0,
