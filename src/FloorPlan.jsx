@@ -627,23 +627,3 @@ export default function FloorPlan({
     </div>
   );
 }
-
-/* 범례는 지도 밖에 둡니다 — SVG 안에 넣으면 지도가 좁아질수록 같이 뭉개집니다. */
-export function FloorPlanLegend({ lang = "ko" }) {
-  const used = [];
-  RACKS.forEach((r) => { if (!used.includes(r.zone)) used.push(r.zone); });
-  return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", marginTop: 10 }}>
-      {used.map((z) => (
-        <span key={z} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#2D373D" }}>
-          <span style={{ width: 9, height: 9, borderRadius: 8, background: zc(z) }} />
-          {zoneLabel(lang, z) || z}
-        </span>
-      ))}
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#2D373D" }}>
-        <span style={{ width: 9, height: 9, borderRadius: 999, background: YOU }} />
-        {t(lang, "youAreHere")}
-      </span>
-    </div>
-  );
-}

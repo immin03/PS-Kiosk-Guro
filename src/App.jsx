@@ -6,7 +6,7 @@ import {
 } from "./storeData.js";
 import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
-import FloorPlan, { FloorPlanLegend, routeSteps } from "./FloorPlan.jsx";
+import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
 import { categoriesOf, countOf, productsOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
@@ -412,7 +412,6 @@ export default function KioskApp() {
           const zone = ZONES_MAP.find(z => z.id === legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
         }}/>
-        <FloorPlanLegend lang={lang}/>
       </div>
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
         {ZONES_MAP.map(z => (
@@ -639,7 +638,6 @@ export default function KioskApp() {
           const zone = ZONES_MAP.find(z => z.id===legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
         }}/>
-        <FloorPlanLegend lang={lang}/>
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
