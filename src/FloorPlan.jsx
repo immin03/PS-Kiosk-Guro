@@ -526,8 +526,8 @@ export default function FloorPlan({
         <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
         <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
         {(view.k > 1 || openBlock) && (
-          <button type="button" aria-label="지도 원래대로" style={{ ...btn, fontSize: 11, fontWeight: 600 }} onClick={resetView}>
-            원래
+          <button type="button" aria-label="지도 원래대로" style={{ ...btn, fontSize: 15 }} onClick={resetView}>
+            ↺
           </button>
         )}
       </div>
