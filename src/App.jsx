@@ -345,8 +345,8 @@ export default function KioskApp() {
                 <div style={{ padding:"8px 20px 16px" }}>
                   <button onClick={() => { doSearch(searchQ); tabTo("search"); }} style={{
                     width:"100%", padding:"14px", borderRadius:8,
-                    background:C.bgL, border:`1px solid ${C.bd}`, cursor:"pointer", fontFamily:"inherit",
-                    fontSize:13, fontWeight:600, color:C.priD
+                    background:BRAND.line, border:`1px solid ${C.bd}`, cursor:"pointer", fontFamily:"inherit",
+                    fontSize:13, fontWeight:600, color:C.t2
                   }}>{t(lang,"viewAllResults",{n:searchResults.length})}</button>
                 </div>
               </>
