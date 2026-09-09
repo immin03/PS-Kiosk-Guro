@@ -55,11 +55,15 @@ const body = `/* 자동 생성 — 직접 고치지 마세요.
  * 갱신: node scripts/sync-racks.mjs
  *
  * 좌표는 격자 기준입니다. c=왼쪽 열, r=위쪽 행, w=너비, h=높이.
- * 축척 도면이 아니라 이웃 관계와 구성이 맞는 개념도입니다.
+ * 판매장 비례는 도면과 맞습니다 (44,030 × 14,250mm · 3.09:1). 한 칸은 250mm 입니다.
  */
 export const STORE_ID = ${JSON.stringify(store.id)};
 export const STORE_NAME = ${JSON.stringify(store.name)};
 export const GRID = ${JSON.stringify(store.grid)};
+
+/* 판매장 외곽과 축척. 벽이 없으면 매대 덩어리만 허공에 떠 보입니다. */
+export const OUTLINE = ${JSON.stringify(store.outline?.points || null)};
+export const SCALE = ${JSON.stringify(store.scale || null)};
 
 /* 매장 집기 — 입구 · 계산대 · 체험존처럼 상품이 놓이지 않는 자리 */
 export const MARKS = ${JSON.stringify(store.marks, null, 2)};
