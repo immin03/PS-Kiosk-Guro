@@ -187,7 +187,9 @@ function TopBar({ title, onBack, isHome, lang, setLang }) {
   return (
     <div style={{ display:"flex", alignItems:"center", padding: isHome ? "14px 20px" : "8px 16px", gap:8,
       background: isHome ? C.bgF : C.wh, position:"sticky", top:0, zIndex:100,
-      borderBottom: isHome ? "none" : `1px solid ${C.bd}` }}>
+      /* 홈만 선이 없어 스크롤하면 배너가 헤더 밑으로 그냥 빨려 들어갔습니다.
+         선 색은 화면 전체가 쓰는 7541 C 하나입니다. */
+      borderBottom:`1px solid ${C.bd}` }}>
       {!isHome && onBack && (
         <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:"4px 6px", display:"flex", borderRadius:8 }}>
           <span style={{ fontSize:19, color:C.t1, lineHeight:1 }}>←</span>
@@ -383,9 +385,13 @@ export default function KioskApp() {
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
       {/* 한 줄로 밀어 봅니다. 왼쪽은 화면 여백을 지키고 오른쪽은 열어 둬서
           다음 카드가 걸쳐 보이게 합니다 — 더 있다는 것이 보여야 밉니다. */}
+      {/* overflow-x 를 열면 세로도 함께 잘립니다. 카드가 호버로 2px 뜨면서
+          위가 잘리고 그림자도 먹혔습니다. 안쪽 여백으로 뜰 자리를 만들고
+          바깥 여백을 같은 만큼 당겨 배치는 그대로 둡니다. */}
       <div className="kiosk-swipe" style={{
-        display:"flex", gap:8, marginBottom:24, overflowX:"auto",
-        marginRight:-20, paddingRight:20, paddingBottom:2,
+        display:"flex", gap:8, overflowX:"auto",
+        marginTop:-6, paddingTop:6, paddingBottom:8, marginBottom:16,
+        marginLeft:-6, paddingLeft:6, marginRight:-20, paddingRight:20,
         WebkitOverflowScrolling:"touch", msOverflowStyle:"none", scrollbarWidth:"none",
       }}>
         {HOME_CATS.map(item => (
@@ -430,8 +436,8 @@ export default function KioskApp() {
             <div style={{ width:30, height:30, borderRadius:8, background:chipColor(z), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
-              <p style={{ margin:0, fontSize:11, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
-              <p style={{ margin:0, fontSize:10, color:C.t3 }}>{t(lang,"zone."+z.id+".desc")}</p>
+              <p style={{ margin:"0 0 5px", fontSize:12, fontWeight:600, lineHeight:1.45 }}>{zoneLabel(lang,z.id)}</p>
+              <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.5 }}>{t(lang,"zone."+z.id+".desc")}</p>
             </div>
           </div>
         ))}

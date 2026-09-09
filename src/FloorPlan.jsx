@@ -689,6 +689,14 @@ export default function FloorPlan({
             >
               {t(lang, "youAreHere")}
             </text>
+            {/* 「현재 위치」만으로는 매장 어디인지 모릅니다. 무슨 자리인지 적습니다. */}
+            <text
+              x={cx(origin)} y={cy(origin) + 8.6} textAnchor="middle"
+              fontSize="2.1" fontWeight="600" fill={MARK_TEXT}
+              stroke="#FFFFFF" strokeWidth="0.8" paintOrder="stroke"
+            >
+              {markLabel(lang, ORIGIN_MARK)}
+            </text>
           </g>
         )}
 
@@ -725,8 +733,12 @@ export default function FloorPlan({
 
       {/* 지도 위에 얹으면 오른쪽 끝 블록 이름을 가립니다. 지도 아래에 둡니다.
           위아래 여백을 같게 둬서 지도와 범례 사이 한가운데에 놓입니다. */}
-      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center",
-        gap: 6, marginTop: 10, marginBottom: 2, paddingRight: 6 }}>
+      <div style={{ display: "flex", alignItems: "center",
+        gap: 6, marginTop: 10, marginBottom: 2, paddingLeft: 6, paddingRight: 6 }}>
+        {/* 층은 지도 옆에 둡니다. 버튼과 같은 줄이라 자리를 더 먹지 않습니다. */}
+        <span style={{ fontSize: 13, fontWeight: 700, color: BRAND.text, marginRight: "auto" }}>
+          {t(lang, "floorName")}
+        </span>
         {/* 되돌리기는 왼쪽에 붙이고 늘 자리를 지킵니다. 나타났다 사라지면
             그때마다 +·− 가 밀려 연달아 누르던 손이 끊깁니다. 되돌릴 것이
             없을 때는 흐리게 두고 누를 수 없게 합니다. */}
