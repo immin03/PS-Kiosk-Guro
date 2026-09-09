@@ -614,7 +614,7 @@ export default function KioskApp() {
 
   const renderMap = () => (
     <div style={{ padding:"16px 20px 24px" }}>
-      <p style={{ fontSize:13, color:C.t2, margin:"0 0 14px" }}>{t(lang,"storeFloor")}</p>
+      <p style={{ fontSize:13, fontWeight:500, color:C.t2, margin:"0 0 14px" }}>{t(lang,"storeFloor")}</p>
       <div style={{ background:C.wh, borderRadius:14, padding:14, border:`1px solid ${C.bd}`, marginBottom:14 }}>
         <FloorPlan lang={lang} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id===legacyZoneOf(rack.code));
