@@ -381,26 +381,34 @@ export default function KioskApp() {
 
       {/* 카테고리 바로가기 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0, 1fr))", gap:8, marginBottom:24 }}>
+      {/* 한 줄로 밀어 봅니다. 왼쪽은 화면 여백을 지키고 오른쪽은 열어 둬서
+          다음 카드가 걸쳐 보이게 합니다 — 더 있다는 것이 보여야 밉니다. */}
+      <div className="kiosk-swipe" style={{
+        display:"flex", gap:8, marginBottom:24, overflowX:"auto",
+        marginRight:-20, paddingRight:20, paddingBottom:2,
+        WebkitOverflowScrolling:"touch", msOverflowStyle:"none", scrollbarWidth:"none",
+      }}>
         {HOME_CATS.map(item => (
           <div
             key={item.label}
-            onClick={() => item.type === "findBrand" ? tabTo("brand") : navTo("catList",{catType:item.type})}
+            /* 예전에는 tabTo("brand") 였습니다. 브랜드는 바텀 탭이 아니라서
+               활성 탭이 셋 다 꺼진 채로 남았습니다. 눌러서 들어간 화면이니
+               있던 탭을 그대로 두고 쌓습니다. */
+            onClick={() => item.type === "findBrand" ? navTo("brand") : navTo("catList",{catType:item.type})}
             className="kiosk-card"
             style={{
-              background:C.wh, borderRadius:8, padding:"14px 10px 12px", border:`1px solid ${C.bd}`, cursor:"pointer",
-              display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", gap:8
+              background:C.wh, borderRadius:8, padding:"20px 12px", border:`1px solid ${C.bd}`, cursor:"pointer",
+              display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center",
+              flex:"0 0 auto", width:118
             }}
           >
-            <EmojiChip e={item.emoji} d={34} s={22} />
-            <div>
-              <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:700, color:C.t1, lineHeight:1.3 }}>
-                {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
-              </p>
-              <p style={{ margin:0, fontSize:11, color:C.t3, lineHeight:1.45 }}>
-                {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
-              </p>
-            </div>
+            <EmojiChip e={item.emoji} d={46} s={30} mb={10} />
+            <p style={{ margin:"0 0 6px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.45 }}>
+              {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
+            </p>
+            <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.45 }}>
+              {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
+            </p>
           </div>
         ))}
       </div>
@@ -535,7 +543,9 @@ export default function KioskApp() {
                 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                     <span style={{ fontSize:14, fontWeight:hasProd?600:400, color:hasProd?C.t1:C.t2 }}>{b}</span>
-                    {hasProd && <span style={{ fontSize:10, color:C.pri, fontWeight:600, background:C.bgL, padding:"2px 7px", borderRadius:999 }}>{t(lang,"productsCount",{n:cnt})}</span>}
+                    {/* 민트 글자에 회색 기운 도는 배경이라 뿌옇게 뭉쳤습니다. 개수는 이
+                          화면의 주인공이 아니고, 다른 화면에서도 회색 글자로만 적습니다. */}
+                      {hasProd && <span style={{ fontSize:12, color:C.t3, fontWeight:500 }}>{t(lang,"productsCount",{n:cnt})}</span>}
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.45}}><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
@@ -836,6 +846,7 @@ export default function KioskApp() {
       .kiosk-card:active{transform:translateY(0);box-shadow:none!important}
       .kiosk-tag{transition:background 0.15s,border-color 0.15s,transform 0.1s!important}
       html,body{background:${C.bgF}}
+      .kiosk-swipe::-webkit-scrollbar{display:none}
       .kiosk-input::placeholder{color:${BRAND.hint}}
       .kiosk-tag:hover{background:${BRAND.accentTint}!important;border-color:${C.pri}!important}
       .kiosk-tag:active{transform:scale(0.95)}
