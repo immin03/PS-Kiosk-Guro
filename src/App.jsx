@@ -26,12 +26,14 @@ const DEFAULT_LANG = "ko";
 /* 홈 카테고리 부제. 예전 문구는 "A·B 섹션 · 796종" 처럼 옛 구역 표기라
    지금 랙 코드와 맞지 않았습니다. 정본에서 센 숫자를 씁니다. */
 const topSub = (lang, type) =>
-  t(lang, "topSub", { n: countOf(type).toLocaleString(), c: categoriesOf(type).length });
+  t(lang, "productsCount", { n: countOf(type).toLocaleString() });
 
 /* 홈 카테고리 카드. 브랜드존은 예전에 건기식 목록에 섞여 있었는데,
    정본 기준으로 갈라내면 갈 곳이 없어져서 자기 자리를 줍니다. */
 const BRAND_CARD = { label: "브랜드 존", emoji: "💎", type: "brand" };
-const HOME_CATS = [...TOP_CATS, BRAND_CARD];
+const FIND_BRAND_CARD = { label: "브랜드 찾기", emoji: "🔎", type: "findBrand" };
+/* 다섯이면 한 칸이 비어 어색합니다. 브랜드 찾기를 더해 세 칸씩 두 줄로 맞춥니다. */
+const HOME_CATS = [...TOP_CATS, BRAND_CARD, FIND_BRAND_CARD];
 
 const legacyZoneOf = (code) => {
   const c = String(code || "");
@@ -357,16 +359,25 @@ export default function KioskApp() {
 
       {/* 카테고리 바로가기 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(0, 1fr))", gap:8, marginBottom:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3, minmax(0, 1fr))", gap:8, marginBottom:24 }}>
         {HOME_CATS.map(item => (
-          <div key={item.label} onClick={() => navTo("catList",{catType:item.type})} className="kiosk-card" style={{
-            background:C.wh, borderRadius:14, padding:"16px 14px", border:`1px solid ${C.bd}`, cursor:"pointer",
-            display:"flex", flexDirection:"column", alignItems:"flex-start", gap:10
-          }}>
-            <EmojiChip e={item.emoji} d={40} s={26} />
+          <div
+            key={item.label}
+            onClick={() => item.type === "findBrand" ? tabTo("brand") : navTo("catList",{catType:item.type})}
+            className="kiosk-card"
+            style={{
+              background:C.wh, borderRadius:14, padding:"14px 10px 12px", border:`1px solid ${C.bd}`, cursor:"pointer",
+              display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", gap:8
+            }}
+          >
+            <EmojiChip e={item.emoji} d={34} s={22} />
             <div>
-              <p style={{ margin:"0 0 4px", fontSize:15, fontWeight:700, color:C.t1, lineHeight:1.35 }}>{item.type === "brand" ? item.label : topCatLabel(lang,item.type)}</p>
-              <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.5 }}>{topSub(lang, item.type)}</p>
+              <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:700, color:C.t1, lineHeight:1.3 }}>
+                {item.type === "brand" ? item.label : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
+              </p>
+              <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.45 }}>
+                {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
+              </p>
             </div>
           </div>
         ))}
