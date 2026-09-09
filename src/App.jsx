@@ -9,7 +9,7 @@ import {
 import FloorPlan, { FloorPlanLegend, routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
 import { categoriesOf, countOf, productsOf } from "./categories.js";
-import { RACK_BY_CODE, RACKS } from "./rackLayout.js";
+import { RACK_BY_CODE } from "./rackLayout.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
@@ -18,22 +18,28 @@ import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
 const SHELL_MAX = "min(100%, 640px)";
 
 /* 존 칩 색 — 지도와 같은 값을 씁니다.
-   storeData 에 색이 따로 박혀 있어서 지도 존 색을 바꿔도 목록의 칩은 옛 색으로
-   남았습니다. 랙 코드의 앞 글자로 배치 정본에서 뽑습니다. */
-const ZONE_CHIP = (() => {
-  const count = {};
-  RACKS.forEach((r) => {
-    const letter = r.code[0];
-    (count[letter] = count[letter] || {})[r.zone] = (count[letter]?.[r.zone] || 0) + 1;
-  });
-  return Object.fromEntries(
-    Object.entries(count).map(([letter, zones]) => [
-      letter,
-      ZONE_COLOR[Object.entries(zones).sort((a, b) => b[1] - a[1])[0][0]] || ZONE_FALLBACK,
-    ])
-  );
-})();
-const chipColor = (id) => ZONE_CHIP[id] || C.pri;
+ *
+ * storeData 에 색이 따로 박혀 있어서 지도 존 색을 바꿔도 목록의 칩은 옛 색으로
+ * 남았습니다. 존이 거느린 랙을 배치 정본에서 찾아 그 구역 색을 씁니다.
+ *
+ * 칩 글자(A~E)와 랙 코드의 앞 글자는 다릅니다 — 펫은 칩이 E 인데 랙은
+ * A31~A36 입니다. 그래서 앞 글자가 아니라 desc 에 적힌 랙 범위로 찾습니다. */
+const chipColor = (zone) => {
+  /* 첫 랙 하나만 보면 안 됩니다 — D존은 D1 이 뷰티 매대라 칩이 분홍으로
+     나왔습니다. 범위 전체에서 가장 많은 구역을 씁니다. */
+  const [from, to] = String(zone?.desc || "").split("~").map((v) => v.trim());
+  const letter = (from.match(/^[A-Z]+/) || [""])[0];
+  const start = Number(from.slice(letter.length));
+  const end = Number((to || from).slice(letter.length)) || start;
+
+  const tally = {};
+  for (let n = start; n <= end; n += 1) {
+    const rack = RACK_BY_CODE[`${letter}${n}`];
+    if (rack) tally[rack.zone] = (tally[rack.zone] || 0) + 1;
+  }
+  const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+  return (top && ZONE_COLOR[top[0]]) || ZONE_FALLBACK;
+};
 
 /* 아무도 만지지 않으면 처음 화면으로 되돌리기까지의 시간. 0 이면 끕니다.
    매장에서 재보고 조정하세요 — 너무 짧으면 읽는 중에 화면이 날아갑니다. */
@@ -414,7 +420,7 @@ export default function KioskApp() {
             display:"flex", gap:10, background:C.wh, borderRadius:8, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
-            <div style={{ width:30, height:30, borderRadius:8, background:chipColor(z.id), flexShrink:0,
+            <div style={{ width:30, height:30, borderRadius:8, background:chipColor(z), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
               <p style={{ margin:0, fontSize:11, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -640,7 +646,7 @@ export default function KioskApp() {
           display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
-          <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z.id), flexShrink:0,
+          <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z), flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 4px", fontSize:14, fontWeight:600, lineHeight:1.4 }}>{zoneLabel(lang,z.id)}</p>
@@ -730,7 +736,7 @@ export default function KioskApp() {
         {/* 위치와 지도는 같은 답이라 한 상자에 담고 선으로만 나눕니다. */}
         <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px" }}>
-            <div style={{ width:42, height:42, borderRadius:8, background:chipColor(zoneInfo?.id), flexShrink:0,
+            <div style={{ width:42, height:42, borderRadius:8, background:chipColor(zoneInfo), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:17 }}>{zone}</div>
             <div style={{ flex:1 }}>
               <p style={{ margin:"0 0 4px", fontSize:14, fontWeight:700, color:C.t1, lineHeight:1.4 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
