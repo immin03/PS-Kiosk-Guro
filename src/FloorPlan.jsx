@@ -543,7 +543,7 @@ export function FloorPlanLegend({ lang = "ko" }) {
     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 14px", marginTop: 10 }}>
       {used.map((z) => (
         <span key={z} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "#2D373D" }}>
-          <span style={{ width: 9, height: 9, borderRadius: 4, background: zc(z) }} />
+          <span style={{ width: 9, height: 9, borderRadius: 8, background: zc(z) }} />
           {zoneLabel(lang, z) || z}
         </span>
       ))}

@@ -62,10 +62,10 @@ export const ZONE_COLOR = {
  * 큰 값은 요소를 물렁해 보이게 합니다 — 버튼은 sm 을 씁니다.
  */
 export const RADIUS = {
-  xs: 4,     /* 배지 · 지도 칸 */
-  sm: 8,     /* 버튼 · 입력칸 · CTA */
-  md: 14,    /* 카드 */
-  pill: 999, /* 토글 · 점 */
+  /* 네모난 것은 카드든 버튼이든 칩이든 같은 값을 씁니다. 값이 여럿이면
+     같은 화면 안에서 모서리가 제각각으로 보입니다. */
+  box: 8,
+  pill: 999, /* 언어 토글 · 브랜드 태그 · 점처럼 본디 알약인 것 */
 };
 
 export const ZONE_FALLBACK = ZONE_COLOR["기타"];

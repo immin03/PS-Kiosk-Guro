@@ -488,7 +488,7 @@ export const BEAUTY_CATS = [
   {
     "id": "c22",
     "name": "성인용품",
-    "emoji": "🔒",
+    "emoji": "💋",
     "count": 16,
     "zone": "C",
     "racks": "C22"

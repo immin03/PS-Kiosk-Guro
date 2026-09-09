@@ -124,13 +124,13 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
   const sp = getSocialProof(lang, p.sale);
   return (
     <div className="kiosk-card" onClick={onPress} style={{
-      width:CARD_W, minWidth:CARD_W, flexShrink:0, background:C.wh, borderRadius:14, padding:14,
+      width:CARD_W, minWidth:CARD_W, flexShrink:0, background:C.wh, borderRadius:8, padding:14,
       border:`1px solid ${C.bd}`, cursor:"pointer", position:"relative",
       display:"flex", flexDirection:"column", gap:6, minHeight:118
     }}>
       {rank && (
         <div style={{
-          width:20, height:20, borderRadius:4, flexShrink:0,
+          width:20, height:20, borderRadius:8, flexShrink:0,
           background: rank===1 ? C.priD : rank<=3 ? C.priM : C.bgL,
           display:"flex", alignItems:"center", justifyContent:"center",
           fontSize:10, fontWeight:800,
@@ -367,7 +367,7 @@ export default function KioskApp() {
             onClick={() => item.type === "findBrand" ? tabTo("brand") : navTo("catList",{catType:item.type})}
             className="kiosk-card"
             style={{
-              background:C.wh, borderRadius:14, padding:"14px 10px 12px", border:`1px solid ${C.bd}`, cursor:"pointer",
+              background:C.wh, borderRadius:8, padding:"14px 10px 12px", border:`1px solid ${C.bd}`, cursor:"pointer",
               display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center", gap:8
             }}
           >
@@ -386,7 +386,7 @@ export default function KioskApp() {
 
       {/* 매장 안내도 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"storeMap")}</p>
-      <div style={{ background:C.wh, borderRadius:14, padding:14, border:`1px solid ${C.bd}`, marginBottom:12 }}>
+      <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:12 }}>
         <FloorPlan lang={lang} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id === legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
@@ -396,10 +396,10 @@ export default function KioskApp() {
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
         {ZONES_MAP.map(z => (
           <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-            display:"flex", gap:10, background:C.wh, borderRadius:14, padding:"10px 12px",
+            display:"flex", gap:10, background:C.wh, borderRadius:8, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
-            <div style={{ width:30, height:30, borderRadius:4, background:z.color, flexShrink:0,
+            <div style={{ width:30, height:30, borderRadius:8, background:z.color, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
               <p style={{ margin:0, fontSize:11, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -423,7 +423,7 @@ export default function KioskApp() {
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
           {cats.map(cat => (
             <div key={cat.id} onClick={() => navTo("catDetail",{cat})} className="kiosk-card" style={{
-              background:C.wh, borderRadius:14, padding:"20px 10px", textAlign:"center",
+              background:C.wh, borderRadius:8, padding:"20px 10px", textAlign:"center",
               border:`1px solid ${C.bd}`, cursor:"pointer"
             }}>
               <EmojiChip e={cat.emoji} d={46} s={30} mb={10} />
@@ -448,7 +448,7 @@ export default function KioskApp() {
             <p style={{ margin:0, fontSize:13, color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
           </div>
         </div>
-        <div style={{ background:C.wh, borderRadius:14, padding:14, border:`1px solid ${C.bd}`, marginBottom:16 }}>
+        <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:16 }}>
           <p style={{ margin:"0 0 8px", fontSize:13, fontWeight:700, color:C.t1 }}>{t(lang,"inStoreLocation")}</p>
           <FloorPlan lang={lang} highlightZone={RACK_BY_CODE[String(cat.racks||"").split(",")[0].trim()]?.zone}/>
         </div>
@@ -581,7 +581,7 @@ export default function KioskApp() {
                   onClick={() => item.type === "findBrand" ? setSearchFacet("brand") : navTo("catList",{catType:item.type})}
                   className="kiosk-card"
                   style={{
-                    display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:14,
+                    display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:8,
                     padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
                   }}
                 >
@@ -616,7 +616,7 @@ export default function KioskApp() {
   const renderMap = () => (
     <div style={{ padding:"16px 20px 24px" }}>
       <p style={{ fontSize:13, fontWeight:500, color:C.t2, margin:"0 0 14px" }}>{t(lang,"storeFloor")}</p>
-      <div style={{ background:C.wh, borderRadius:14, padding:14, border:`1px solid ${C.bd}`, marginBottom:14 }}>
+      <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:14 }}>
         <FloorPlan lang={lang} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id===legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
@@ -625,10 +625,10 @@ export default function KioskApp() {
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:14,
+          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
-          <div style={{ width:38, height:38, borderRadius:4, background:z.color, flexShrink:0,
+          <div style={{ width:38, height:38, borderRadius:8, background:z.color, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 1px", fontSize:14, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -681,7 +681,7 @@ export default function KioskApp() {
 
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        <div style={{ background:C.wh, borderRadius:14, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
+        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
           <div style={{ padding:16 }}>
             <p style={{ margin:"0 0 4px", fontSize:12, color:C.priD, fontWeight:600 }}>{p.brand}</p>
             <p style={{ margin:0, fontSize:16, fontWeight:700, color:C.t1, lineHeight:1.35 }}>{p.name}</p>
@@ -716,9 +716,9 @@ export default function KioskApp() {
         </div>
 
         {/* 위치와 지도는 같은 답이라 한 상자에 담고 선으로만 나눕니다. */}
-        <div style={{ background:C.wh, borderRadius:14, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
+        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px" }}>
-            <div style={{ width:42, height:42, borderRadius:4, background:zoneInfo?.color||C.pri, flexShrink:0,
+            <div style={{ width:42, height:42, borderRadius:8, background:zoneInfo?.color||C.pri, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:17 }}>{zone}</div>
             <div style={{ flex:1 }}>
               <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
@@ -733,7 +733,7 @@ export default function KioskApp() {
         </div>
 
         {/* 3단계 안내 — 각 step kiosk-card 인터랙션 */}
-        <div style={{ background:C.wh, borderRadius:14, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
+        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
           {steps.map((s,idx) => (
             <div key={s.n} className="kiosk-card" style={{
               display:"flex", gap:14, alignItems:"center", padding:"16px 18px",
@@ -742,7 +742,7 @@ export default function KioskApp() {
             }}>
               {/* 넘버 — 크고 명확하게 */}
               <div style={{
-                width:32, height:32, borderRadius:4, flexShrink:0,
+                width:32, height:32, borderRadius:8, flexShrink:0,
                 background: C.pri,
                 display:"flex", alignItems:"center", justifyContent:"center",
                 color: C.wh, fontSize:14, fontWeight:700
