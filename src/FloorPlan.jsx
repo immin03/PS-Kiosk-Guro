@@ -523,13 +523,15 @@ export default function FloorPlan({
 
       {/* 지도 위에 얹으면 오른쪽 끝 블록 이름을 가립니다. 지도 아래에 둡니다. */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8, paddingRight: 6 }}>
-        <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
-        <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
+        {/* 되돌리기는 왼쪽에 붙입니다. 오른쪽에 두면 나타날 때 +·− 가 밀려
+            연달아 누르던 손이 끊깁니다. */}
         {(view.k > 1 || openBlock) && (
           <button type="button" aria-label="지도 원래대로" style={{ ...btn, fontSize: 15 }} onClick={resetView}>
             ↺
           </button>
         )}
+        <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
+        <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
       </div>
     </div>
   );
