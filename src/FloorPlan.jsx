@@ -438,6 +438,26 @@ export default function FloorPlan({
   };
   const onTouchEnd = () => { gesture.current = null; };
 
+  /* 마우스로도 끌어 옮깁니다. 손가락만 받아 두어서 확대한 뒤 커서로는
+     움직일 수 없었습니다. 버튼을 뗀 곳이 지도 밖이어도 끝나도록 창에
+     붙였다 뗍니다. */
+  const [dragging, setDragging] = useState(false);
+  const onMouseDown = (e) => {
+    if (view.k <= 1 || e.button !== 0) return;
+    e.preventDefault();
+    setDragging(true);
+    const from = { px: e.clientX, py: e.clientY, x: view.x, y: view.y };
+    const move = (ev) =>
+      setView((v) => clamp({ ...v, x: from.x + (ev.clientX - from.px), y: from.y + (ev.clientY - from.py) }));
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+  };
+
   /* 트랙패드에서 두 손가락을 오므리면 브라우저가 ctrl 을 붙인 휠로 보냅니다.
      그때만 확대하고, 그냥 스크롤은 페이지에 넘깁니다. */
   useEffect(() => {
@@ -465,7 +485,9 @@ export default function FloorPlan({
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
-      style={{ overflow: "hidden", touchAction: "none", cursor: view.k > 1 ? "grab" : "default" }}
+      onMouseDown={onMouseDown}
+      style={{ overflow: "hidden", touchAction: "none",
+        cursor: view.k > 1 ? (dragging ? "grabbing" : "grab") : "default" }}
     >
     <div ref={scroller} style={{ overflowX: "auto", overflowY: "hidden", WebkitOverflowScrolling: "touch",
       transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})`,

@@ -6,7 +6,7 @@
  * 판매장 비례는 도면과 맞습니다 (44,030 × 14,250mm · 3.09:1). 한 칸은 250mm 입니다.
  */
 export const STORE_ID = "guro";
-export const STORE_NAME = "구로 2호점";
+export const STORE_NAME = "구로";
 export const GRID = {"rows":63,"cols":180};
 
 /* 판매장 외곽과 축척. 벽이 없으면 매대 덩어리만 허공에 떠 보입니다. */
@@ -438,7 +438,7 @@ export const RACKS = [
     "code": "B1",
     "c": 6,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "농협 · 한삼인",
     "zone": "브랜드"
@@ -447,7 +447,7 @@ export const RACKS = [
     "code": "B2",
     "c": 16,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "대상 웰라이프",
     "zone": "브랜드"
@@ -456,7 +456,7 @@ export const RACKS = [
     "code": "B3",
     "c": 26,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "대상 웰라이프",
     "zone": "브랜드"
@@ -465,7 +465,7 @@ export const RACKS = [
     "code": "B4",
     "c": 36,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "네이처가든",
     "zone": "브랜드"
@@ -474,7 +474,7 @@ export const RACKS = [
     "code": "B5",
     "c": 46,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "익스트림",
     "zone": "브랜드"
@@ -483,7 +483,7 @@ export const RACKS = [
     "code": "B6",
     "c": 56,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "있나요 · 뉴핏",
     "zone": "브랜드"
@@ -492,7 +492,7 @@ export const RACKS = [
     "code": "B7",
     "c": 66,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "어린이 간식",
     "zone": "브랜드"
@@ -501,7 +501,7 @@ export const RACKS = [
     "code": "B8",
     "c": 76,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "어린이 간식",
     "zone": "브랜드"
@@ -510,7 +510,7 @@ export const RACKS = [
     "code": "B9",
     "c": 122,
     "r": 4,
-    "w": 8,
+    "w": 10,
     "h": 3,
     "cat": "이벤트존",
     "zone": "프로모션"
