@@ -21,6 +21,70 @@ export const ORIGIN_MARK = "엘리베이터 입구";
 const WAYPOINT = /입구|계산|PHAMA BEST|체험존|행사|음료/;
 
 const zc = (zone) => ZONE_COLOR[zone] || FALLBACK;
+
+/*
+ * 존 블록 — 랙 85개를 덩어리로 묶습니다.
+ *
+ * 손으로 그린 예전 지도는 매장 구조가 한눈에 들어왔지만 좌표가 코드에 박혀 있어
+ * 매대를 옮겨도 지도가 따라오지 않았습니다. 그래서 정본 좌표에서 직접 계산합니다.
+ * 랙 코드의 앞 글자로 나누고, 같은 글자라도 멀리 떨어져 있으면 (D 는 오른쪽 기둥과
+ * 아래 줄로 나뉩니다) 따로 묶습니다.
+ */
+const BLOCK_GAP = 10;
+
+function buildBlocks() {
+  const byLetter = {};
+  RACKS.forEach((r) => {
+    const letter = r.code[0];
+    (byLetter[letter] = byLetter[letter] || []).push(r);
+  });
+
+  const out = [];
+  Object.entries(byLetter).forEach(([letter, list]) => {
+    /* 가까이 붙은 랙끼리 잇습니다. 서로 BLOCK_GAP 칸 안에 있으면 같은 덩어리입니다. */
+    const parent = list.map((_, i) => i);
+    const find = (i) => (parent[i] === i ? i : (parent[i] = find(parent[i])));
+    const near = (a, b) =>
+      a.c - (b.c + b.w) <= BLOCK_GAP && b.c - (a.c + a.w) <= BLOCK_GAP &&
+      a.r - (b.r + b.h) <= BLOCK_GAP && b.r - (a.r + a.h) <= BLOCK_GAP;
+    for (let i = 0; i < list.length; i += 1)
+      for (let j = i + 1; j < list.length; j += 1)
+        if (near(list[i], list[j])) parent[find(i)] = find(j);
+
+    const groups = {};
+    list.forEach((r, i) => { (groups[find(i)] = groups[find(i)] || []).push(r); });
+
+    /* 매장 구역으로 더 쪼개 보았지만 블록이 여덟 개로 늘고 이름이 서로 겹쳤습니다.
+       손님이 한눈에 보는 화면이라 덩어리는 크고 적어야 합니다. 랙 자체는 구역 색으로
+       칠하므로, A 줄 끝의 펫처럼 섞여 있는 자리도 색으로는 구분됩니다. */
+    Object.values(groups).forEach((racks) => {
+      const nums = racks.map((r) => Number(r.code.slice(1))).sort((a, b) => a - b);
+      const zones = {};
+      racks.forEach((r) => { zones[r.zone] = (zones[r.zone] || 0) + 1; });
+      const zone = Object.entries(zones).sort((a, b) => b[1] - a[1])[0][0];
+      const cxs = racks.map((r) => r.c + r.w / 2);
+      const cys = racks.map((r) => r.r + r.h / 2);
+      out.push({
+        /* 이름은 랙들의 한가운데에 얹습니다. ㄱ자 구역이라도 랙 위에 놓입니다. */
+        lx: cxs.reduce((a, b) => a + b, 0) / cxs.length,
+        ly: cys.reduce((a, b) => a + b, 0) / cys.length,
+        id: `${letter}${nums[0]}`,
+        letter,
+        zone,
+        racks,
+        range: nums[0] === nums[nums.length - 1] ? `${letter}${nums[0]}` : `${letter}${nums[0]}–${letter}${nums[nums.length - 1]}`,
+        c: Math.min(...racks.map((r) => r.c)),
+        r: Math.min(...racks.map((r) => r.r)),
+        w: Math.max(...racks.map((r) => r.c + r.w)) - Math.min(...racks.map((r) => r.c)),
+        h: Math.max(...racks.map((r) => r.r + r.h)) - Math.min(...racks.map((r) => r.r)),
+      });
+    });
+  });
+  return out.sort((a, b) => b.racks.length - a.racks.length);
+}
+
+const BLOCKS = buildBlocks();
+
 const cx = (o) => o.c + o.w / 2;
 const cy = (o) => o.r + o.h / 2;
 
@@ -201,6 +265,8 @@ export default function FloorPlan({
   };
 
   const labelled = (r) => {
+    if (grouped) return false;
+    if (openBlock) return openBlock.racks.includes(r);
     if (detail === "all" || !target) return true;
     return r.code === target.code;
   };
@@ -208,6 +274,10 @@ export default function FloorPlan({
   /* 지도는 화면에 다 들어오지만 랙 이름이 작습니다. 손님이 직접 키워 볼 수 있게
      두 손가락 확대와 버튼을 답니다. 키운 상태에서는 끌어서 옮깁니다. */
   const [view, setView] = useState({ k: 1, x: 0, y: 0 });
+  /* 처음에는 존 덩어리만 보여 매장 구조가 한눈에 들어오게 하고,
+     블록을 누르면 그 안의 랙 이름을 폅니다. */
+  const [openBlock, setOpenBlock] = useState(null);
+  const grouped = detail === "all" && !target && !openBlock;
   const box = useRef(null);
   const gesture = useRef(null);
 
@@ -220,7 +290,7 @@ export default function FloorPlan({
     return { k, x: Math.min(mx, Math.max(-mx, v.x)), y: Math.min(my, Math.max(-my, v.y)) };
   };
   const zoomBy = (f) => setView((v) => clamp({ ...v, k: v.k * f, x: v.x * f, y: v.y * f }));
-  const resetView = () => setView({ k: 1, x: 0, y: 0 });
+  const resetView = () => { setView({ k: 1, x: 0, y: 0 }); setOpenBlock(null); };
 
   const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
   const onTouchStart = (e) => {
@@ -302,13 +372,17 @@ export default function FloorPlan({
           return (
             <g
               key={r.code}
-              onClick={onRackClick ? () => onRackClick(r) : undefined}
-              style={onRackClick ? { cursor: "pointer" } : undefined}
+              onClick={
+                grouped
+                  ? () => setOpenBlock(BLOCKS.find((b) => b.racks.includes(r)) || null)
+                  : onRackClick ? () => onRackClick(r) : undefined
+              }
+              style={grouped || onRackClick ? { cursor: "pointer" } : undefined}
             >
               <rect
                 x={r.c} y={r.r} width={r.w} height={r.h} rx="0.8"
                 fill={isTarget ? color : color}
-                fillOpacity={isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
+                fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
                 stroke={color}
                 strokeOpacity={isTarget ? 1 : dim ? 0.3 : 0.55}
                 strokeWidth={isTarget ? 0.7 : 0.3}
@@ -325,6 +399,26 @@ export default function FloorPlan({
             </g>
           );
         })}
+
+        {/* 블록 이름 — 덩어리로 볼 때만 크게 얹습니다 */}
+        {grouped && BLOCKS.map((b) => (
+          <g key={`b${b.id}`} style={{ pointerEvents: "none" }}>
+            <text
+              x={b.lx} y={b.ly - 0.2} textAnchor="middle"
+              fontSize="4.6" fontWeight="800" fill={zc(b.zone)}
+              stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke"
+            >
+              {zoneLabel("ko", b.zone) || b.zone}
+            </text>
+            <text
+              x={b.lx} y={b.ly + 4.4} textAnchor="middle"
+              fontSize="3" fontWeight="600" fill="#2D373D"
+              stroke="#FFFFFF" strokeWidth="0.9" paintOrder="stroke"
+            >
+              {b.range}
+            </text>
+          </g>
+        ))}
 
         {/* 걸어가는 길 — 빈 칸만 밟은 경로 */}
         {route && (
@@ -381,10 +475,11 @@ export default function FloorPlan({
     </div>
     </div>
 
-      <div style={{ position: "absolute", right: 8, bottom: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+      {/* 지도 위에 얹으면 오른쪽 끝 블록 이름을 가립니다. 지도 아래에 둡니다. */}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8 }}>
         <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
         <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
-        {view.k > 1 && (
+        {(view.k > 1 || openBlock) && (
           <button type="button" aria-label="지도 원래대로" style={{ ...btn, fontSize: 11, fontWeight: 600 }} onClick={resetView}>
             원래
           </button>
