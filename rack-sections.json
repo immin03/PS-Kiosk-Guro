@@ -1,5 +1,5 @@
 {
-  "_note": "구로점 최신 도면 기준 섹션 라벨. Excel Rack 열 = 이 섹션 코드. SKU [브랜드]제품명.",
+  "_note": "폐기 예정입니다. 랙 카테고리의 정본은 PS-OS catalog/racks.json 이며 src/rackLayout.js 로 가져옵니다(node scripts/sync-racks.mjs). 이 파일의 카테고리는 2026-08-01 엑셀 기준이라 정본과 14개가 어긋납니다 — C18~C24 는 통째로 밀려 있어 손님을 다른 매대로 보냈습니다. _gen_store_data.py 가 아직 이 파일을 읽으므로 남겨둡니다. 생성기를 rackLayout 기준으로 옮기면 지우세요.",
   "_source_map": "구로 2호점 floor plan (user provided 2026-08-01)",
   "_source_sku": "구로점 랙별 진열 SKU_260801.xlsx",
   "A": {

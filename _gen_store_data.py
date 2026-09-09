@@ -1,4 +1,6 @@
 # Generate storeData.js from Excel + rack-sections.json
+# 주의: 랙 카테고리 정본은 PS-OS catalog/racks.json 입니다.
+#      여기서 만드는 라벨은 화면에 쓰지 않습니다 (src/rackLayout.js 가 정본 사본).
 import json, re, sys
 from pathlib import Path
 from collections import Counter
@@ -38,7 +40,7 @@ EMOJIS = {
     "프레시케어": "🧴", "뷰티 디바이스": "🔌", "샴푸": "💇",
     "트리트먼트·팩": "💇", "헤어케어·염색": "💇", "핸드크림·립밤": "🧴",
     "생리용품": "🧼", "위생용품": "🧼", "헤어 스타일링": "💇",
-    "성인용품": "🔒", "여성 위생용품": "🧼", "제모용품·스크럽": "✨",
+    "성인용품": "💋", "여성 위생용품": "🧼", "제모용품·스크럽": "✨",
     "탈취·방향제": "🏡", "글로벌 뷰티": "🌍", "클렌징": "🫧",
     "핸드워시": "🧴", "바디케어": "🧴", "제이숲": "💇",
     "티에스": "💇", "꼬꼬도르": "🏡", "브이티 코스메틱": "💧",
@@ -162,17 +164,17 @@ pet_n = sum(1 for p in products if p["zone"] == "E")
 
 TOP_CATS = [
     {"label": "건강기능식품", "sub": f"A·B 섹션 · {health_n}종", "emoji": "💊", "type": "health"},
-    {"label": "화장품 · 뷰티", "sub": f"C·D 섹션 · {beauty_n}종", "emoji": "🧴", "type": "beauty"},
-    {"label": "펫용품", "sub": f"A31–A36 · {pet_n}종", "emoji": "🐾", "type": "pet"},
-    {"label": "생활 · 위생", "sub": "프레시케어 · 위생 · 탈취 등", "emoji": "🏡", "type": "life"},
+    {"label": "뷰티 · 라이프 스타일", "sub": f"C·D 섹션 · {beauty_n}종", "emoji": "🎀", "type": "beauty"},
+    {"label": "펫", "sub": f"A31–A36 · {pet_n}종", "emoji": "🐾", "type": "pet"},
+    {"label": "라이프 스타일", "sub": "프레시케어 · 위생 · 탈취 등", "emoji": "🧴", "type": "life"},
 ]
 
 ZONES_MAP = [
-    {"id": "A", "label": "건강기능식품", "color": "#159A87", "desc": "A1~A30", "catType": "health"},
-    {"id": "B", "label": "브랜드 · 간식 · 음료", "color": "#0E6E60", "desc": "B1~B10", "catType": "health"},
-    {"id": "C", "label": "화장품 · 뷰티", "color": "#C98A8A", "desc": "C1~C25", "catType": "beauty"},
-    {"id": "D", "label": "브랜드존", "color": "#B07070", "desc": "D1~D15", "catType": "beauty"},
-    {"id": "E", "label": "펫", "color": "#D9A441", "desc": "A31~A36", "catType": "pet"},
+    {"id": "A", "label": "건강기능식품", "color": "#00978F", "desc": "A1~A30", "catType": "health"},
+    {"id": "B", "label": "브랜드 · 간식 · 음료", "color": "#9B7BE0", "desc": "B1~B10", "catType": "health"},
+    {"id": "C", "label": "뷰티 · 라이프 스타일", "color": "#EF7BA4", "desc": "C1~C25", "catType": "beauty"},
+    {"id": "D", "label": "브랜드 존", "color": "#5BB8E8", "desc": "D1~D15", "catType": "beauty"},
+    {"id": "E", "label": "펫", "color": "#FF9F43", "desc": "A31~A36", "catType": "pet"},
 ]
 
 ALL_BRANDS = sorted(brands.keys(), key=lambda b: (-brands[b], b))
@@ -185,7 +187,6 @@ def dumps(obj):
 js = f"""/* Auto-generated from 구로점 랙별 진열 SKU_260801.xlsx + latest floor map.
  * Do not edit by hand — regenerate via _gen_store_data.py
  */
-export const SECTION_LABELS = {dumps(LABELS)};
 
 export const HEALTH_CATS = {dumps(HEALTH_CATS)};
 
