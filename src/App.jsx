@@ -49,7 +49,7 @@ const C = {
   /* 메인은 브랜드 accent1 밝은 민트입니다. 딥그린은 글자 대비가 필요한 자리에만 씁니다. */
   pri: BRAND.accent, priL: BRAND.accentSoft, priD: BRAND.primary, priM: BRAND.secondary,
   acc: BRAND.accent, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
-  t1: "#2D373D", t2: "#2D373D", t3: "#2D373D", wh: "#FFFFFF", bd: BRAND.border,
+  t1: "#2D373D", t2: "#2D373D", t3: "#CCCCCC", wh: "#FFFFFF", bd: BRAND.border,
 };
 
 const BANNERS = [
@@ -375,7 +375,7 @@ export default function KioskApp() {
               <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:700, color:C.t1, lineHeight:1.3 }}>
                 {item.type === "brand" ? item.label : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
               </p>
-              <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.45 }}>
+              <p style={{ margin:0, fontSize:11, color:C.t3, lineHeight:1.45 }}>
                 {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
               </p>
             </div>
