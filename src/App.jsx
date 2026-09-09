@@ -219,7 +219,7 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
     <div style={{
       display:"flex", alignItems:"center", background:C.wh, borderRadius:8,
       padding:"16px 16px", border:`1px solid ${C.bd}`, gap:10,
-      boxShadow:"0 2px 10px rgba(20,60,54,0.05)"
+      boxShadow:"0 2px 10px rgba(45,55,61,0.05)"
     }}>
       <span style={{ color:C.priM, flexShrink:0, display:"flex" }}><Icon name="search" size={20} color={C.priM} /></span>
       <input type="text" placeholder={placeholder || "Search"}
@@ -353,7 +353,7 @@ export default function KioskApp() {
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
         {searchQ && (
           <div style={{ marginTop:8, background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`,
-            boxShadow:"0 6px 20px rgba(20,60,54,0.10)", overflow:"hidden", position:"relative", zIndex:50 }}>
+            boxShadow:"0 6px 20px rgba(45,55,61,0.12)", overflow:"hidden", position:"relative", zIndex:50 }}>
             {searchResults.length > 0 ? (
               <>
                 <p style={{ fontSize:11, color:C.t3, margin:"12px 20px 4px" }}>{t(lang,"resultsCount",{n:searchResults.length})}</p>
@@ -830,12 +830,12 @@ export default function KioskApp() {
     <>
     <style>{`
       .kiosk-card{transition:transform 0.15s,box-shadow 0.15s,background 0.15s!important}
-      .kiosk-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,82,81,0.08)!important}
+      .kiosk-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(45,55,61,0.10)!important}
       .kiosk-card:active{transform:translateY(0);box-shadow:none!important}
-      .kiosk-tag{transition:background 0.15s,transform 0.1s!important}
+      .kiosk-tag{transition:background 0.15s,border-color 0.15s,transform 0.1s!important}
       html,body{background:${C.bgF}}
       .kiosk-input::placeholder{color:${BRAND.hint}}
-      .kiosk-tag:hover{background:${C.pri}18!important}
+      .kiosk-tag:hover{background:${BRAND.accentTint}!important;border-color:${C.pri}!important}
       .kiosk-tag:active{transform:scale(0.95)}
       .kiosk-product{transition:background 0.15s,box-shadow 0.15s!important}
       .kiosk-product:hover{background:${C.bgF}!important;box-shadow:-20px 0 0 ${C.bgF},20px 0 0 ${C.bgF}!important}

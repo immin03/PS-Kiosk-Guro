@@ -379,6 +379,45 @@ export default function FloorPlan({
   const zoomBy = (f) => setView((v) => clamp({ ...v, k: v.k * f, x: v.x * f, y: v.y * f }));
   const resetView = () => { setView({ k: 1, x: 0, y: 0 }); setOpenBlock(null); };
 
+  /* 구역을 누르면 그 구역만 크게 봅니다.
+   *
+   * 전체 지도에서 랙 이름은 1픽셀 남짓이라, 눌러서 이름을 펴도 읽히지
+   * 않았습니다. 지도를 확대해 미는 대신 그릴 범위를 그 구역으로 줄입니다.
+   * 카드 크기는 그대로인데 구역만 화면을 채우니 이름이 그만큼 커집니다.
+   * 되돌리기(↺)를 누르면 매장 전체로 돌아옵니다. */
+  const zoomToBlock = (b) => {
+    setOpenBlock(b);
+    setView({ k: 1, x: 0, y: 0 });
+  };
+
+  /* 넓은 구역은 범위를 줄이는 것만으로는 부족합니다. A존은 매장 폭을 거의
+     다 쓰기 때문에 1.5 배밖에 못 키웁니다. 구역이 카드 높이의 70% 를
+     채우도록 한 번 더 키웁니다. 좁은 구역은 이미 차 있어 그대로입니다. */
+  useEffect(() => {
+    if (!openBlock) return;
+    const k = Math.min(3, Math.max(1, (vb.h * 0.7) / (openBlock.h + 2)));
+    if (k > 1.05) setView((v) => clamp({ ...v, k }));
+    /* vb 는 openBlock 에서 계산되므로 openBlock 만 지켜보면 됩니다. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openBlock]);
+
+  /* 그릴 범위. 카드 높이가 들쭉날쭉하지 않게 전체 지도와 같은 비율로 넓힙니다. */
+  const FULL = { x: -pad, y: -pad, w: cols + pad * 2, h: rows + pad * 2 };
+  const ratio = FULL.w / FULL.h;
+  const vb = (() => {
+    if (!openBlock) return FULL;
+    const m = 2;
+    let w = openBlock.w + m * 2;
+    let h = openBlock.h + m * 2;
+    if (w / h < ratio) w = h * ratio;
+    else h = w / ratio;
+    return {
+      x: openBlock.c + openBlock.w / 2 - w / 2,
+      y: openBlock.r + openBlock.h / 2 - h / 2,
+      w, h,
+    };
+  })();
+
   const dist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
   const onTouchStart = (e) => {
     if (e.touches.length === 2) gesture.current = { d: dist(e.touches), k: view.k };
@@ -429,7 +468,7 @@ export default function FloorPlan({
       transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})`,
       transformOrigin: "center center", transition: gesture.current ? "none" : "transform 0.18s ease" }}>
       <svg
-        viewBox={`${-pad} ${-pad} ${cols + pad * 2} ${rows + pad * 2}`}
+        viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
         style={{ display: "block", width: "100%", minWidth: wide }}
         role="img"
         aria-label={
@@ -477,7 +516,7 @@ export default function FloorPlan({
               key={r.code}
               onClick={
                 grouped
-                  ? () => setOpenBlock(BLOCKS.find((b) => b.racks.includes(r)) || null)
+                  ? () => zoomToBlock(BLOCKS.find((b) => b.racks.includes(r)) || null)
                   : onRackClick ? () => onRackClick(r) : undefined
               }
               style={grouped || onRackClick ? { cursor: "pointer" } : undefined}
