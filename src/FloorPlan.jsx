@@ -37,10 +37,13 @@ const BLOCK_GAP = 10;
 const INSET = 0.35;
 
 /* 랙은 도면처럼 그립니다 — 긴 축은 거의 붙여 한 줄의 매대로 이어 보이게 하고,
-   짧은 축만 넉넉히 들여 얇고 긴 막대가 되게 합니다. 7×3 칸이 6.8×2.0 으로
-   그려져 도면의 매대 비례에 가까워집니다. */
+   짧은 축만 들여 칸이 구분되게 합니다. 7×3 칸이 6.8×2.6 으로 그려집니다.
+   전에는 2.0 이라 이름 두 줄이 안 들어가고 알약처럼 보였습니다. */
 const BAR_LONG = 0.12;
-const BAR_SHORT = 0.5;
+const BAR_SHORT = 0.2;
+
+/* 매대는 네모난 집기입니다. 모서리를 굴리면 알약이 됩니다. */
+const BAR_RADIUS = 0.25;
 
 /* 랙 이름을 칸 안에 앉힙니다.
  *
@@ -160,14 +163,14 @@ const BAR = (() => {
     return { code: r.code, upright, ix, iy, label: r.cat ? fitLabel(r.cat, boxW, boxH) : null };
   });
 
-  /* 칸마다 제 이름에 맞춰 글자를 키우면 「식품」만 크고 「식이섬유 · 효소」는
-     작아져 지도가 들쭉날쭉해집니다. 대부분이 소화할 수 있는 한 크기로 맞추고,
-     그보다도 이름이 긴 몇 칸만 더 줄입니다. */
-  const sizes = rows.filter((b) => b.label).map((b) => b.label.size).sort((a, b) => a - b);
-  const common = sizes[Math.floor(sizes.length * 0.5)];
+  /* 글자 크기는 한 값입니다. 칸마다 제 이름에 맞춰 키우면 「식품」만 크고
+     「식이섬유 · 효소」는 작아져 지도가 들쭉날쭉해집니다. 가장 긴 이름이
+     들어가는 크기에 전부를 맞춥니다. */
+  const sizes = rows.filter((b) => b.label).map((b) => b.label.size);
+  const common = Math.min(...sizes);
 
   rows.forEach((b) => {
-    if (b.label) b.label = { ...b.label, size: Math.min(b.label.size, common) };
+    if (b.label) b.label = { ...b.label, size: common };
   });
   return Object.fromEntries(rows.map((b) => [b.code, b]));
 })();
@@ -523,7 +526,7 @@ export default function FloorPlan({
             >
               <rect
                 x={r.c + bar.ix} y={r.r + bar.iy}
-                width={r.w - bar.ix * 2} height={r.h - bar.iy * 2} rx="0.5"
+                width={r.w - bar.ix * 2} height={r.h - bar.iy * 2} rx={BAR_RADIUS}
                 fill={color}
                 fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
                 stroke={color}
