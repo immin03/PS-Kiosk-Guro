@@ -942,7 +942,7 @@ export const ZONES_MAP = [
   },
   {
     "id": "C",
-    "label": "뷰티 라이프스타일",
+    "label": "뷰티 · 라이프스타일",
     "color": "#E07A93",
     "desc": "C1~C25",
     "catType": "beauty"

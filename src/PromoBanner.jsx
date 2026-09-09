@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { PROMOTIONS } from "./promotions.js";
+import { STORE_PHOTO } from "./storePhoto.js";
 
 /* 홈 상단 프로모션 배너.
  *
@@ -8,12 +9,9 @@ import { PROMOTIONS } from "./promotions.js";
  * v3 프로토타입의 슬라이드 방식을 되살리되 문구는 정본에서 받습니다.
  */
 
-const TONE = [
-  "linear-gradient(135deg,#10181E 0%,#00978F 100%)",
-  "linear-gradient(135deg,#005251 0%,#01C0A4 100%)",
-  "linear-gradient(135deg,#005251 0%,#2BCAB0 100%)",
-  "linear-gradient(135deg,#005251 0%,#00978F 100%)",
-];
+/* 배경은 정본에 등록된 슬라이드 이미지(running[].image)를 먼저 쓰고,
+   없으면 매장 사진을 깝니다. 글자가 얹히므로 위에 어둡게 덮습니다. */
+const bgOf = (p) => `url(${p.image || STORE_PHOTO})`;
 
 export default function PromoBanner({ onPress, interval = 5000 }) {
   const items = PROMOTIONS;
@@ -41,11 +39,13 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
             position: "absolute", inset: 0, transition: "opacity .6s",
             opacity: n === i ? 1 : 0,
             pointerEvents: n === i ? "auto" : "none",
-            background: TONE[n % TONE.length],
+            backgroundImage: bgOf(p),
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             cursor: onPress ? "pointer" : "default",
           }}
         >
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,40,38,.18) 0%,rgba(0,40,38,.62) 100%)" }} />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,40,38,.30) 0%,rgba(0,40,38,.74) 100%)" }} />
           <div style={{ position: "relative", height: "100%", padding: "22px 22px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
             {p.tag && (
               <span style={{
