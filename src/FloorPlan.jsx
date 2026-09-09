@@ -11,7 +11,6 @@ import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from ".
  */
 
 const MARK_FILL = "#E5E5E5";
-const MARK_LINE = "#D8E1E2";
 const MARK_TEXT = "#2D373D";
 
 /* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 배치도의 집기 이름과 같아야 합니다. */
@@ -31,10 +30,6 @@ const zc = (zone) => ZONE_COLOR[zone] || FALLBACK;
  * 아래 줄로 나뉩니다) 따로 묶습니다.
  */
 const BLOCK_GAP = 10;
-
-/* 매대는 실제로 맞붙어 있습니다. 좌표는 그대로 두고 그릴 때만 살짝 들여
-   그려 칸이 구분되게 합니다. */
-const INSET = 0.35;
 
 /* 랙은 도면처럼 그립니다. 7×3 칸이 6.4×2.6 으로 그려집니다.
    전에 긴 축을 0.12 만 들였더니 옆 칸과 선이 맞닿아 한 덩어리로 보였습니다.
@@ -504,23 +499,33 @@ export default function FloorPlan({
       >
         <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="1.5" fill="#FFFFFF" />
 
-        {/* 집기 — 상품이 놓이지 않는 자리 */}
+        {/* 집기 — 상품이 놓이지 않는 자리.
+            매대와 같은 규칙으로 그립니다. 여기만 알약처럼 굴려 두면
+            한 도면 안에서 집기와 매대가 다른 물건으로 보입니다. */}
         {MARKS.map((m, i) => {
-          const isDoor = m.kind.includes("입구");
+          /* 상품이 놓이는 집기(파마베스트 · 행사)는 정본에 구역이 달려
+             있습니다. 그런 자리는 매대와 같은 색으로 그리고, 나머지 시설은
+             테두리 없는 회색 상자 하나로 통일합니다. */
+          const color = m.zone ? zc(m.zone) : null;
+          const ix = m.h > m.w ? BAR_SHORT : BAR_LONG;
+          const iy = m.h > m.w ? BAR_LONG : BAR_SHORT;
           return (
             <g key={`m${i}`}>
               <rect
-                x={m.c + INSET} y={m.r + INSET}
-                width={m.w - INSET * 2} height={m.h - INSET * 2} rx="1"
-                fill={isDoor ? "#D9E4E3" : MARK_FILL}
-                stroke={isDoor ? BRAND.accent : MARK_LINE}
-                strokeWidth="0.3"
+                x={m.c + ix} y={m.r + iy}
+                width={m.w - ix * 2} height={m.h - iy * 2}
+                rx={BAR_RADIUS}
+                fill={color || MARK_FILL}
+                fillOpacity={color ? 0.16 : 1}
+                stroke={color || "none"}
+                strokeOpacity={color ? 0.9 : 0}
+                strokeWidth={color ? 0.12 : 0}
               />
               {m.kind !== ORIGIN_MARK && (
                 <text
                   x={cx(m)} y={cy(m) + 0.62} textAnchor="middle"
-                  fontSize={Math.min(1.9, m.h * 0.72)} fill={isDoor ? BRAND.secondary : MARK_TEXT}
-                  fontWeight={isDoor ? 700 : 500}
+                  fontSize={Math.min(1.9, m.h * 0.72)}
+                  fill={color || MARK_TEXT} fontWeight={color ? 600 : 500}
                 >
                   {markLabel(lang, m.kind)}
                 </text>

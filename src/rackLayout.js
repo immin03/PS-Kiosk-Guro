@@ -23,7 +23,7 @@ export const MARKS = [
     "h": 3
   },
   {
-    "kind": "셀프 계산",
+    "kind": "셀프 계산대",
     "c": 140,
     "r": 4,
     "w": 16,
@@ -41,14 +41,16 @@ export const MARKS = [
     "c": 26,
     "r": 31,
     "w": 8,
-    "h": 2
+    "h": 2,
+    "zone": "프로모션"
   },
   {
     "kind": "PHAMA BEST",
     "c": 46,
     "r": 31,
     "w": 28,
-    "h": 3
+    "h": 3,
+    "zone": "프로모션"
   },
   {
     "kind": "계단 입구",
