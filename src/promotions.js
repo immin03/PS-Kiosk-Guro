@@ -1,5 +1,5 @@
 /* 자동 생성 — 직접 고치지 마세요.
- * 정본: PS-OS catalog/promotions.json (2026-09-03 기준)
+ * 정본: PS-OS catalog/promotions.json (2026-09-06 기준)
  * 갱신: node scripts/sync-racks.mjs
  *
  * 노출 순서(rank)는 이벤트 페이지 · 홈페이지와 같습니다. 생김새만 화면마다 다릅니다.
