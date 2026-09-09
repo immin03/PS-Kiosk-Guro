@@ -54,10 +54,30 @@ function buildBlocks() {
     const groups = {};
     list.forEach((r, i) => { (groups[find(i)] = groups[find(i)] || []).push(r); });
 
-    /* 매장 구역으로 더 쪼개 보았지만 블록이 여덟 개로 늘고 이름이 서로 겹쳤습니다.
-       손님이 한눈에 보는 화면이라 덩어리는 크고 적어야 합니다. 랙 자체는 구역 색으로
-       칠하므로, A 줄 끝의 펫처럼 섞여 있는 자리도 색으로는 구분됩니다. */
+    /* 손님이 따로 찾아오는 구역은 이름을 따로 답니다. 펫이 그렇습니다.
+       기준은 두 가지를 모두 만족할 때입니다 — 같은 구역 랙이 네 개 이상이고,
+       코드 번호가 줄의 한쪽 끝에 몰려 있을 것. 한두 칸 섞인 자리(A10 뷰티,
+       A25 식품·음료)는 떼지 않습니다. 매장 구역 전부로 쪼개면 블록이 여덟 개로
+       늘고 이름이 서로 겹칩니다. */
+    const SPLIT_MIN = 4;
+    const parts = [];
     Object.values(groups).forEach((racks) => {
+      const nums = racks.map((r) => Number(r.code.slice(1))).sort((a, b) => a - b);
+      const byZone = {};
+      racks.forEach((r) => { (byZone[r.zone] = byZone[r.zone] || []).push(r); });
+      const main = Object.entries(byZone).sort((a, b) => b[1].length - a[1].length)[0][0];
+      const rest = [];
+      Object.entries(byZone).forEach(([zone, rs]) => {
+        const ns = rs.map((r) => Number(r.code.slice(1))).sort((a, b) => a - b);
+        const atEnd = ns[0] === nums[0] || ns[ns.length - 1] === nums[nums.length - 1];
+        const solid = ns[ns.length - 1] - ns[0] + 1 <= ns.length + 1;
+        if (zone !== main && rs.length >= SPLIT_MIN && atEnd && solid) parts.push(rs);
+        else rest.push(...rs);
+      });
+      if (rest.length) parts.push(rest);
+    });
+
+    parts.forEach((racks) => {
       const nums = racks.map((r) => Number(r.code.slice(1))).sort((a, b) => a - b);
       const zones = {};
       racks.forEach((r) => { zones[r.zone] = (zones[r.zone] || 0) + 1; });
@@ -308,6 +328,20 @@ export default function FloorPlan({
     }
   };
   const onTouchEnd = () => { gesture.current = null; };
+
+  /* 트랙패드에서 두 손가락을 오므리면 브라우저가 ctrl 을 붙인 휠로 보냅니다.
+     그때만 확대하고, 그냥 스크롤은 페이지에 넘깁니다. */
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const onWheel = (e) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      setView((v) => clamp({ ...v, k: v.k * (e.deltaY < 0 ? 1.08 : 1 / 1.08) }));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
 
   const btn = {
     width: 34, height: 34, borderRadius: 10, border: `1px solid ${BRAND.border}`,
