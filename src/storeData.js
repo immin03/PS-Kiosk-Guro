@@ -600,7 +600,7 @@ export const BEAUTY_CATS = [
   {
     "id": "d11",
     "name": "데싱디바",
-    "emoji": "💅",
+    "emoji": "🎀",
     "count": 48,
     "zone": "D",
     "racks": "D11"
@@ -700,7 +700,7 @@ export const TOP_CATS = [
   {
     "label": "뷰티",
     "sub": "C·D 섹션 · 723종",
-    "emoji": "💅",
+    "emoji": "🎀",
     "type": "beauty"
   },
   {
