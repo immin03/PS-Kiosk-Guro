@@ -1,5 +1,5 @@
 import { useMemo, useRef, useEffect, useState } from "react";
-import { GRID, MARKS, RACKS, RACK_BY_CODE, OUTLINE } from "./rackLayout.js";
+import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel, markLabel, t } from "./i18n.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
 
@@ -376,15 +376,6 @@ export default function FloorPlan({
         }
       >
         <rect x={-pad} y={-pad} width={cols + pad * 2} height={rows + pad * 2} rx="1.5" fill="#FFFFFF" />
-
-        {/* 판매장 벽 — 매대만 떠 있으면 손님이 어디에 선 것인지 알 수 없습니다. */}
-        {OUTLINE && (
-          <polygon
-            points={OUTLINE.map(([c, r]) => `${c},${r}`).join(" ")}
-            fill="#FFFFFF" stroke={BRAND.text} strokeWidth="0.7"
-            strokeLinejoin="round" fillOpacity="1"
-          />
-        )}
 
         {/* 집기 — 상품이 놓이지 않는 자리 */}
         {MARKS.map((m, i) => {
