@@ -812,6 +812,7 @@ export default function KioskApp() {
       .kiosk-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,82,81,0.08)!important}
       .kiosk-card:active{transform:translateY(0);box-shadow:none!important}
       .kiosk-tag{transition:background 0.15s,transform 0.1s!important}
+      html,body{background:${C.bgF}}
       .kiosk-tag:hover{background:${C.pri}18!important}
       .kiosk-tag:active{transform:scale(0.95)}
       .kiosk-product{transition:background 0.15s,box-shadow 0.15s!important}
@@ -823,10 +824,12 @@ export default function KioskApp() {
       .kiosk-loc{transition:background 0.15s,border-color 0.15s!important}
       .kiosk-loc:hover{background:${C.bgF}!important;border-color:${C.bd}!important}
     `}</style>
+    {/* 껍데기는 내용만큼만 높입니다.
+        화면 폭에 맞춘 zoom 이 걸려 있어서 vh 를 쓰면 안 됩니다 — zoom 2.6 에서
+        100vh 는 실제 화면의 2.6배가 되고, 그만큼 빈 자리가 아래로 늘어납니다.
+        바탕색은 body 가 깔아 주므로 짧은 화면에서도 흰 자리가 생기지 않습니다. */}
     <div style={{ maxWidth:SHELL_MAX, margin:"0 auto", background:C.bgF,
-      /* 안쪽 여백까지 높이에 넣습니다. 넣지 않으면 내용이 짧은 화면에서도
-         100vh + 여백만큼 페이지가 늘어나 빈 자리를 스크롤하게 됩니다. */
-      boxSizing:"border-box", minHeight:"100dvh", fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:100 }}>
+      fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:64 }}>
       <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}/>
       <div>{renderPage()}</div>
 
