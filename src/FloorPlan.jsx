@@ -449,7 +449,7 @@ export default function FloorPlan({
                 x={m.c + INSET} y={m.r + INSET}
                 width={m.w - INSET * 2} height={m.h - INSET * 2} rx="1"
                 fill={isDoor ? "#D9E4E3" : MARK_FILL}
-                stroke={isDoor ? "#63CAC1" : MARK_LINE}
+                stroke={isDoor ? BRAND.accent : MARK_LINE}
                 strokeWidth="0.3"
               />
               {m.kind !== ORIGIN_MARK && (

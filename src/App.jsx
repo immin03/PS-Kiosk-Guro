@@ -48,7 +48,7 @@ const C = {
   /* 딥그린(7722 C)은 화면에서 뺐습니다. 진한 자리는 7716 C 청록이 맡습니다. */
   pri: BRAND.accent, priL: BRAND.accentSoft, priD: BRAND.secondary, priM: BRAND.secondary,
   acc: BRAND.accent, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
-  t1: "#2D373D", t2: "#2D373D", t3: BRAND.faint, wh: "#FFFFFF", bd: BRAND.border,
+  t1: "#2D373D", t2: "#2D373D", t3: BRAND.gray, wh: "#FFFFFF", bd: BRAND.border,
 };
 
 /* ── 판매수량 → 소셜 프루프 문구 ── */
@@ -580,7 +580,7 @@ export default function KioskApp() {
                 >
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
-                    <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:600 }}>
+                    <p style={{ margin:"0 0 4px", fontSize:14, fontWeight:600, lineHeight:1.4 }}>
                       {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
                     </p>
                     <p style={{ margin:0, fontSize:12, color:C.t3 }}>
@@ -624,8 +624,8 @@ export default function KioskApp() {
           <div style={{ width:38, height:38, borderRadius:8, background:z.color, flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
-            <p style={{ margin:"0 0 1px", fontSize:14, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
-            <p style={{ margin:0, fontSize:11, color:C.t2 }}>{t(lang,"zone."+z.id+".desc")}</p>
+            <p style={{ margin:"0 0 4px", fontSize:14, fontWeight:600, lineHeight:1.4 }}>{zoneLabel(lang,z.id)}</p>
+            <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.4 }}>{t(lang,"zone."+z.id+".desc")}</p>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
         </div>
@@ -676,7 +676,7 @@ export default function KioskApp() {
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
           <div style={{ padding:16 }}>
-            <p style={{ margin:"0 0 4px", fontSize:12, color:C.priD, fontWeight:600 }}>{p.brand}</p>
+            <p style={{ margin:"0 0 5px", fontSize:12, color:C.priD, fontWeight:600, lineHeight:1.4 }}>{p.brand}</p>
             <p style={{ margin:0, fontSize:16, fontWeight:700, color:C.t1, lineHeight:1.35 }}>{p.name}</p>
           </div>
           {/* 카테고리와 위치는 바로 아래 배지가 이미 말합니다. 여기서는 배지가
@@ -714,7 +714,7 @@ export default function KioskApp() {
             <div style={{ width:42, height:42, borderRadius:8, background:zoneInfo?.color||C.pri, flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:17 }}>{zone}</div>
             <div style={{ flex:1 }}>
-              <p style={{ margin:"0 0 2px", fontSize:14, fontWeight:700, color:C.t1 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
+              <p style={{ margin:"0 0 4px", fontSize:14, fontWeight:700, color:C.t1, lineHeight:1.4 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
               <p style={{ margin:0, fontSize:12, color:C.t2 }}>{rackInfo ? rackInfo.cat : zLbl}</p>
             </div>
           </div>
@@ -741,7 +741,7 @@ export default function KioskApp() {
                 color: C.wh, fontSize:14, fontWeight:700
               }}>{s.n}</div>
               <div style={{ flex:1 }}>
-                <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:600, color:C.t1 }}>{s.t}</p>
+                <p style={{ margin:"0 0 4px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.4 }}>{s.t}</p>
                 <p style={{ margin:0, fontSize:11, color:C.t3 }}>{s.sub}</p>
               </div>
             </div>
