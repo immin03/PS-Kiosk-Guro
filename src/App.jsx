@@ -45,9 +45,10 @@ const LOGO_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAC7gAAADQCAYAAACX
 
 const C = {
   /* 메인은 브랜드 accent1 밝은 민트입니다. 딥그린은 글자 대비가 필요한 자리에만 씁니다. */
-  pri: BRAND.accent, priL: BRAND.accentSoft, priD: BRAND.primary, priM: BRAND.secondary,
+  /* 딥그린(7722 C)은 화면에서 뺐습니다. 진한 자리는 7716 C 청록이 맡습니다. */
+  pri: BRAND.accent, priL: BRAND.accentSoft, priD: BRAND.secondary, priM: BRAND.secondary,
   acc: BRAND.accent, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
-  t1: "#2D373D", t2: "#2D373D", t3: "#CCCCCC", wh: "#FFFFFF", bd: BRAND.border,
+  t1: "#2D373D", t2: "#2D373D", t3: BRAND.faint, wh: "#FFFFFF", bd: BRAND.border,
 };
 
 /* ── 판매수량 → 소셜 프루프 문구 ── */

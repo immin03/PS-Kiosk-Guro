@@ -455,7 +455,7 @@ export default function FloorPlan({
               {m.kind !== ORIGIN_MARK && (
                 <text
                   x={cx(m)} y={cy(m) + 0.62} textAnchor="middle"
-                  fontSize={Math.min(1.9, m.h * 0.72)} fill={isDoor ? "#005251" : MARK_TEXT}
+                  fontSize={Math.min(1.9, m.h * 0.72)} fill={isDoor ? BRAND.secondary : MARK_TEXT}
                   fontWeight={isDoor ? 700 : 500}
                 >
                   {markLabel(lang, m.kind)}
