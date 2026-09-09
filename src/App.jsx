@@ -9,13 +9,31 @@ import {
 import FloorPlan, { FloorPlanLegend, routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
 import { categoriesOf, countOf, productsOf } from "./categories.js";
-import { RACK_BY_CODE } from "./rackLayout.js";
-import { BRAND } from "./theme.js";
+import { RACK_BY_CODE, RACKS } from "./rackLayout.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
 /* 화면 폭. 세로 키오스크(보통 540 CSS px)는 꽉 채우고, 넓은 화면에서는 적당히 멈춥니다.
    예전 420px 은 휴대폰 기준이라 키오스크에서 양옆 120px 이 비었습니다. */
 const SHELL_MAX = "min(100%, 640px)";
+
+/* 존 칩 색 — 지도와 같은 값을 씁니다.
+   storeData 에 색이 따로 박혀 있어서 지도 존 색을 바꿔도 목록의 칩은 옛 색으로
+   남았습니다. 랙 코드의 앞 글자로 배치 정본에서 뽑습니다. */
+const ZONE_CHIP = (() => {
+  const count = {};
+  RACKS.forEach((r) => {
+    const letter = r.code[0];
+    (count[letter] = count[letter] || {})[r.zone] = (count[letter]?.[r.zone] || 0) + 1;
+  });
+  return Object.fromEntries(
+    Object.entries(count).map(([letter, zones]) => [
+      letter,
+      ZONE_COLOR[Object.entries(zones).sort((a, b) => b[1] - a[1])[0][0]] || ZONE_FALLBACK,
+    ])
+  );
+})();
+const chipColor = (id) => ZONE_CHIP[id] || C.pri;
 
 /* 아무도 만지지 않으면 처음 화면으로 되돌리기까지의 시간. 0 이면 끕니다.
    매장에서 재보고 조정하세요 — 너무 짧으면 읽는 중에 화면이 날아갑니다. */
@@ -45,8 +63,9 @@ const LOGO_IMG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAC7gAAADQCAYAAACX
 
 const C = {
   /* 메인은 브랜드 accent1 밝은 민트입니다. 딥그린은 글자 대비가 필요한 자리에만 씁니다. */
-  /* 딥그린(7722 C)은 화면에서 뺐습니다. 진한 자리는 7716 C 청록이 맡습니다. */
-  pri: BRAND.accent, priL: BRAND.accentSoft, priD: BRAND.secondary, priM: BRAND.secondary,
+  /* 화면의 민트는 929 C 한 값입니다. 딥그린(7722 C)과 7716 C 청록은
+     화면에서 뺐습니다 — 민트 옆에 놓이면 혼자 가라앉습니다. */
+  pri: BRAND.accent, priL: BRAND.accent, priD: BRAND.accent, priM: BRAND.accent,
   acc: BRAND.accent, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
   t1: "#2D373D", t2: "#2D373D", t3: BRAND.gray, wh: "#FFFFFF", bd: BRAND.border,
 };
@@ -395,7 +414,7 @@ export default function KioskApp() {
             display:"flex", gap:10, background:C.wh, borderRadius:8, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
-            <div style={{ width:30, height:30, borderRadius:8, background:z.color, flexShrink:0,
+            <div style={{ width:30, height:30, borderRadius:8, background:chipColor(z.id), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
               <p style={{ margin:0, fontSize:11, fontWeight:600 }}>{zoneLabel(lang,z.id)}</p>
@@ -621,7 +640,7 @@ export default function KioskApp() {
           display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
-          <div style={{ width:38, height:38, borderRadius:8, background:z.color, flexShrink:0,
+          <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z.id), flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 4px", fontSize:14, fontWeight:600, lineHeight:1.4 }}>{zoneLabel(lang,z.id)}</p>
@@ -711,7 +730,7 @@ export default function KioskApp() {
         {/* 위치와 지도는 같은 답이라 한 상자에 담고 선으로만 나눕니다. */}
         <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px" }}>
-            <div style={{ width:42, height:42, borderRadius:8, background:zoneInfo?.color||C.pri, flexShrink:0,
+            <div style={{ width:42, height:42, borderRadius:8, background:chipColor(zoneInfo?.id), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize:17 }}>{zone}</div>
             <div style={{ flex:1 }}>
               <p style={{ margin:"0 0 4px", fontSize:14, fontWeight:700, color:C.t1, lineHeight:1.4 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
