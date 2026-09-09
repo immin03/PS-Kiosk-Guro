@@ -836,6 +836,7 @@ export default function KioskApp() {
       .kiosk-card:active{transform:translateY(0);box-shadow:none!important}
       .kiosk-tag{transition:background 0.15s,transform 0.1s!important}
       html,body{background:${C.bgF}}
+      .kiosk-input::placeholder{color:${BRAND.hint}}
       .kiosk-tag:hover{background:${C.pri}18!important}
       .kiosk-tag:active{transform:scale(0.95)}
       .kiosk-product{transition:background 0.15s,box-shadow 0.15s!important}
