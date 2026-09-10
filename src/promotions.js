@@ -81,6 +81,6 @@ export const PROMOTIONS = [
       "kiosk"
     ],
     "link": "https://www.phamasquare.com/event.html",
-    "image": "store-c.jpg"
+    "image": "store-floor.jpg"
   }
 ];

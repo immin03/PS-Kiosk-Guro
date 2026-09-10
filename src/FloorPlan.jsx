@@ -494,8 +494,8 @@ export default function FloorPlan({
   }, []);
 
   const btn = {
-    width: 30, height: 30, borderRadius: 8, border: `1px solid ${BRAND.border}`,
-    background: BRAND.surface, color: BRAND.text, fontSize: 15, fontWeight: 600,
+    width: 26, height: 26, borderRadius: 8, border: `1px solid ${BRAND.border}`,
+    background: BRAND.surface, color: BRAND.text, fontSize: 14, fontWeight: 600,
     lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   };
 

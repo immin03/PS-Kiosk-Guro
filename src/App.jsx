@@ -435,8 +435,8 @@ export default function KioskApp() {
             <div style={{ width:30, height:30, borderRadius:8, background:chipColor(z), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
             <div>
-              <p style={{ margin:"0 0 5px", fontSize:12, fontWeight:600, lineHeight:1.45 }}>{zoneLabel(lang,z.id)}</p>
-              <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.5 }}>{t(lang,"zone."+z.id+".desc")}</p>
+              <p style={{ margin:"0 0 2px", fontSize:12, fontWeight:600, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
+              <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
             </div>
           </div>
         ))}
@@ -663,8 +663,8 @@ export default function KioskApp() {
           <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z), flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
           <div style={{ flex:1 }}>
-            <p style={{ margin:"0 0 7px", fontSize:14, fontWeight:600, lineHeight:1.45 }}>{zoneLabel(lang,z.id)}</p>
-            <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.5 }}>{t(lang,"zone."+z.id+".desc")}</p>
+            <p style={{ margin:"0 0 3px", fontSize:14, fontWeight:600, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
+            <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
         </div>
