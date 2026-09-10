@@ -41,6 +41,10 @@ const BAR_SHORT = 0.15;
 /* 매대는 네모난 집기입니다. 모서리를 굴리면 알약이 됩니다. */
 const BAR_RADIUS = 0.25;
 
+/* 구역 덩어리를 만들 때 칸을 넓히는 양. 위아래로 붙은 매대가 이어지고
+   통로는 남을 만큼입니다. */
+const MERGE = 0.55;
+
 /* 집기 상자 안쪽 여백. 그림과 글자가 테두리에 붙지 않게 합니다. */
 const MARK_PAD = 0.9;
 
@@ -621,8 +625,33 @@ export default function FloorPlan({
           );
         })}
 
-        {/* 랙 */}
-        {RACKS.map((r) => {
+        {/* 구역만 보는 첫 화면.
+         *
+         * 매대 85개를 낱낱이 그리면 멀리서는 잔무늬로만 보입니다. 처음에는
+         * 구역을 덩어리로 보여 주고, 누르면 그 구역의 매대가 펴집니다.
+         * 덩어리는 실제 매대 칸을 조금씩 넓혀 이어 붙인 것이라 통로와
+         * 곤돌라 사이는 그대로 남습니다 — 네모를 새로 그리면 구역끼리
+         * 겹쳐 엉킵니다. */}
+        {grouped && BLOCKS.map((b) => (
+          <g
+            key={`grp${b.id}`}
+            onClick={() => zoomToBlock(b)}
+            style={{ cursor: "pointer" }}
+            opacity="0.55"
+          >
+            {b.racks.map((r) => (
+              <rect
+                key={r.code}
+                x={r.c - MERGE} y={r.r - MERGE}
+                width={r.w + MERGE * 2} height={r.h + MERGE * 2}
+                rx={BAR_RADIUS * 4} fill={zc(r.zone)}
+              />
+            ))}
+          </g>
+        ))}
+
+        {/* 랙 — 구역을 열었을 때만 낱낱이 그립니다 */}
+        {!grouped && RACKS.map((r) => {
           const color = zc(r.zone);
           const bar = BAR[r.code];
           const isTarget = target && r.code === target.code;
