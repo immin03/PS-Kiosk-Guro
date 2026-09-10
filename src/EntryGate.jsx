@@ -13,11 +13,13 @@ import { t } from "./i18n.js";
 export const SITE = "https://www.phamasquare.com";
 export const SITE_EVENT = `${SITE}/event.html`;
 
-export default function EntryGate({ lang, setLang, onEnterMap, logo, LangToggle }) {
+export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) {
+  /* 2 × 2. 매장에서 쓰는 둘을 윗줄에, 밖으로 나가는 둘을 아랫줄에 둡니다. */
   const cards = [
-    { id: "map", emoji: "🗺️", key: "gateMap", sub: "gateMapSub" },
+    { id: "map", emoji: "🗺️", key: "gateMap", sub: "gateMapSub", tab: "map" },
+    { id: "search", emoji: "🔎", key: "gateSearch", sub: "gateSearchSub", tab: "search" },
     { id: "event", emoji: "🎁", key: "gateEvent", sub: "gateEventSub", href: SITE_EVENT },
-    { id: "site", emoji: "🏬", key: "gateSite", sub: "gateSiteSub", href: SITE },
+    { id: "site", emoji: "🌐", key: "gateSite", sub: "gateSiteSub", href: SITE },
   ];
 
   return (
@@ -31,7 +33,8 @@ export default function EntryGate({ lang, setLang, onEnterMap, logo, LangToggle 
       </div>
 
       <img src={logo} alt="PHAMA SQUARE" style={{ height: 14, objectFit: "contain", display: "block", marginTop: 28 }} />
-      <p style={{ margin: "12px 0 0", fontSize: 15, fontWeight: 700, color: BRAND.text, letterSpacing: "-0.01em" }}>
+      {/* 매장 이름은 첫 화면의 얼굴이라 자간을 좁히지 않습니다. */}
+      <p style={{ margin: "12px 0 0", fontSize: 16, fontWeight: 700, color: BRAND.text, letterSpacing: "0.02em" }}>
         {t(lang, "gateTitle")}
       </p>
       <p style={{ margin: "6px 0 0", fontSize: 13, color: BRAND.gray }}>
@@ -40,34 +43,31 @@ export default function EntryGate({ lang, setLang, onEnterMap, logo, LangToggle 
 
       <div style={{
         width: "100%", maxWidth: 420, marginTop: 32,
-        display: "flex", flexDirection: "column", gap: 12,
+        display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12,
       }}>
         {cards.map((c) => (
           <button
             key={c.id}
             type="button"
             className="kiosk-card"
-            onClick={() => (c.href ? window.location.assign(c.href) : onEnterMap())}
+            onClick={() => (c.href ? window.location.assign(c.href) : onEnter(c.tab))}
             style={{
-              display: "flex", alignItems: "center", gap: 16, textAlign: "left",
-              padding: "22px 20px", borderRadius: RADIUS.box, cursor: "pointer",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              gap: 10, textAlign: "center", padding: "26px 12px",
+              borderRadius: RADIUS.box, cursor: "pointer",
               background: BRAND.surface, border: `1px solid ${BRAND.border}`,
               fontFamily: "inherit", width: "100%",
             }}
           >
-            <span style={{ fontSize: 34, lineHeight: 1, flexShrink: 0 }} aria-hidden>{c.emoji}</span>
-            <span style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ display: "block", fontSize: 16, fontWeight: 700, color: BRAND.text, lineHeight: 1.35 }}>
+            <span style={{ fontSize: 34, lineHeight: 1 }} aria-hidden>{c.emoji}</span>
+            <span>
+              <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: BRAND.text, lineHeight: 1.35 }}>
                 {t(lang, c.key)}
               </span>
               <span style={{ display: "block", marginTop: 4, fontSize: 12, color: BRAND.gray, lineHeight: 1.35 }}>
                 {t(lang, c.sub)}
               </span>
             </span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={BRAND.gray}
-              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block", flexShrink: 0 }}>
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
           </button>
         ))}
       </div>

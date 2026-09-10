@@ -859,7 +859,7 @@ export default function KioskApp() {
       `}</style>
       <EntryGate
         lang={lang} setLang={setLang} logo={LOGO_IMG} LangToggle={LangToggle}
-        onEnterMap={() => { setEntered(true); tabTo("map"); }}
+        onEnter={(tab) => { setEntered(true); tabTo(tab); }}
       />
       </>
     );
