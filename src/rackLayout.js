@@ -118,8 +118,8 @@ export const RACKS = [
     "r": 20,
     "w": 7,
     "h": 3,
-    "cat": "콘드로이친",
-    "zone": "건기식"
+    "cat": "펫 모래 · 패드",
+    "zone": "펫"
   },
   {
     "code": "A2",
@@ -127,8 +127,8 @@ export const RACKS = [
     "r": 16,
     "w": 7,
     "h": 3,
-    "cat": "뼈건강",
-    "zone": "건기식"
+    "cat": "펫 건강",
+    "zone": "펫"
   },
   {
     "code": "A3",
@@ -136,8 +136,8 @@ export const RACKS = [
     "r": 12,
     "w": 7,
     "h": 3,
-    "cat": "관절·근육 건강",
-    "zone": "건기식"
+    "cat": "펫 위생용품",
+    "zone": "펫"
   },
   {
     "code": "A4",
@@ -145,8 +145,8 @@ export const RACKS = [
     "r": 20,
     "w": 7,
     "h": 3,
-    "cat": "오메가3",
-    "zone": "건기식"
+    "cat": "페스룸",
+    "zone": "펫"
   },
   {
     "code": "A5",
@@ -154,8 +154,8 @@ export const RACKS = [
     "r": 16,
     "w": 7,
     "h": 3,
-    "cat": "기억력 · 인지력",
-    "zone": "건기식"
+    "cat": "페스룸",
+    "zone": "펫"
   },
   {
     "code": "A6",
@@ -163,8 +163,8 @@ export const RACKS = [
     "r": 12,
     "w": 7,
     "h": 3,
-    "cat": "눈 건강",
-    "zone": "건기식"
+    "cat": "펫 사료 · 간식",
+    "zone": "펫"
   },
   {
     "code": "A7",
@@ -388,8 +388,8 @@ export const RACKS = [
     "r": 20,
     "w": 7,
     "h": 3,
-    "cat": "펫 모래 · 패드",
-    "zone": "펫"
+    "cat": "콘드로이친",
+    "zone": "건기식"
   },
   {
     "code": "A32",
@@ -397,8 +397,8 @@ export const RACKS = [
     "r": 16,
     "w": 7,
     "h": 3,
-    "cat": "펫 건강",
-    "zone": "펫"
+    "cat": "뼈건강",
+    "zone": "건기식"
   },
   {
     "code": "A33",
@@ -406,8 +406,8 @@ export const RACKS = [
     "r": 12,
     "w": 7,
     "h": 3,
-    "cat": "펫 미용",
-    "zone": "펫"
+    "cat": "관절·근육 건강",
+    "zone": "건기식"
   },
   {
     "code": "A34",
@@ -415,8 +415,8 @@ export const RACKS = [
     "r": 20,
     "w": 7,
     "h": 3,
-    "cat": "펫 장난감",
-    "zone": "펫"
+    "cat": "오메가3",
+    "zone": "건기식"
   },
   {
     "code": "A35",
@@ -424,8 +424,8 @@ export const RACKS = [
     "r": 16,
     "w": 7,
     "h": 3,
-    "cat": "펫 위생용품",
-    "zone": "라이프"
+    "cat": "기억력 · 인지력",
+    "zone": "건기식"
   },
   {
     "code": "A36",
@@ -433,8 +433,8 @@ export const RACKS = [
     "r": 12,
     "w": 7,
     "h": 3,
-    "cat": "펫 사료 · 간식",
-    "zone": "펫"
+    "cat": "눈 건강",
+    "zone": "건기식"
   },
   {
     "code": "B1",
@@ -811,7 +811,7 @@ export const RACKS = [
     "r": 40,
     "w": 8,
     "h": 3,
-    "cat": "브이티코스메틱",
+    "cat": "더블유랩",
     "zone": "브랜드존"
   },
   {
