@@ -24,10 +24,10 @@ export const BRAND = {
   accent: "#2BCAB0",      /* 929 C — 메인 · CTA · 활성 탭 · 강조 전부 */
 
   /* 가이드의 그라데이션 견본과 같은 방식입니다 — 흰 바탕에서 바닥으로
-     내려가며 민트가 옅게 배어 나옵니다. 글자와 카드가 얹히는 윗쪽은
-     흰색 그대로 두고, 아래 절반만 아주 옅게 물들입니다.
+     내려가며 민트가 옅게 배어 나옵니다. 화면 바닥에 바짝 붙여 둡니다 —
+     버튼까지 올라오면 카드가 색 위에 뜬 것처럼 보입니다.
      화면 배경에만 씁니다. 요소(버튼 · 카드 · 칩)에는 쓰지 않습니다. */
-  wash: "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 46%, #E4F6F3 74%, #BEE7E0 100%)",
+  wash: "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 84%, #E4F6F3 94%, #BEE7E0 100%)",
   accentSoft: "#2BCAB0",
   light: "#2BCAB0",
   tint: "#D9E4E3",        /* P 123-1 C — 배지 · 선택 배경 */
