@@ -16,7 +16,7 @@ const SLIDES = import.meta.glob("./promo/*", { eager: true, query: "?url", impor
 const slideUrl = (name) => SLIDES[`./promo/${name}`];
 const bgOf = (p) => `url(${(p.image && slideUrl(p.image)) || STORE_PHOTO})`;
 
-export default function PromoBanner({ onPress, interval = 5000 }) {
+export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
   const items = PROMOTIONS;
   const [i, setI] = useState(0);
 
@@ -33,7 +33,12 @@ export default function PromoBanner({ onPress, interval = 5000 }) {
   if (!items.length) return null;
 
   return (
-    <div style={{ position: "relative", borderRadius: 8, overflow: "hidden", marginBottom: 20, aspectRatio: "16 / 9" }}>
+    /* 배너는 화면 폭을 다 씁니다. 좌우 여백과 둥근 모서리를 두면 사진이
+       카드처럼 보여 시선이 덜 갑니다. bleed 만큼 바깥으로 물려 냅니다. */
+    <div style={{
+      position: "relative", overflow: "hidden", aspectRatio: "16 / 9",
+      marginLeft: -bleed, marginRight: -bleed, marginTop: -bleed, marginBottom: 20,
+    }}>
       {items.map((p, n) => (
         <div
           key={p.id}

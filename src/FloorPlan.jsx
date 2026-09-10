@@ -333,6 +333,7 @@ export default function FloorPlan({
   highlightRack,
   showPath = false,
   detail = "all",       // "all" 모든 랙에 코드 표시 · "target" 목표와 주변만
+  heading,              // 머리글 줄 왼쪽에 적을 말. 없으면 버튼만 놓입니다.
   onRackClick,
   minWidth,
 }) {
@@ -499,6 +500,33 @@ export default function FloorPlan({
 
   return (
     <div style={{ position: "relative" }}>
+      {/* 머리글 줄. 버튼은 지도 안이 아니라 제목 오른쪽 끝에 둡니다 —
+          지도 위에 얹으면 매대를 가리고, 아래에 두면 자리를 또 먹습니다. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, paddingLeft: 4 }}>
+        {heading && (
+          <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: BRAND.text }}>{heading}</p>
+        )}
+        <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+          {(() => {
+            const on = view.k > 1 || openBlock;
+            return (
+              <button
+                type="button" aria-label="지도 원래대로" disabled={!on}
+                style={{ ...btn, fontSize: 15, opacity: on ? 1 : 0.35, cursor: on ? "pointer" : "default" }}
+                onClick={resetView}
+              >
+                ↺
+              </button>
+            );
+          })()}
+          <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
+          <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
+        </div>
+      </div>
+
+      {/* 지도는 카드 안쪽을 다 씁니다. 안쪽 여백을 두면 그만큼 잘립니다. */}
+      <div style={{ background: BRAND.surface, border: `1px solid ${BRAND.border}`,
+        borderRadius: 8, overflow: "hidden" }}>
     <div
       ref={box}
       onTouchStart={onTouchStart}
@@ -743,32 +771,6 @@ export default function FloorPlan({
       </svg>
     </div>
     </div>
-
-      {/* 지도 위에 얹으면 오른쪽 끝 블록 이름을 가립니다. 지도 아래에 둡니다.
-          위아래 여백을 같게 둬서 지도와 범례 사이 한가운데에 놓입니다. */}
-      <div style={{ display: "flex", alignItems: "center",
-        gap: 6, marginTop: 10, marginBottom: 2, paddingLeft: 6, paddingRight: 6 }}>
-        {/* 층은 지도 옆에 둡니다. 버튼과 같은 줄이라 자리를 더 먹지 않습니다. */}
-        <span style={{ fontSize: 13, fontWeight: 600, color: BRAND.gray, marginRight: "auto" }}>
-          {t(lang, "floorName")}
-        </span>
-        {/* 되돌리기는 왼쪽에 붙이고 늘 자리를 지킵니다. 나타났다 사라지면
-            그때마다 +·− 가 밀려 연달아 누르던 손이 끊깁니다. 되돌릴 것이
-            없을 때는 흐리게 두고 누를 수 없게 합니다. */}
-        {(() => {
-          const on = view.k > 1 || openBlock;
-          return (
-            <button
-              type="button" aria-label="지도 원래대로" disabled={!on}
-              style={{ ...btn, fontSize: 15, opacity: on ? 1 : 0.35, cursor: on ? "pointer" : "default" }}
-              onClick={resetView}
-            >
-              ↺
-            </button>
-          );
-        })()}
-        <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
-        <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
       </div>
     </div>
   );

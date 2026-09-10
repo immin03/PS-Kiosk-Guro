@@ -348,7 +348,7 @@ export default function KioskApp() {
   const renderHome = () => (
     <div style={{ padding:"16px 20px 24px" }}>
       {/* 운영 중인 혜택 — 순서는 PS-OS 프로모션 정본이 정합니다 */}
-      <PromoBanner/>
+      <PromoBanner bleed={20}/>
 
       {/* 통합 검색 */}
       <div style={{ marginBottom:24, position:"relative" }}>
@@ -420,9 +420,8 @@ export default function KioskApp() {
       </div>
 
       {/* 매장 지도 */}
-      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"storeMap")}</p>
-      <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:12 }}>
-        <FloorPlan lang={lang} onRackClick={(rack) => {
+      <div style={{ marginBottom:12 }}>
+        <FloorPlan lang={lang} heading={t(lang,"storeMap")} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id === legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
         }}/>
@@ -480,9 +479,9 @@ export default function KioskApp() {
           <EmojiChip e={cat.emoji} d={44} s={28} />
           <p style={{ margin:0, fontSize:13, color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
         </div>
-        <div style={{ background:C.wh, borderRadius:8, padding:14, border:`1px solid ${C.bd}`, marginBottom:16 }}>
-          <p style={{ margin:"0 0 8px", fontSize:13, fontWeight:700, color:C.t1 }}>{t(lang,"inStoreLocation")}</p>
-          <FloorPlan lang={lang} highlightZone={RACK_BY_CODE[String(cat.racks||"").split(",")[0].trim()]?.zone}/>
+        <div style={{ marginBottom:16 }}>
+          <FloorPlan lang={lang} heading={t(lang,"inStoreLocation")}
+            highlightZone={RACK_BY_CODE[String(cat.racks||"").split(",")[0].trim()]?.zone}/>
         </div>
         <p style={{ fontSize:13, fontWeight:700, color:C.t2, margin:"0 0 8px" }}>{prods.length>0?t(lang,"productListN",{n:prods.length}):t(lang,"productList")}</p>
         {prods.length>0 ? prods.map((p,i) => (
@@ -650,9 +649,8 @@ export default function KioskApp() {
     /* 지도는 이 화면의 본체입니다. 바깥 여백과 카드 안쪽 여백을 줄여
        테두리 사이를 지도가 다 쓰게 합니다. */
     <div style={{ padding:"12px 12px 24px" }}>
-      <p style={{ fontSize:13, fontWeight:500, color:C.t2, margin:"0 0 8px 4px" }}>{t(lang,"storeFloor")}</p>
-      <div style={{ background:C.wh, borderRadius:8, padding:"8px 6px 6px", border:`1px solid ${C.bd}`, marginBottom:12 }}>
-        <FloorPlan lang={lang} onRackClick={(rack) => {
+      <div style={{ marginBottom:12 }}>
+        <FloorPlan lang={lang} heading={t(lang,"storeFloor")} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id===legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
         }}/>
@@ -761,8 +759,8 @@ export default function KioskApp() {
           </div>
 
           <div style={{ borderTop:`1px solid ${C.bd}`, padding:"12px 10px 10px" }}>
-            <p style={{ margin:"0 0 8px 6px", fontSize:12, fontWeight:600, color:C.t2 }}>{t(lang,"directions")}</p>
-            <FloorPlan lang={lang} highlightRack={p.rack} showPath detail="target"/>
+            <FloorPlan lang={lang} heading={t(lang,"directions")}
+              highlightRack={p.rack} showPath detail="target"/>
           </div>
         </div>
 
