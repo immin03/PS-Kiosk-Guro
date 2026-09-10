@@ -18,7 +18,7 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
   const cards = [
     { id: "map", emoji: "🗺️", key: "gateMap", sub: "gateMapSub", tab: "map" },
     { id: "search", emoji: "🔎", key: "gateSearch", sub: "gateSearchSub", tab: "search" },
-    { id: "event", emoji: "🎁", key: "gateEvent", sub: "gateEventSub", href: SITE_EVENT },
+    { id: "event", emoji: "🎟️", key: "gateEvent", sub: "gateEventSub", href: SITE_EVENT },
     { id: "site", emoji: "🌐", key: "gateSite", sub: "gateSiteSub", href: SITE },
   ];
 
