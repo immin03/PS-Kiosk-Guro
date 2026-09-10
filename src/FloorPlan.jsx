@@ -341,9 +341,10 @@ export default function FloorPlan({
      자기가 무엇을 놓쳤는지 알 수 없습니다. */
   const wide = minWidth != null ? minWidth : 0;
   const { rows, cols } = GRID;
-  /* 판매장 둘레 여백. 3칸이면 카드 안에서 지도가 그만큼 작아집니다.
-     매대가 카드 테두리에 닿지 않을 만큼만 둡니다. */
-  const pad = 1.2;
+  /* 판매장 둘레 여백. 카드에 여백을 주는 대신 그릴 범위를 넓혀 지도를
+     한 뼘 작게 그립니다 — 카드 여백은 지도를 잘라 내지만 이쪽은 지도가
+     통째로 줄어 매대가 테두리에 닿지 않습니다. */
+  const pad = 3;
   const target = highlightRack ? RACK_BY_CODE[highlightRack] : null;
   const origin = useMemo(() => MARKS.find((m) => m.kind === ORIGIN_MARK), []);
   const route = useMemo(
