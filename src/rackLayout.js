@@ -299,7 +299,7 @@ export const RACKS = [
     "w": 7,
     "h": 3,
     "cat": "어린이 건강",
-    "zone": "건기식"
+    "zone": "키즈"
   },
   {
     "code": "A22",
@@ -497,7 +497,7 @@ export const RACKS = [
     "w": 10,
     "h": 3,
     "cat": "어린이 간식",
-    "zone": "브랜드"
+    "zone": "키즈"
   },
   {
     "code": "B8",
@@ -506,7 +506,7 @@ export const RACKS = [
     "w": 10,
     "h": 3,
     "cat": "어린이 간식",
-    "zone": "브랜드"
+    "zone": "키즈"
   },
   {
     "code": "B9",

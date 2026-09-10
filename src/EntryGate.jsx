@@ -35,10 +35,11 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
 
       <img src={logo} alt="PHAMA SQUARE" style={{ height: 14, objectFit: "contain", display: "block", marginTop: 28 }} />
       {/* 매장 이름은 첫 화면의 얼굴이라 자간을 좁히지 않습니다. */}
-      <p style={{ margin: "12px 0 0", fontSize: 16, fontWeight: 700, color: BRAND.text, letterSpacing: "0.02em" }}>
+      <p style={{ margin: "14px 0 0", fontSize: 16, fontWeight: 700, color: BRAND.text,
+        letterSpacing: "0.02em", lineHeight: 1.45 }}>
         {t(lang, "gateTitle")}
       </p>
-      <p style={{ margin: "6px 0 0", fontSize: 13, color: BRAND.gray }}>
+      <p style={{ margin: "10px 0 0", fontSize: 13, color: BRAND.gray, lineHeight: 1.45 }}>
         {t(lang, "gateSub")}
       </p>
 

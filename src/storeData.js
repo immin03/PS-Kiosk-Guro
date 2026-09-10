@@ -700,8 +700,14 @@ export const TOP_CATS = [
   {
     "label": "뷰티",
     "sub": "C·D 섹션 · 723종",
-    "emoji": "🎀",
+    "emoji": "💄",
     "type": "beauty"
+  },
+  {
+    "label": "라이프 스타일",
+    "sub": "프레시케어 · 위생 · 탈취 등",
+    "emoji": "🧴",
+    "type": "life"
   },
   {
     "label": "펫",
@@ -710,10 +716,10 @@ export const TOP_CATS = [
     "type": "pet"
   },
   {
-    "label": "라이프 스타일",
-    "sub": "프레시케어 · 위생 · 탈취 등",
-    "emoji": "🧴",
-    "type": "life"
+    "label": "키즈",
+    "sub": "어린이 영양제 · 간식",
+    "emoji": "🧸",
+    "type": "kids"
   }
 ];
 

@@ -652,9 +652,10 @@ export default function KioskApp() {
   };
 
   const renderMap = () => (
-    /* 지도는 이 화면의 본체입니다. 바깥 여백과 카드 안쪽 여백을 줄여
-       테두리 사이를 지도가 다 쓰게 합니다. */
-    <div style={{ padding:"12px 12px 24px" }}>
+    /* 지도는 이 화면의 본체라 바깥 여백을 줄였습니다. 지도 카드와 아래
+       목록이 같은 선에서 시작해야 합니다 — 목록에만 여백을 더 주었더니
+       왼쪽 끝이 8px 어긋나 보였습니다. */
+    <div style={{ padding:"12px 16px 24px" }}>
       <div style={{ marginBottom:12 }}>
         <FloorPlan lang={lang} heading={t(lang,"storeFloor")} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id===legacyZoneOf(rack.code));
@@ -663,7 +664,7 @@ export default function KioskApp() {
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, marginLeft:8, marginRight:8, background:C.wh, borderRadius:8,
+          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
           <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z), flexShrink:0,
