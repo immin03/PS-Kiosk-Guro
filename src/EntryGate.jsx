@@ -24,7 +24,8 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
 
   return (
     <div style={{
-      minHeight: "100dvh", background: BRAND.bg, display: "flex", flexDirection: "column",
+      minHeight: "100dvh", background: BRAND.wash, backgroundAttachment: "fixed",
+      display: "flex", flexDirection: "column",
       alignItems: "center", padding: "0 20px 40px",
     }}>
       {/* 언어는 여기서도 바꿀 수 있어야 합니다 — 들어간 뒤에야 보이면 늦습니다. */}
@@ -37,7 +38,8 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
       <p style={{ margin: "12px 0 0", fontSize: 16, fontWeight: 700, color: BRAND.text, letterSpacing: "0.02em" }}>
         {t(lang, "gateTitle")}
       </p>
-      <p style={{ margin: "6px 0 0", fontSize: 13, color: BRAND.gray }}>
+      {/* 민트 위에서는 회색 글자가 묻힙니다. 흐린 자리 색은 흰 바탕 기준입니다. */}
+      <p style={{ margin: "6px 0 0", fontSize: 13, color: BRAND.text, opacity: 0.62 }}>
         {t(lang, "gateSub")}
       </p>
 
