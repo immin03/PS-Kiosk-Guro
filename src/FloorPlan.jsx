@@ -684,9 +684,11 @@ export default function FloorPlan({
             표 하나로 바꿉니다. 이름과 랙 범위를 한 줄에 담습니다. */}
         {grouped && BLOCKS.map((b) => {
           const name = zoneLabel(lang, b.zone) || b.zone;
-          const FS = 3;
-          const padX = FS * 0.75;
-          const w = (runWidth(name) + runWidth(b.range) * 0.72 + 0.6) * FS + padX * 2;
+          const FS = 3.6;
+          const padX = FS * 0.7;
+          /* 이름과 랙 번호 사이. 공백 하나로는 두 말이 붙어 보입니다. */
+          const NUM_GAP = 0.62;
+          const w = (runWidth(name) + runWidth(b.range) * 0.72 + NUM_GAP) * FS + padX * 2;
           const h = FS * 1.85;
           /* 오른쪽 끝 구역은 표가 판매장 밖으로 삐져나갑니다. 안쪽으로 붙입니다. */
           const x = Math.min(Math.max(b.lx - w / 2, FULL.x + 0.5), FULL.x + FULL.w - w - 0.5);
@@ -701,7 +703,7 @@ export default function FloorPlan({
                 fontSize={FS} fontWeight="700" fill="#FFFFFF"
               >
                 {name}
-                <tspan fontSize={FS * 0.72} fillOpacity="0.75">{`  ${b.range}`}</tspan>
+                <tspan dx={FS * NUM_GAP} fontSize={FS * 0.72} fillOpacity="0.75">{b.range}</tspan>
               </text>
             </g>
           );
