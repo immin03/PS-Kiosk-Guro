@@ -8,6 +8,7 @@ import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
 import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
+import EntryGate from "./EntryGate.jsx";
 import { categoriesOf, countOf, productsOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
@@ -268,6 +269,11 @@ export default function KioskApp() {
   useEffect(() => {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : lang;
   }, [lang]);
+  /* 첫 화면 — 매장 지도 · 이벤트 · 홈페이지 중에 고릅니다.
+     ?start=app 을 붙이면 건너뜁니다(설치·점검용). */
+  const [entered, setEntered] = useState(
+    () => new URLSearchParams(window.location.search).get("start") === "app"
+  );
   const [nav, setNav] = useState([{ page:"home" }]);
   const cur = nav[nav.length - 1];
   const push = useCallback((pg) => setNav(p => [...p, pg]), []);
@@ -841,6 +847,23 @@ export default function KioskApp() {
     { id:"search", label:t(lang,"tabSearch") },
     { id:"map", label:t(lang,"storeMap") },
   ];
+
+  if (!entered) {
+    return (
+      <>
+      <style>{`
+        .kiosk-card{transition:transform 0.15s,box-shadow 0.15s!important}
+        .kiosk-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(45,55,61,0.10)!important}
+        .kiosk-card:active{transform:translateY(0);box-shadow:none!important}
+        html,body{background:${C.bgF};font-family:Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif}
+      `}</style>
+      <EntryGate
+        lang={lang} setLang={setLang} logo={LOGO_IMG} LangToggle={LangToggle}
+        onEnterMap={() => { setEntered(true); tabTo("map"); }}
+      />
+      </>
+    );
+  }
 
   return (
     <>
