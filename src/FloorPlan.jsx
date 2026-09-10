@@ -371,7 +371,10 @@ export default function FloorPlan({
 
   const labelled = (r) => {
     if (grouped) return false;
-    if (openBlock) return openBlock.racks.includes(r);
+    /* 구역을 열면 그 구역 이름만 폈더니, 화면에 함께 보이는 옆 구역이
+       빈 상자로 남아 여기가 어디인지 알 수 없었습니다. 보이는 매대는
+       전부 이름을 답니다. */
+    if (openBlock) return true;
     if (detail === "all" || !target) return true;
     return r.code === target.code;
   };
@@ -592,6 +595,8 @@ export default function FloorPlan({
           const isTarget = target && r.code === target.code;
           const zoneOn = !target && highlightZone && r.zone === highlightZone;
           const dim = target && !isTarget;
+          /* 연 구역 밖의 매대 — 이름은 남기되 한 겹 물립니다. */
+          const aside = openBlock && !openBlock.racks.includes(r);
           return (
             <g
               key={r.code}
@@ -606,9 +611,9 @@ export default function FloorPlan({
                 x={r.c + bar.ix} y={r.r + bar.iy}
                 width={r.w - bar.ix * 2} height={r.h - bar.iy * 2} rx={BAR_RADIUS}
                 fill={color}
-                fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : 0.16}
+                fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : aside ? 0.09 : 0.16}
                 stroke={color}
-                strokeOpacity={isTarget ? 1 : dim ? 0.4 : 0.9}
+                strokeOpacity={isTarget ? 1 : dim ? 0.4 : aside ? 0.45 : 0.9}
                 strokeWidth={isTarget ? 0.3 : 0.12}
               />
               {labelled(r) && !isTarget && bar.label && (
@@ -630,7 +635,7 @@ export default function FloorPlan({
                         (i - (bar.label.lines.length - 1) / 2) * bar.label.size * 1.12
                       }
                       textAnchor="middle" fontSize={bar.label.size} fontWeight="600"
-                      fill={color} fillOpacity={dim ? 0.55 : 1}
+                      fill={color} fillOpacity={dim ? 0.55 : aside ? 0.55 : 1}
                     >
                       {line}
                     </text>
