@@ -33,9 +33,10 @@ const BLOCK_GAP = 10;
 
 /* 랙은 도면처럼 그립니다. 7×3 칸이 6.4×2.6 으로 그려집니다.
    전에 긴 축을 0.12 만 들였더니 옆 칸과 선이 맞닿아 한 덩어리로 보였습니다.
-   어느 방향이든 칸과 칸 사이에 최소 0.6 칸(150mm)이 뜹니다. */
-const BAR_LONG = 0.3;
-const BAR_SHORT = 0.2;
+   어느 방향이든 칸과 칸 사이가 최소 0.5 칸(125mm) 뜹니다. 여백을 넓히면
+   그만큼 매대와 글자가 작아집니다 — 붙어 보이지 않을 만큼만 띄웁니다. */
+const BAR_LONG = 0.25;
+const BAR_SHORT = 0.15;
 
 /* 매대는 네모난 집기입니다. 모서리를 굴리면 알약이 됩니다. */
 const BAR_RADIUS = 0.25;
@@ -344,7 +345,7 @@ export default function FloorPlan({
   /* 판매장 둘레 여백. 카드에 여백을 주는 대신 그릴 범위를 넓혀 지도를
      한 뼘 작게 그립니다 — 카드 여백은 지도를 잘라 내지만 이쪽은 지도가
      통째로 줄어 매대가 테두리에 닿지 않습니다. */
-  const pad = 3;
+  const pad = 2;
   const target = highlightRack ? RACK_BY_CODE[highlightRack] : null;
   const origin = useMemo(() => MARKS.find((m) => m.kind === ORIGIN_MARK), []);
   const route = useMemo(
