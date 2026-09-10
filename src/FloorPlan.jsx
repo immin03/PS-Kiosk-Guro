@@ -157,6 +157,30 @@ function buildBlocks() {
 
 const BLOCKS = buildBlocks();
 
+/* 구역 보기의 상자 배치 — 도식입니다.
+ *
+ * 매장의 세 줄만 지킵니다. 위는 벽면 랙과 계산대, 가운데는 매대, 아래는
+ * 손님이 드나드는 자리. 가로 100 · 세로 46 을 기준으로 적습니다. */
+const SCHEMATIC = [
+  { id: "b",     zone: "브랜드",   range: "B1–B6",   x: 2,  y: 2,  w: 40, h: 9 },
+  { id: "bkids", zone: "키즈",     range: "B7–B8",   x: 44, y: 2,  w: 14, h: 9 },
+  { id: "drink", mark: "음료판매대",                 x: 60, y: 2,  w: 14, h: 9 },
+  { id: "event", zone: "프로모션", range: "B9–B10",  x: 76, y: 2,  w: 12, h: 9 },
+  { id: "pay",   mark: "계산대",                     x: 90, y: 2,  w: 8,  h: 9 },
+  /* 계산대는 좁아 이름만 들어갑니다. 셀프 계산대는 바로 옆이라 함께 읽힙니다. */
+
+  { id: "a",     zone: "건기식",   range: "A1–A30",  x: 2,  y: 13, w: 40, h: 19 },
+  { id: "pet",   zone: "펫",       range: "A31–A36", x: 44, y: 13, w: 14, h: 19 },
+  { id: "c",     zone: "뷰티",     range: "C1–C25",  x: 60, y: 13, w: 23, h: 19 },
+  { id: "d",     zone: "브랜드존", range: "D1–D15",  x: 85, y: 13, w: 13, h: 19 },
+
+  { id: "elev",  mark: "엘리베이터 입구", here: true, x: 2,  y: 34, w: 22, h: 10 },
+  { id: "best",  mark: "파마베스트", zone: "프로모션", x: 26, y: 34, w: 22, h: 10 },
+  { id: "stair", mark: "계단 입구",                   x: 50, y: 34, w: 16, h: 10 },
+  { id: "exp",   mark: "체험존",                      x: 68, y: 34, w: 30, h: 10 },
+];
+const SCHEMATIC_BOX = { x: 0, y: 0, w: 100, h: 46 };
+
 /* 매대와 집기가 실제로 놓인 범위 */
 const BOUNDS = (() => {
   const all = [...RACKS, ...MARKS];
@@ -434,6 +458,8 @@ export default function FloorPlan({
   const FULL = { x: BOUNDS.x - pad, y: BOUNDS.y - pad, w: BOUNDS.w + pad * 2, h: BOUNDS.h + pad * 2 };
   const ratio = FULL.w / FULL.h;
   const vb = (() => {
+    /* 구역 보기는 도식이라 좌표계가 다릅니다. */
+    if (grouped) return SCHEMATIC_BOX;
     if (!openBlock) return FULL;
     const m = 2;
     let w = openBlock.w + m * 2;
@@ -563,7 +589,7 @@ export default function FloorPlan({
         {/* 집기 — 상품이 놓이지 않는 자리.
             매대와 같은 규칙으로 그립니다. 여기만 알약처럼 굴려 두면
             한 도면 안에서 집기와 매대가 다른 물건으로 보입니다. */}
-        {MARKS.map((m, i) => {
+        {!grouped && MARKS.map((m, i) => {
           /* 상품이 놓이는 집기(파마베스트 · 행사)는 정본에 구역이 달려
              있습니다. 그런 자리는 매대와 같은 색으로 그리고, 나머지 시설은
              테두리 없는 회색 상자 하나로 통일합니다. */
@@ -628,27 +654,72 @@ export default function FloorPlan({
         {/* 구역만 보는 첫 화면.
          *
          * 매대 85개를 낱낱이 그리면 멀리서는 잔무늬로만 보입니다. 처음에는
-         * 구역을 덩어리로 보여 주고, 누르면 그 구역의 매대가 펴집니다.
-         * 덩어리는 실제 매대 칸을 조금씩 넓혀 이어 붙인 것이라 통로와
-         * 곤돌라 사이는 그대로 남습니다 — 네모를 새로 그리면 구역끼리
-         * 겹쳐 엉킵니다. */}
-        {grouped && BLOCKS.map((b) => (
-          <g
-            key={`grp${b.id}`}
-            onClick={() => zoomToBlock(b)}
-            style={{ cursor: "pointer" }}
-            opacity="0.55"
-          >
-            {b.racks.map((r) => (
+         * 구역 하나에 상자 하나로 보여 주고, 누르면 그 구역이 확대되며
+         * 매대 이름이 펴집니다.
+         *
+         * 이 상자들은 축척 도면이 아니라 도식입니다. 구역의 실제 좌표로
+         * 상자를 그리면 A존 상자가 그 안에 든 키즈 · 펫 · 뷰티 상자와
+         * 포개집니다(A존은 c6~104, 키즈는 c69~76). 매장의 세 줄 구조 —
+         * 위 벽면 랙 · 가운데 매대 · 아래 집기 — 만 지킵니다.
+         * 정확한 자리는 상자를 눌렀을 때 나오는 실좌표 지도가 맡습니다. */}
+        {grouped && SCHEMATIC.map((b) => {
+          const color = b.zone ? zc(b.zone) : null;
+          /* 구역이 통째로 한 덩어리인 곳은 그 덩어리를, 키즈처럼 다른 구역
+             안에 몇 칸만 있는 곳은 그 칸이 든 덩어리를 엽니다. */
+          const block = b.zone && (
+            BLOCKS.find((x) => x.zone === b.zone) ||
+            BLOCKS.find((x) => x.racks.some((r) => r.zone === b.zone))
+          );
+          const name = b.mark ? markLabel(lang, b.mark) : zoneLabel(lang, b.zone) || b.zone;
+          return (
+            <g
+              key={b.id}
+              onClick={block ? () => zoomToBlock(block) : undefined}
+              style={block ? { cursor: "pointer" } : undefined}
+            >
               <rect
-                key={r.code}
-                x={r.c - MERGE} y={r.r - MERGE}
-                width={r.w + MERGE * 2} height={r.h + MERGE * 2}
-                rx={BAR_RADIUS * 4} fill={zc(r.zone)}
+                x={b.x} y={b.y} width={b.w} height={b.h} rx="1.6"
+                fill={color || MARK_FILL} fillOpacity={color ? 0.14 : 1}
+                stroke={color || "none"} strokeOpacity={color ? 0.55 : 0}
+                strokeWidth={color ? 0.3 : 0}
               />
-            ))}
-          </g>
-        ))}
+              {color && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
+              <text
+                x={color ? b.x + 4.4 : b.x + b.w / 2} y={b.y + 3.5}
+                textAnchor={color ? "start" : "middle"}
+                /* 좁은 상자에서 이름이 밖으로 흘러나오지 않게 폭에 맞춥니다. */
+                fontSize={Math.min(
+                  color ? 2.6 : 2.1,
+                  (b.w - (color ? 6 : 3)) / runWidth(name)
+                )}
+                fontWeight={color ? 700 : 500}
+                fill={color ? BRAND.text : MARK_TEXT}
+              >
+                {name}
+              </text>
+              {b.here && (
+                <>
+                  <circle cx={b.x + b.w - 3.2} cy={b.y + b.h / 2} r="1.1" fill={YOU} />
+                  <circle cx={b.x + b.w - 3.2} cy={b.y + b.h / 2} r="2" fill="none" stroke={YOU} strokeWidth="0.35" opacity="0.5">
+                    <animate attributeName="r" values="1.4;2.8;1.4" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.8s" repeatCount="indefinite" />
+                  </circle>
+                  <text x={b.x + 2.6} y={b.y + 7.4} fontSize="1.9" fontWeight="700" fill={YOU}>
+                    {t(lang, "youAreHere")}
+                  </text>
+                </>
+              )}
+              {b.range && (
+                <text
+                  x={b.x + 2.6} y={b.y + 6.6}
+                  fontSize="2.1" fontWeight="600" fill={color} fillOpacity="0.85"
+                >
+                  {b.range}
+                </text>
+              )}
+            </g>
+          );
+        })}
 
         {/* 랙 — 구역을 열었을 때만 낱낱이 그립니다 */}
         {!grouped && RACKS.map((r) => {
@@ -708,36 +779,7 @@ export default function FloorPlan({
           );
         })}
 
-        {/* 구역 이름.
-            전에는 큰 글자에 흰 테두리를 둘러 매대 위에 겹쳐 놓았습니다.
-            글자가 매대를 파먹는 것처럼 보여서, 지도 라벨답게 구역 색을 채운
-            표 하나로 바꿉니다. 이름과 랙 범위를 한 줄에 담습니다. */}
-        {grouped && BLOCKS.map((b) => {
-          const name = zoneLabel(lang, b.zone) || b.zone;
-          const FS = 3.6;
-          const padX = FS * 0.7;
-          /* 이름과 랙 번호 사이. 공백 하나로는 두 말이 붙어 보입니다. */
-          const NUM_GAP = 0.62;
-          const w = (runWidth(name) + runWidth(b.range) * 0.72 + NUM_GAP) * FS + padX * 2;
-          const h = FS * 1.85;
-          /* 오른쪽 끝 구역은 표가 판매장 밖으로 삐져나갑니다. 안쪽으로 붙입니다. */
-          const x = Math.min(Math.max(b.lx - w / 2, FULL.x + 0.5), FULL.x + FULL.w - w - 0.5);
-          return (
-            <g key={`b${b.id}`} style={{ pointerEvents: "none" }}>
-              <rect
-                x={x} y={b.ly - h / 2} width={w} height={h} rx={h / 2}
-                fill={zc(b.zone)}
-              />
-              <text
-                x={x + w / 2} y={b.ly + FS * 0.36} textAnchor="middle"
-                fontSize={FS} fontWeight="700" fill="#FFFFFF"
-              >
-                {name}
-                <tspan dx={FS * NUM_GAP} fontSize={FS * 0.72} fillOpacity="0.75">{b.range}</tspan>
-              </text>
-            </g>
-          );
-        })}
+
 
         {/* 걸어가는 길 — 빈 칸만 밟은 경로 */}
         {route && (
@@ -752,7 +794,7 @@ export default function FloorPlan({
         )}
 
         {/* 현재 위치 */}
-        {origin && (
+        {!grouped && origin && (
           <g>
             <circle cx={cx(origin)} cy={cy(origin)} r="1.5" fill={YOU} />
             <circle cx={cx(origin)} cy={cy(origin)} r="2.6" fill="none" stroke={YOU} strokeWidth="0.5" opacity="0.45">
