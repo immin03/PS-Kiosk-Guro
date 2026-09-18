@@ -1,5 +1,5 @@
 import { RACKS } from "./rackLayout.js";
-import { ALL_PRODUCTS } from "./storeData.js";
+import { COUNT_BY_RACK } from "./catalogStats.js";
 
 /* 카테고리 목록을 배치 정본에서 만듭니다.
  *
@@ -64,13 +64,6 @@ const EMOJI = {
    개별 이모지를 박지 않고 공통 표식을 씁니다. */
 const FALLBACK_EMOJI = "🏬";
 
-/* 랙별 상품 수 */
-const COUNT_BY_RACK = (() => {
-  const n = {};
-  ALL_PRODUCTS.forEach((p) => { if (p.rack) n[p.rack] = (n[p.rack] || 0) + 1; });
-  return n;
-})();
-
 /* cat 하나가 여러 랙에 걸칠 수 있습니다(마스크팩 C1·C9). 하나로 묶습니다. */
 export const CATEGORIES = (() => {
   const byCat = new Map();
@@ -80,7 +73,10 @@ export const CATEGORIES = (() => {
     const k = key(r.cat);
     if (!byCat.has(k)) {
       byCat.set(k, {
-        id: k, name: r.cat, type, zone: r.zone,
+        /* fileId 는 화면별 JSON 파일 이름입니다. 이름(콘드로이친 · 관절·근육건강)은
+           주소에 넣기 까다로워서 이 카테고리의 첫 랙 번호를 씁니다. 랙 하나는
+           카테고리 하나에만 속하므로 겹치지 않습니다. */
+        id: k, fileId: r.code.toLowerCase(), name: r.cat, type, zone: r.zone,
         emoji: EMOJI[k] || FALLBACK_EMOJI,
         rackList: [], count: 0,
       });
@@ -103,8 +99,10 @@ export const countOf = (type) =>
   categoriesOf(type).reduce((s, c) => s + c.count, 0);
 
 /* 카테고리에 속한 상품 — 랙으로 찾습니다. 상품의 cat 문자열은 예전 엑셀
-   기준이라 정본 카테고리 이름과 다를 수 있습니다. */
-export function productsOf(cat) {
+   기준이라 정본 카테고리 이름과 다를 수 있습니다.
+   상품 원장은 앱에 들어 있지 않으므로 목록을 받아서 거릅니다. 빌드 때
+   화면별 JSON 을 만들 때 씁니다. */
+export function productsOf(cat, products) {
   const set = new Set(cat.rackList || String(cat.racks || "").split(","));
-  return ALL_PRODUCTS.filter((p) => set.has(p.rack));
+  return products.filter((p) => set.has(p.rack));
 }

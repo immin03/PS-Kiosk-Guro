@@ -1,15 +1,19 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
 import {
-  HEALTH_CATS, BEAUTY_CATS, PET_CATS, TOP_CATS,
-  ALL_BRANDS, ZONES_MAP, ALL_PRODUCTS,
+  HEALTH_CATS, BEAUTY_CATS, PET_CATS, TOP_CATS, ZONES_MAP,
 } from "./storeData.js";
+/* 상품 원장은 앱에 싣지 않습니다. 개수만 싣고, 목록은 필요할 때 불러옵니다. */
+import { COUNT_BY_BRAND, STOCKED_BRANDS, BRAND_TOTAL } from "./catalogStats.js";
+import { catalogClient } from "./data/catalogClient.js";
+import { filterProducts, productKey, PRODUCT_ROW_HEIGHT } from "./catalogPerformance.js";
+import VirtualProductList from "./VirtualProductList.jsx";
 import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
 import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
 import EntryGate from "./EntryGate.jsx";
-import { categoriesOf, countOf, productsOf } from "./categories.js";
+import { categoriesOf, countOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
 
@@ -237,14 +241,23 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
   );
 }
 
+/* 상품 조각을 받는 동안. 매장 서버에서 오므로 대개 한순간입니다. */
+function Loading({ lang }) {
+  return <p style={{ textAlign:"center", padding:"32px 0", fontSize:13, color:C.t3, margin:0 }}>{t(lang,"catalogLoading")}</p>;
+}
+
 function ProductCard({ p, onLocate }) {
+  /* 높이를 고정합니다. 긴 목록은 보이는 줄만 그리는데, 몇 번째 줄이 화면에
+     있는지를 이 높이로 셉니다. 이름과 브랜드는 한 줄씩이라 넘치지 않습니다. */
   return (
     <div className="kiosk-product" onClick={() => onLocate?.(p)}
-      style={{ display:"flex", gap:12, padding:"14px 0", borderBottom:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer" }}>
+      style={{ display:"flex", gap:12, height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box",
+        borderBottom:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer" }}>
       <div style={{ flex:1, minWidth:0 }}>
         <p style={{ margin:"0 0 5px", fontSize:14, fontWeight:600, color:C.t1, lineHeight:1.45,
           overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</p>
-        <p style={{ margin:0, fontSize:12, color:C.t2 }}>{p.brand} · {p.cat}</p>
+        <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.3,
+          overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.brand} · {p.cat}</p>
       </div>
       <div className="kiosk-loc" style={{
         background:C.wh, border:`1px solid ${C.bd}`, borderRadius:8,
@@ -285,13 +298,47 @@ export default function KioskApp() {
   const [searchFacet, setSearchFacet] = useState("cat");
   const [recentSearch, setRecentSearch] = useState(["비타민C","오메가3","유산균","밀크씨슬"]);
 
+  /* ── 상품 조각 ──
+   * 검색 색인(상품 전체)과 카테고리별 조각을 필요할 때 불러옵니다.
+   * 「ready」 가 따로 있는 이유 — 불러오는 동안 목록이 비어 있다고 「상품 준비 중」
+   * 을 띄우면 안 됩니다. */
+  const [searchIndex, setSearchIndex] = useState({ ready:false, products:[] });
+  const [catalogByCat, setCatalogByCat] = useState({});
+  /* 화면이 떠 있는 동안만 받은 조각을 씁니다. 개발 모드는 일부러 두 번
+     붙였다 떼므로, 붙을 때 다시 켜 두어야 합니다 — 떼기만 하면 한 번 뗀
+     뒤로 받은 조각을 전부 버립니다. */
+  const alive = useRef(false);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+
+  const ensureSearchIndex = useCallback(() =>
+    catalogClient.loadSearchIndex()
+      .then((d) => { if (alive.current) setSearchIndex((cur) => cur.ready ? cur : { ready:true, products:d.products }); return d.products; })
+      .catch((e) => { console.error("상품 검색 색인을 불러오지 못했습니다", e); return []; }),
+  []);
+
+  const ensureCategory = useCallback((fileId) =>
+    catalogClient.loadCategory(fileId)
+      .then((d) => { if (alive.current) setCatalogByCat((cur) => cur[fileId]?.ready ? cur : { ...cur, [fileId]: { ready:true, products:d.products } }); })
+      .catch((e) => console.error("카테고리 상품을 불러오지 못했습니다", fileId, e)),
+  []);
+
+  /* 첫 화면이 그려진 뒤, 손님이 검색창을 누르기 전에 색인을 미리 받아 둡니다.
+     켤 때 싣지 않으니 첫 화면은 가볍고, 검색은 칠 때 바로 나옵니다. */
+  useEffect(() => {
+    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 1200));
+    const id = idle(() => { ensureSearchIndex(); });
+    return () => (window.cancelIdleCallback || clearTimeout)(id);
+  }, [ensureSearchIndex]);
+
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get("locate");
     if (!q) return;
-    const prod = ALL_PRODUCTS.find(p => p.name === q)
-      || ALL_PRODUCTS.find(p => p.name.includes(q) || (p.en||"").toLowerCase().includes(q.toLowerCase()));
-    if (prod) setNav([{ page:"location", product:prod }]);
-  }, []);
+    ensureSearchIndex().then((all) => {
+      const prod = all.find(p => p.name === q)
+        || all.find(p => p.name.includes(q) || (p.en||"").toLowerCase().includes(q.toLowerCase()));
+      if (prod && alive.current) setNav([{ page:"location", product:prod }]);
+    });
+  }, [ensureSearchIndex]);
 
   // 화면 폭에 맞춰 비율 확대 — 43/50/75인치 DID·웹에서 420px 기둥이 작게 보이지 않게
   useEffect(() => {
@@ -333,22 +380,24 @@ export default function KioskApp() {
       events.forEach((e) => window.removeEventListener(e, arm));
     };
   }, [nav, searchQ]);
+  useEffect(() => {
+    if (cur.page === "catDetail" && cur.cat?.fileId) ensureCategory(cur.cat.fileId);
+    if (["search","brandDetail","location"].includes(cur.page)) ensureSearchIndex();
+  }, [cur.page, cur.cat?.fileId, ensureCategory, ensureSearchIndex]);
+  useEffect(() => { if (searchQ) ensureSearchIndex(); }, [searchQ, ensureSearchIndex]);
+
   const doSearch = (q) => {
     if (!q.trim()) return;
     setRecentSearch(prev => [q, ...prev.filter(r => r !== q)].slice(0,8));
   };
 
-  const searchResults = searchQ.length >= 1
-    ? ALL_PRODUCTS.filter(p =>
-        p.name.toLowerCase().includes(searchQ.toLowerCase()) ||
-        p.brand.toLowerCase().includes(searchQ.toLowerCase()) ||
-        p.cat.toLowerCase().includes(searchQ.toLowerCase()) ||
-        (p.en||"").toLowerCase().includes(searchQ.toLowerCase()) ||
-        (p.benefit||"").toLowerCase().includes(searchQ.toLowerCase())
-      )
-    : [];
-
-  const bestProducts = [...ALL_PRODUCTS].sort((a,b) => (b.sale||0)-(a.sale||0)).slice(0,8);
+  /* 검색어가 바뀔 때만 다시 거릅니다. 전에는 화면이 다시 그려질 때마다
+     1,600개를 새로 훑었습니다. 쓰이지 않던 「베스트」 정렬도 걷었습니다. */
+  const searchResults = useMemo(
+    () => filterProducts(searchIndex.products, searchQ),
+    [searchIndex.products, searchQ]
+  );
+  const searchPending = !!searchQ.trim() && !searchIndex.ready;
 
   /* ── HOME ── */
   const renderHome = () => (
@@ -362,7 +411,7 @@ export default function KioskApp() {
         {searchQ && (
           <div style={{ marginTop:8, background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`,
             boxShadow:"0 6px 20px rgba(45,55,61,0.12)", overflow:"hidden", position:"relative", zIndex:50 }}>
-            {searchResults.length > 0 ? (
+            {searchPending ? <Loading lang={lang}/> : searchResults.length > 0 ? (
               <>
                 <p style={{ fontSize:11, color:C.t3, margin:"12px 20px 4px" }}>{t(lang,"resultsCount",{n:searchResults.length})}</p>
                 <div style={{ padding:"0 20px" }}>
@@ -419,7 +468,7 @@ export default function KioskApp() {
               {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
             </p>
             <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.45 }}>
-              {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
+              {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type)}
             </p>
           </div>
         ))}
@@ -477,7 +526,8 @@ export default function KioskApp() {
 
   const renderCatDetail = () => {
     const cat = cur.cat;
-    const prods = productsOf(cat);
+    const loaded = catalogByCat[cat.fileId];
+    const prods = loaded?.products || [];
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         {/* 이름은 헤더가 답니다. 여기서 또 적으면 같은 말이 두 줄로 겹칩니다. */}
@@ -490,9 +540,11 @@ export default function KioskApp() {
             highlightZone={RACK_BY_CODE[String(cat.racks||"").split(",")[0].trim()]?.zone}/>
         </div>
         <p style={{ fontSize:13, fontWeight:700, color:C.t2, margin:"0 0 8px" }}>{prods.length>0?t(lang,"productListN",{n:prods.length}):t(lang,"productList")}</p>
-        {prods.length>0 ? prods.map((p,i) => (
-          <ProductCard key={i} p={p} onLocate={(prod) => navTo("location",{product:prod})}/>
-        )) : <p style={{ textAlign:"center", padding:24, fontSize:13, color:C.t3 }}>{t(lang,"skuNote")}</p>}
+        {!loaded ? <Loading lang={lang}/>
+          : prods.length>0 ? (
+            <VirtualProductList items={prods} itemKey={(p,i) => `${productKey(p)}|${i}`}
+              renderItem={(p) => <ProductCard p={p} onLocate={(prod) => navTo("location",{product:prod})}/>}/>
+          ) : <p style={{ textAlign:"center", padding:24, fontSize:13, color:C.t3 }}>{t(lang,"skuNote")}</p>}
       </div>
     );
   };
@@ -511,7 +563,7 @@ export default function KioskApp() {
       }
       return "A-Z";
     };
-    const filtered = brandQ ? ALL_BRANDS.filter(b => b.toLowerCase().includes(brandQ.toLowerCase())) : ALL_BRANDS;
+    const filtered = brandQ ? STOCKED_BRANDS.filter(b => b.toLowerCase().includes(brandQ.toLowerCase())) : STOCKED_BRANDS;
     const grouped = {};
     filtered.forEach(b => { const k=getInitial(b); if(!grouped[k])grouped[k]=[]; grouped[k].push(b); });
     const activeLabels = LABELS.filter(l => grouped[l]?.length>0);
@@ -545,8 +597,10 @@ export default function KioskApp() {
               <span style={{ fontSize:11, color:C.t3 }}>{grouped[label].length}</span>
             </div>
             {grouped[label].map(b => {
-              const hasProd = ALL_PRODUCTS.some(p => p.brand===b);
-              const cnt = ALL_PRODUCTS.filter(p => p.brand===b).length;
+              /* 전에는 브랜드마다 상품 1,600개를 두 번씩 훑었습니다(한 화면에 65만 번).
+                 빌드 때 센 개수를 씁니다. */
+              const cnt = COUNT_BY_BRAND[b] || 0;
+              const hasProd = cnt > 0;
               return (
                 <div key={b} className="kiosk-product" onClick={() => navTo("brandDetail",{brandName:b})} style={{
                   display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -570,15 +624,20 @@ export default function KioskApp() {
 
   const renderBrandDetail = () => {
     const name = cur.brandName;
-    const prods = ALL_PRODUCTS.filter(p => p.brand===name);
+    const prods = searchIndex.products.filter(p => p.brand===name);
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ padding:"0 0 12px" }}>
           <p style={{ margin:0, fontSize:13, color:C.t2 }}>{prods.length>0?t(lang,"showingProducts",{n:prods.length}):t(lang,"dataPending")}</p>
         </div>
         <div style={{ height:1, background:C.bd, margin:"0 0 8px" }}/>
-        {prods.map((p,i) => <ProductCard key={i} p={p} onLocate={(prod) => navTo("location",{product:prod})}/>)}
-        {prods.length===0 && <p style={{ textAlign:"center", padding:32, fontSize:13, color:C.t3 }}>{t(lang,"dataPreparing")}</p>}
+        {!searchIndex.ready ? <Loading lang={lang}/> : (
+          <>
+            <VirtualProductList items={prods} itemKey={(p,i) => `${productKey(p)}|${i}`}
+              renderItem={(p) => <ProductCard p={p} onLocate={(prod) => navTo("location",{product:prod})}/>}/>
+            {prods.length===0 && <p style={{ textAlign:"center", padding:32, fontSize:13, color:C.t3 }}>{t(lang,"dataPreparing")}</p>}
+          </>
+        )}
       </div>
     );
   };
@@ -588,10 +647,13 @@ export default function KioskApp() {
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ marginBottom:16 }}><SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/></div>
         {searchQ ? (
+          searchPending ? <Loading lang={lang}/> :
           searchResults.length>0 ? (
             <div>
               <p style={{ fontSize:12, color:C.t2, margin:"0 0 8px" }}><strong style={{color:C.t1}}>"{searchQ}"</strong> {t(lang,"productsCount",{n:searchResults.length})}</p>
-              {searchResults.map((p,i) => <ProductCard key={i} p={p} onLocate={(prod) => { doSearch(searchQ); navTo("location",{product:prod}); }}/>)}
+              {/* 「비타민」 하나에 수백 줄이 나옵니다. 보이는 줄만 그립니다. */}
+              <VirtualProductList items={searchResults} itemKey={(p,i) => `${productKey(p)}|${i}`}
+                renderItem={(p) => <ProductCard p={p} onLocate={(prod) => { doSearch(searchQ); navTo("location",{product:prod}); }}/>}/>
             </div>
           ) : (
             <div style={{ textAlign:"center", padding:"40px 20px" }}>
@@ -629,7 +691,7 @@ export default function KioskApp() {
                       {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
                     </p>
                     <p style={{ margin:0, fontSize:12, color:C.t3 }}>
-                      {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: ALL_BRANDS.length }) : topSub(lang, item.type)}
+                      {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type)}
                     </p>
                   </div>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
@@ -637,7 +699,7 @@ export default function KioskApp() {
               ))
             ) : (
               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                {ALL_BRANDS.filter(b => ALL_PRODUCTS.some(p => p.brand===b)).map(b => (
+                {STOCKED_BRANDS.map(b => (
                   <span key={b} onClick={() => navTo("brandDetail",{brandName:b})} className="kiosk-tag" style={{
                     background:C.wh, borderRadius:999, padding:"9px 15px", fontSize:13, color:C.t1,
                     fontWeight:500, cursor:"pointer", border:`1px solid ${C.bd}`
@@ -691,7 +753,7 @@ export default function KioskApp() {
        상품 데이터의 cat 은 예전 엑셀 기준이라 어긋난 랙이 있습니다. */
     const rackInfo = RACK_BY_CODE[p.rack];
     const guide = routeSteps(p.rack);
-    const related = ALL_PRODUCTS.filter(r => r.cat===p.cat && r.name!==p.name).slice(0,6);
+    const related = searchIndex.products.filter(r => r.cat===p.cat && r.name!==p.name).slice(0,6);
     /* 존 이름도 정본을 먼저 봅니다. 정본에 없는 랙일 때만 옛 A~E 라벨로 물러섭니다. */
     const zLbl = rackInfo
       ? (zoneLabel(lang, rackInfo.zone) || rackInfo.zone)

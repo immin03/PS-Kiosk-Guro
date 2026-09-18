@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "currentVersion": "8e4b44be4d5ca94d",
+  "baseUrl": "releases/8e4b44be4d5ca94d/",
+  "resources": {
+    "brands": "brands.json",
+    "searchIndex": "search-index.json",
+    "categoryRoot": "categories/"
+  }
+}
