@@ -711,7 +711,7 @@ export const TOP_CATS = [
   },
   {
     "label": "펫",
-    "sub": "A31–A36 · 87종",
+    "sub": "A1–A6 · 87종",
     "emoji": "🐾",
     "type": "pet"
   },
@@ -936,7 +936,7 @@ export const ZONES_MAP = [
     "id": "A",
     "label": "건강기능식품",
     "color": "#00978F",
-    "desc": "A1~A30",
+    "desc": "A7~A36",
     "catType": "health"
   },
   {
@@ -964,7 +964,7 @@ export const ZONES_MAP = [
     "id": "E",
     "label": "펫",
     "color": "#FF9F43",
-    "desc": "A31~A36",
+    "desc": "A1~A6",
     "catType": "pet"
   }
 ];
