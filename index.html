@@ -5,8 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="theme-color" content="#FFFFFF" />
   <title>파마스퀘어 익스프레스 구로점</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
+    /* 글꼴을 직접 싣습니다. 전에는 CDN(jsdelivr) 에서 받아서, 매장 인터넷이
+       느리거나 끊기면 글자가 늦게 뜨거나 다른 글꼴로 나왔습니다.
+       주소는 상대경로라 /guro/ 처럼 하위 경로에 올려도 맞습니다.
+       보이미 전달본(2026-09-18) 의 서브셋입니다. */
+    @font-face{
+      font-family:"Pretendard";
+      src:url("./assets/fonts/Pretendard-Variable.subset.woff2") format("woff2-variations");
+      font-weight:100 900;
+      font-display:swap;
+    }
     html,body,#root{width:100%;height:100%;margin:0}
     .kiosk-input::placeholder{font-weight:400}
     body{background:#FFFFFF;font-family:Pretendard,"Pretendard Variable",-apple-system,"Noto Sans KR",sans-serif}
