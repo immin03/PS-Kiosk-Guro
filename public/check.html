@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>화면 점검 · 파마스퀘어 구로점</title>
+<style>
+  /* 이 페이지는 앱과 떨어져 있습니다. 확대(zoom)도 걸지 않습니다 —
+     화면이 신호를 1:1 로 받고 있는지만 보려는 것이라, 우리 쪽에서 아무것도
+     건드리지 않은 상태로 보여 줘야 합니다. */
+  html,body{margin:0;background:#fff;color:#10181E;
+    font-family:-apple-system,"Noto Sans KR",sans-serif}
+  .wrap{padding:16px}
+  h1{font-size:18px;margin:0 0 4px}
+  p{font-size:13px;margin:0 0 14px;color:#5a6a70}
+  table{border-collapse:collapse;font-size:15px;margin-bottom:18px}
+  td{padding:4px 14px 4px 0}
+  td:first-child{color:#5a6a70}
+  b{font-size:19px}
+  h2{font-size:14px;margin:18px 0 6px}
+  .note{font-size:12px;color:#5a6a70;margin:4px 0 0}
+
+  /* 1픽셀 격자. 화면이 신호를 1:1 로 받으면 고운 회색으로 균일하게 보입니다.
+     신호 해상도와 패널 해상도가 달라 늘려 그리는 중이면, 여기서 물결무늬와
+     무지개빛이 바로 뜹니다. 화면 내용과 무관한 검사라 결론이 분명합니다. */
+  .grid{height:150px;border:1px solid #ccc;
+    background-image:repeating-linear-gradient(0deg,#000 0 1px,#fff 1px 2px)}
+  .grid.v{background-image:repeating-linear-gradient(90deg,#000 0 1px,#fff 1px 2px)}
+  .checks{height:150px;border:1px solid #ccc;
+    background-image:
+      repeating-linear-gradient(0deg,#000 0 1px,transparent 1px 2px),
+      repeating-linear-gradient(90deg,#000 0 1px,transparent 1px 2px);
+    background-color:#fff}
+  .half{display:flex;gap:12px}
+  .half>div{flex:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>화면 점검</h1>
+  <p>파마스퀘어 구로점 · 이 페이지는 키오스크 앱과 별개입니다</p>
+
+  <table>
+    <tr><td>화면 크기</td><td><b id="vp">—</b> px</td></tr>
+    <tr><td>패널이 알려주는 크기</td><td><b id="scr">—</b> px</td></tr>
+    <tr><td>픽셀 배율</td><td><b id="dpr">—</b></td></tr>
+    <tr><td>가로세로비</td><td><b id="ratio">—</b></td></tr>
+    <tr><td>뷰어</td><td id="ua" style="font-size:11px;max-width:60vw"></td></tr>
+  </table>
+
+  <h2>1 — 가로 1픽셀 줄</h2>
+  <div class="grid"></div>
+  <p class="note">고른 회색으로 보이면 정상입니다. 물결무늬·무지개빛이 보이면 화면이 신호를 늘려 그리고 있습니다.</p>
+
+  <h2>2 — 세로 1픽셀 줄</h2>
+  <div class="grid v"></div>
+  <p class="note">왼쪽은 깨끗한데 오른쪽만 무늬가 생기는지 보세요. 그렇다면 가로로 늘려 그리는 중입니다.</p>
+
+  <h2>3 — 1픽셀 격자</h2>
+  <div class="checks"></div>
+
+  <h2>4 — 흰 화면 · 검은 화면</h2>
+  <div class="half">
+    <div style="height:110px;border:1px solid #ccc;background:#fff"></div>
+    <div style="height:110px;background:#000"></div>
+  </div>
+  <p class="note">얼룩이나 세로 띠가 보이면 패널 쪽입니다.</p>
+</div>
+
+<script>
+  var vp = innerWidth + " × " + innerHeight;
+  document.getElementById("vp").textContent = vp;
+  document.getElementById("scr").textContent = screen.width + " × " + screen.height;
+  document.getElementById("dpr").textContent = devicePixelRatio;
+  document.getElementById("ratio").textContent = (innerWidth / innerHeight).toFixed(3);
+  document.getElementById("ua").textContent = navigator.userAgent;
+</script>
+</body>
+</html>
