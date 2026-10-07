@@ -344,10 +344,23 @@ export default function KioskApp() {
   }, [ensureSearchIndex]);
 
   // 화면 폭에 맞춰 비율 확대 — 43/50/75인치 DID·웹에서 420px 기둥이 작게 보이지 않게
+  //
+  // 배율은 딱 떨어지는 값으로 깎습니다. 1080px 화면에서 폭을 그대로 나누면
+  // 1080/420 = 2.571428… 이 되고, 레이아웃 1px 이 화면에서 2.571px 로 그려집니다.
+  // 테두리와 글자 가장자리가 화면 픽셀 사이에 걸치면서 7픽셀 주기로 번지는
+  // 자리와 선명한 자리가 번갈아 생기고, 그 주기가 화면 폭을 따라 어긋나 어느
+  // 구역은 유독 더 깨져 보입니다. 2.5 처럼 0.5 단위로 깎으면 어긋남이 2픽셀
+  // 주기로 고르게 반복되어 무늬로 뭉치지 않습니다. 대신 폭을 조금 덜 쓰는데,
+  // 1080px 에서 30px(2.8%) 입니다. 너무 많이 버리는 폭에서는 0.25 단위로 깎습니다.
   useEffect(() => {
     const DESIGN_W = 420;
+    const snap = (s) => {
+      const half = Math.floor(s * 2) / 2;
+      if (half >= 1 && (s - half) / s <= 0.08) return half;
+      return Math.max(1, Math.floor(s * 4) / 4);
+    };
     const fit = () => {
-      const s = Math.min(window.innerWidth / DESIGN_W, 2.6);
+      const s = snap(Math.min(window.innerWidth / DESIGN_W, 2.6));
       document.documentElement.style.zoom = s > 1 ? String(s) : "";
     };
     fit();
