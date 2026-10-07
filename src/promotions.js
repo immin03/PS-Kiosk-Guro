@@ -23,7 +23,7 @@ export const PROMOTIONS = [
       "web"
     ],
     "link": "https://www.phamasquare.com/event.html",
-    "image": "chuseok-01.jpg"
+    "image": "store-05.jpg"
   },
   {
     "id": "guro-readybag",
@@ -43,7 +43,7 @@ export const PROMOTIONS = [
       "kiosk"
     ],
     "link": "https://www.phamasquare.com/event.html",
-    "image": "chuseok-02.jpg"
+    "image": "store-c.jpg"
   },
   {
     "id": "guro-welcome-coupon",

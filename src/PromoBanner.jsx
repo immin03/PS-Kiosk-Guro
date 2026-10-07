@@ -53,12 +53,15 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
             cursor: onPress ? "pointer" : "default",
           }}
         >
-          {/* 슬라이드 이미지에는 문구가 이미 들어 있습니다. 위에 글자를 또 얹으면
-              겹치므로, 이미지가 있는 슬라이드는 이미지만 보여줍니다. */}
-          {!p.image && (
+          {/* 그림 안에 이미 문구가 박힌 디자인 시안이면 글자를 얹지 않습니다 —
+              겹쳐 읽힙니다. 그 외(매장 사진)에는 문구를 얹어야 합니다. 전에는
+              「그림이 있으면 문구가 박힌 것」으로 보아, 맨 매장 사진을 건 슬라이드
+              두 장이 제목도 설명도 없는 빈 사진으로 떠 있었습니다.
+              정본에 imageHasText 를 적은 슬라이드만 글자를 숨깁니다. */}
+          {!p.imageHasText && (
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,40,38,.30) 0%,rgba(0,40,38,.74) 100%)" }} />
           )}
-          {!p.image && (
+          {!p.imageHasText && (
           <div style={{ position: "relative", height: "100%", padding: "22px 22px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
             {p.tag && (
               <span style={{
