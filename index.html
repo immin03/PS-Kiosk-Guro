@@ -20,6 +20,13 @@
     .kiosk-input::placeholder{font-weight:400}
     body{background:#FFFFFF;font-family:Pretendard,"Pretendard Variable",-apple-system,"Noto Sans KR",sans-serif}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    /* 터치로 누를 때 생기는 테두리를 없앱니다. 안드로이드 뷰어는 이것을
+       노란 선으로 그려서, 손님이 누를 때마다 화면에 줄이 그어졌습니다.
+       키보드로 짚어 갈 때(:focus-visible)는 그대로 보여 줍니다 — 매장에서는
+       쓸 일이 없지만 없애 두면 키보드로 쓰는 사람이 지금 어디인지 잃습니다. */
+    :focus{outline:none}
+    :focus:not(:focus-visible){outline:none;box-shadow:none}
+    :focus-visible{outline:2px solid #2BCAB0;outline-offset:2px}
     button,input{font:inherit}
   </style>
 </head>
