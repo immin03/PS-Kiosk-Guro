@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PROMOTIONS } from "./promotions.js";
 import { STORE_PHOTO } from "./storePhoto.js";
-import { TYPE } from "./theme.js";
+import { TYPE, RADIUS } from "./theme.js";
 
 /* 홈 상단 프로모션 배너.
  *
@@ -66,7 +66,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
           <div style={{ position: "relative", height: "100%", padding:"20px 20px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
             {p.tag && (
               <span style={{
-                alignSelf: "flex-start", marginBottom: 8, padding:"4px 10px", borderRadius: 999,
+                alignSelf: "flex-start", marginBottom: 8, padding:"4px 10px", borderRadius: RADIUS.pill,
                 background: "rgba(255,255,255,.2)", color: "#fff",
                 fontSize: TYPE["label"], fontWeight: 700, letterSpacing: ".04em",
               }}>{p.tag}</span>
@@ -89,7 +89,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
               onClick={() => setI(n)}
               aria-label={`${n + 1}번째 혜택 보기`}
               style={{
-                width: n === i ? 18 : 6, height: 6, borderRadius: 999, padding: 0,
+                width: n === i ? 18 : 6, height: 6, borderRadius: RADIUS.pill, padding: 0,
                 border: "none", cursor: "pointer", transition: "width .3s, background .3s",
                 background: n === i ? "#fff" : "rgba(255,255,255,.42)",
               }}

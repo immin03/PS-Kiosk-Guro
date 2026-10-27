@@ -1,7 +1,7 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel, markLabel, t } from "./i18n.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE, RADIUS } from "./theme.js";
 
 /* 매장 지도.
  *
@@ -10,8 +10,8 @@ import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE } f
  * 이제 랙 하나하나가 제 자리에 그려지고, 경로는 실제로 비어 있는 칸만 밟습니다.
  */
 
-const MARK_FILL = "#E5E5E5";
-const MARK_TEXT = "#2D373D";
+const MARK_FILL = BRAND.border;
+const MARK_TEXT = BRAND.ink;
 
 /* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 지도의 집기 이름과 같아야 합니다. */
 export const ORIGIN_MARK = "엘리베이터 입구";
@@ -526,7 +526,7 @@ export default function FloorPlan({
   }, []);
 
   const btn = {
-    width: 26, height: 26, borderRadius: 8, border: `1px solid ${BRAND.border}`,
+    width: 26, height: 26, borderRadius: RADIUS.box, border: `1px solid ${BRAND.border}`,
     background: BRAND.surface, color: BRAND.text, fontSize: TYPE["body"], fontWeight: 600,
     lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   };
@@ -562,7 +562,7 @@ export default function FloorPlan({
 
       {/* 지도는 카드 안쪽을 다 씁니다. 안쪽 여백을 두면 그만큼 잘립니다. */}
       <div style={{ background: BRAND.surface, border: `1px solid ${BRAND.border}`,
-        borderRadius: 8, overflow: "hidden" }}>
+        borderRadius: RADIUS.box, overflow: "hidden" }}>
     <div
       ref={box}
       onTouchStart={onTouchStart}
@@ -585,7 +585,7 @@ export default function FloorPlan({
             : "파마스퀘어 구로점 매장 지도"
         }
       >
-        <rect x={FULL.x} y={FULL.y} width={FULL.w} height={FULL.h} rx="1.5" fill="#FFFFFF" />
+        <rect x={FULL.x} y={FULL.y} width={FULL.w} height={FULL.h} rx="1.5" fill={BRAND.bg} />
 
         {/* 집기 — 상품이 놓이지 않는 자리.
             매대와 같은 규칙으로 그립니다. 여기만 알약처럼 굴려 두면
@@ -805,7 +805,7 @@ export default function FloorPlan({
             <text
               x={cx(origin)} y={cy(origin) + 5.4} textAnchor="middle"
               fontSize="2.6" fontWeight="800" fill={YOU}
-              stroke="#FFFFFF" strokeWidth="0.9" paintOrder="stroke"
+              stroke={BRAND.bg} strokeWidth="0.9" paintOrder="stroke"
             >
               {t(lang, "youAreHere")}
             </text>
@@ -813,7 +813,7 @@ export default function FloorPlan({
             <text
               x={cx(origin)} y={cy(origin) + 8.6} textAnchor="middle"
               fontSize="2.1" fontWeight="600" fill={MARK_TEXT}
-              stroke="#FFFFFF" strokeWidth="0.8" paintOrder="stroke"
+              stroke={BRAND.bg} strokeWidth="0.8" paintOrder="stroke"
             >
               {markLabel(lang, ORIGIN_MARK)}
             </text>
@@ -833,14 +833,14 @@ export default function FloorPlan({
             <text
               x={cx(target)} y={above ? target.r - 4.6 : target.r + target.h + 4.2}
               textAnchor="middle" fontSize="4.2" fontWeight="800" fill={zc(target.zone)}
-              stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke"
+              stroke={BRAND.bg} strokeWidth="1.1" paintOrder="stroke"
             >
               {target.code}
             </text>
             <text
               x={cx(target)} y={above ? target.r - 1.4 : target.r + target.h + 7.4}
-              textAnchor="middle" fontSize="2.8" fontWeight="600" fill="#2D373D"
-              stroke="#FFFFFF" strokeWidth="0.9" paintOrder="stroke"
+              textAnchor="middle" fontSize="2.8" fontWeight="600" fill={BRAND.ink}
+              stroke={BRAND.bg} strokeWidth="0.9" paintOrder="stroke"
             >
               {target.cat}
             </text>
