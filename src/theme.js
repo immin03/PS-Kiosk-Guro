@@ -13,52 +13,54 @@
  * 가이드 밖 색은 아래 두 자리뿐이고, 이유를 각각 적어 두었습니다.
  */
 
+import { tokens } from "./tokens.js";
+
 export const BRAND = {
   /* 7722 C 딥그린은 BI·인쇄용으로 남깁니다. 화면에서는 쓰지 않습니다 —
      민트 옆에 놓으면 혼자 칙칙하게 가라앉습니다. */
-  primary: "#005251",     /* 7722 C — BI · 인쇄 전용 */
-  secondary: "#00978F",   /* 7716 C — 본문 강조 */
+  primary: tokens.color["teal-deep"],     /* 7722 C — BI · 인쇄 전용 */
+  secondary: tokens.color["teal-deep"],   /* 7716 C — 본문 강조 */
   /* 민트는 929 C 한 값만 씁니다.
      922 C · #63CAC1 · 7716 C 를 자리마다 섞어 쓰던 탓에 같은 민트가 화면에서
      세 톤으로 보였습니다. 화면의 민트는 전부 이 값입니다. */
-  accent: "#2BCAB0",      /* 929 C — 메인 · CTA · 활성 탭 · 강조 전부 */
+  accent: tokens.color.mint,      /* 929 C — 메인 · CTA · 활성 탭 · 강조 전부 */
 
   /* 가이드의 그라데이션 견본과 같은 방식입니다 — 흰 바탕에서 바닥으로
      내려가며 민트가 옅게 배어 나옵니다. 화면 바닥에 바짝 붙여 둡니다 —
      버튼까지 올라오면 카드가 색 위에 뜬 것처럼 보입니다.
      화면 배경에만 씁니다. 요소(버튼 · 카드 · 칩)에는 쓰지 않습니다. */
   wash: "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 84%, #E4F6F3 94%, #BEE7E0 100%)",
-  accentSoft: "#2BCAB0",
-  light: "#2BCAB0",
-  tint: "#D9E4E3",        /* P 123-1 C — 배지 · 선택 배경 */
+  accentSoft: tokens.color.mint,
+  light: tokens.color.mint,
+  tint: tokens.color["mint-light"],        /* P 123-1 C — 배지 · 선택 배경 */
 
   /* 929 C 를 흰 바탕에 15% 로 얹은 값입니다. P 123-1 C 는 회색 기운이 돌아
      민트 테두리 안에 깔면 칩이 꺼진 것처럼 보입니다. */
-  accentTint: "#DFF7F3",
+  accentTint: tokens.color["mint-light"],
 
   /* 본문은 파마 블랙 라이트를 씁니다. BLACK 6 C 는 로고·인쇄용으로 남깁니다. */
-  ink: "#2D373D",
-  text: "#2D373D",
-  muted: "#2D373D",   /* 가이드의 회색은 본문에 쓰기엔 밝습니다. 크기·굵기로 층을 가릅니다. */
+  ink: tokens.color.ink,
+  text: tokens.color.ink,
+  muted: tokens.color["text-mid"],   /* 가이드의 회색은 본문에 쓰기엔 밝습니다. 크기·굵기로 층을 가릅니다. */
 
   /* 회색은 7541 C 하나만 씁니다.
      경계선은 7541 C 인데 플레이스홀더는 #CCCCCC 라 한 상자 안에서 회색이
      둘로 보였습니다. #CCCCCC 는 청록 기운이 없어 옆에 놓으면 색이 다릅니다. */
-  border: "#D8E1E2",      /* 7541 C — 경계선 · 지도의 빈 구역 */
+  border: tokens.color.border,      /* 7541 C — 경계선 · 지도의 빈 구역 */
 
   /* 가이드에 없어 한 칸 더한 값입니다.
      7541 C 는 선으로는 맞는데 글자로 쓰면 흰 바탕 대비가 1.3:1 이라 매장
      조명에서 읽히지 않습니다. 7541 C 를 그대로 어둡게 내린 값이라 같은
      계열로 읽히고, 대비는 2.3:1 로 올라갑니다. 보조 글자에만 씁니다. */
-  gray: "#9FB3B5",        /* 7541 C 계열 — 상품 개수 · 비활성 탭 */
+  gray: tokens.color["text-soft"],        /* 7541 C 계열 — 상품 개수 · 비활성 탭 */
 
   /* 플레이스홀더는 한 칸 더 연하게 씁니다. 남아 있는 글자가 아니라 입력하면
      사라지는 힌트라, 보조 글자와 같은 진하기면 값이 적힌 것처럼 보입니다. */
-  hint: "#C3D1D3",        /* 7541 C 계열 */
-  line: "#E5E5E5",
-  bg: "#FFFFFF",
-  surface: "#FFFFFF",
-  surfaceSoft: "#E5E5E5",
+  hint: tokens.color["text-soft"],        /* 7541 C 계열 */
+  line: tokens.color.border,
+  bg: tokens.color.bg,
+  surface: tokens.color.bg,
+  surfaceSoft: tokens.color.surface,
 };
 
 /**
@@ -72,7 +74,7 @@ export const BRAND = {
  * 가이드 값입니다.
  */
 export const ZONE_COLOR = {
-  "건기식": "#2BCAB0",     /* 929 C — 화면 민트와 한 값 */
+  "건기식": tokens.color.mint,     /* 929 C — 화면 민트와 한 값 */
   "라이프": "#5BB8E8",     /* 파랑 */
   "프로모션": "#66CC99",   /* 이벤트존 — 가이드에서 가장 밝은 초록 */
   "뷰티": "#EF7BA4",       /* 핑크 */
@@ -96,7 +98,7 @@ export const ZONE_COLOR = {
 export const RADIUS = {
   /* 네모난 것은 카드든 버튼이든 칩이든 같은 값을 씁니다. 값이 여럿이면
      같은 화면 안에서 모서리가 제각각으로 보입니다. */
-  box: 8,
+  box: tokens.radius.base.base,
   pill: 999, /* 언어 토글 · 브랜드 태그 · 점처럼 본디 알약인 것 */
 };
 
