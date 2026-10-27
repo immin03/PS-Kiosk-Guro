@@ -542,7 +542,7 @@ export default function FloorPlan({
           <p style={{ margin: 0, fontSize: TYPE["body"], fontWeight: 700, color: BRAND.text,
             letterSpacing: "-0.01em" }}>{heading}</p>
         )}
-        <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
+        <div style={{ marginLeft:"auto", display: "flex", gap: 6 }}>
           {(() => {
             const on = view.k > 1 || openBlock;
             return (

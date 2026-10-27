@@ -121,3 +121,12 @@ export const YOU_HERE = "#F04438";
 export const TYPE = Object.fromEntries(
   Object.entries(tokens.type).map(([k, v]) => [k, v.kiosk]),
 );
+
+/**
+ * 간격.
+ *
+ * 2단위 눈금입니다. 건강 가이드 · 이벤트 페이지와 같은 표를 씁니다.
+ * 3 · 7 · 9 · 11 처럼 한 픽셀씩 어긋난 값이 섞이면 카드마다 숨통이 달라 보입니다.
+ * 새 간격이 필요하면 먼저 이 표를 고칩니다.
+ */
+export const SPACE = tokens.space;

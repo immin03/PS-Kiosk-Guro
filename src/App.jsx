@@ -150,9 +150,9 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
   const sp = getSocialProof(lang, p.sale);
   return (
     <div className="kiosk-card" onClick={onPress} style={{
-      width:CARD_W, minWidth:CARD_W, flexShrink:0, background:C.wh, borderRadius:8, padding:14,
+      width:CARD_W, minWidth:CARD_W, flexShrink:0, background:C.wh, borderRadius:8, padding: 14,
       border:`1px solid ${C.bd}`, cursor:"pointer", position:"relative",
-      display:"flex", flexDirection:"column", gap:6, minHeight:118
+      display:"flex", flexDirection:"column", gap: 6, minHeight:118
     }}>
       {rank && (
         <div style={{
@@ -163,10 +163,10 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
           color: rank<=3 ? C.wh : C.t3,
         }}>{rank}</div>
       )}
-      <p style={{ margin:0, fontSize: TYPE["body"], fontWeight:600, color:C.t1, lineHeight:1.4,
+      <p style={{ margin: 0, fontSize: TYPE["body"], fontWeight:600, color:C.t1, lineHeight:1.4,
         display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{p.name}</p>
-      <p style={{ margin:0, fontSize: TYPE["label"], color:C.t2 }}>{p.brand}</p>
-      <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:"auto" }}>
+      <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2 }}>{p.brand}</p>
+      <div style={{ display:"flex", alignItems:"center", gap: 4, marginTop:"auto" }}>
         {sp.hot && <span style={{ fontSize: TYPE["badge"] }}>🔥</span>}
         <span style={{ fontSize: TYPE["badge"], color: sp.hot ? C.priM : C.t3, fontWeight: sp.hot ? 600 : 400 }}>{sp.label}</span>
       </div>
@@ -177,12 +177,12 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
 /* ── COMPONENTS ── */
 function LangToggle({ lang, setLang }) {
   return (
-    <div style={{ display:"inline-flex", alignItems:"center", gap:2, background:C.wh,
-      border:`1px solid ${C.bd}`, borderRadius:999, padding:3, flexShrink:0, lineHeight:1 }}>
+    <div style={{ display:"inline-flex", alignItems:"center", gap: 2, background:C.wh,
+      border:`1px solid ${C.bd}`, borderRadius:999, padding: 2, flexShrink:0, lineHeight:1 }}>
       {[["ko","KO"],["en","EN"],["zh","中"]].map(([id, lb]) => (
         <button key={id} type="button" onClick={() => setLang(id)} style={{
           border:"none", cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["label"], fontWeight:700,
-          letterSpacing:".04em", padding:"3px 0", width:30, textAlign:"center",
+          letterSpacing:".04em", padding:"2px 0", width:30, textAlign:"center",
           borderRadius:999, lineHeight:1.1, minHeight:0,
           background: lang===id ? C.pri : "transparent", color: lang===id ? C.wh : C.t2,
         }}>{lb}</button>
@@ -193,7 +193,7 @@ function LangToggle({ lang, setLang }) {
 
 function TopBar({ title, onBack, isHome, lang, setLang }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", padding: isHome ? "14px 20px" : "8px 16px", gap:8,
+    <div style={{ display:"flex", alignItems:"center", padding: isHome ? "14px 20px" : "8px 16px", gap: 8,
       background: isHome ? C.bgF : C.wh, position:"sticky", top:0, zIndex:100,
       /* 홈만 선이 없어 스크롤하면 배너가 헤더 밑으로 그냥 빨려 들어갔습니다.
          선 색은 화면 전체가 쓰는 7541 C 하나입니다. */
@@ -228,7 +228,7 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
   return (
     <div style={{
       display:"flex", alignItems:"center", background:C.wh, borderRadius:8,
-      padding:"16px 16px", border:`1px solid ${C.bd}`, gap:10,
+      padding:"16px 16px", border:`1px solid ${C.bd}`, gap: 10,
       boxShadow:"0 2px 10px rgba(45,55,61,0.05)"
     }}>
       <span style={{ color:C.priM, flexShrink:0, display:"flex" }}><Icon name="search" size={20} color={C.priM} /></span>
@@ -246,7 +246,7 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
 
 /* 상품 조각을 받는 동안. 매장 서버에서 오므로 대개 한순간입니다. */
 function Loading({ lang }) {
-  return <p style={{ textAlign:"center", padding:"32px 0", fontSize: TYPE["body"], color:C.t3, margin:0 }}>{t(lang,"catalogLoading")}</p>;
+  return <p style={{ textAlign:"center", padding:"32px 0", fontSize: TYPE["body"], color:C.t3, margin: 0 }}>{t(lang,"catalogLoading")}</p>;
 }
 
 function ProductCard({ p, onLocate }) {
@@ -254,18 +254,18 @@ function ProductCard({ p, onLocate }) {
      있는지를 이 높이로 셉니다. 이름과 브랜드는 한 줄씩이라 넘치지 않습니다. */
   return (
     <div className="kiosk-product" onClick={() => onLocate?.(p)}
-      style={{ display:"flex", gap:12, height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box",
+      style={{ display:"flex", gap: 12, height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box",
         borderBottom:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer" }}>
       <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ margin:"0 0 5px", fontSize: TYPE["body"], fontWeight:600, color:C.t1, lineHeight:1.45,
+        <p style={{ margin:"0 0 4px", fontSize: TYPE["body"], fontWeight:600, color:C.t1, lineHeight:1.45,
           overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</p>
-        <p style={{ margin:0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight:1.3,
+        <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight:1.3,
           overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.brand} · {p.cat}</p>
       </div>
       <div className="kiosk-loc" style={{
         background:C.wh, border:`1px solid ${C.bd}`, borderRadius:8,
-        padding:"6px 10px", display:"flex", alignItems:"center", gap:4,
-        flexShrink:0, marginLeft:8
+        padding:"6px 10px", display:"flex", alignItems:"center", gap: 4,
+        flexShrink:0, marginLeft: 8
       }}>
         <span style={{ fontSize: TYPE["body-sm"], fontWeight:600, color:C.t1 }}>{p.rack}</span>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
@@ -422,10 +422,10 @@ export default function KioskApp() {
       <PromoBanner bleed={20}/>
 
       {/* 통합 검색 */}
-      <div style={{ marginBottom:24, position:"relative" }}>
+      <div style={{ marginBottom: 24, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
         {searchQ && (
-          <div style={{ marginTop:8, background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`,
+          <div style={{ marginTop: 8, background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`,
             boxShadow:"0 6px 20px rgba(45,55,61,0.12)", overflow:"hidden", position:"relative", zIndex:50 }}>
             {searchPending ? <Loading lang={lang}/> : searchResults.length > 0 ? (
               <>
@@ -460,9 +460,9 @@ export default function KioskApp() {
           위가 잘리고 그림자도 먹혔습니다. 안쪽 여백으로 뜰 자리를 만들고
           바깥 여백을 같은 만큼 당겨 배치는 그대로 둡니다. */}
       <div className="kiosk-swipe" style={{
-        display:"flex", gap:8, overflowX:"auto",
-        marginTop:-6, paddingTop:6, paddingBottom:8, marginBottom:16,
-        marginLeft:-6, paddingLeft:6, marginRight:-20, paddingRight:20,
+        display:"flex", gap: 8, overflowX:"auto",
+        marginTop:-6, paddingTop: 6, paddingBottom: 8, marginBottom: 16,
+        marginLeft:-6, paddingLeft: 6, marginRight:-20, paddingRight: 20,
         WebkitOverflowScrolling:"touch", msOverflowStyle:"none", scrollbarWidth:"none",
       }}>
         {HOME_CATS.map(item => (
@@ -483,7 +483,7 @@ export default function KioskApp() {
             <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight:600, color:C.t1, lineHeight:1.45 }}>
               {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
             </p>
-            <p style={{ margin:0, fontSize: TYPE["label"], color:C.t2, lineHeight:1.45 }}>
+            <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2, lineHeight:1.45 }}>
               {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type)}
             </p>
           </div>
@@ -491,23 +491,23 @@ export default function KioskApp() {
       </div>
 
       {/* 매장 지도 */}
-      <div style={{ marginBottom:12 }}>
+      <div style={{ marginBottom: 12 }}>
         <FloorPlan lang={lang} heading={t(lang,"storeMap")} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id === legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
         }}/>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: 8 }}>
         {ZONES_MAP.map(z => (
           <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-            display:"flex", gap:10, background:C.wh, borderRadius:8, padding:"10px 12px",
+            display:"flex", gap: 10, background:C.wh, borderRadius:8, padding:"10px 12px",
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
             <div style={{ width:30, height:30, borderRadius:8, background:chipColor(z), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize: TYPE["body"] }}>{z.id}</div>
             <div>
               <p style={{ margin:"0 0 2px", fontSize: TYPE["body-sm"], fontWeight:600, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
-              <p style={{ margin:0, fontSize: TYPE["label"], color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
+              <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
             </div>
           </div>
         ))}
@@ -524,7 +524,7 @@ export default function KioskApp() {
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <p style={{ fontSize: TYPE["body"], color:C.t2, margin:"0 0 16px" }}>{t(lang,"productsCount",{n:cats.reduce((s,c)=>s+c.count,0).toLocaleString()})}</p>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap: 10 }}>
           {cats.map(cat => (
             <div key={cat.id} onClick={() => navTo("catDetail",{cat})} className="kiosk-card" style={{
               background:C.wh, borderRadius:8, padding:"20px 10px", textAlign:"center",
@@ -532,7 +532,7 @@ export default function KioskApp() {
             }}>
               <EmojiChip e={cat.emoji} d={46} s={30} mb={10} />
               <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight:600, color:C.t1, lineHeight:1.45 }}>{catLabel(lang,cat)}</p>
-              <p style={{ margin:0, fontSize: TYPE["label"], color:C.t2 }}>{t(lang,"productsCount",{n:cat.count})}</p>
+              <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2 }}>{t(lang,"productsCount",{n:cat.count})}</p>
             </div>
           ))}
         </div>
@@ -547,11 +547,11 @@ export default function KioskApp() {
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         {/* 이름은 헤더가 답니다. 여기서 또 적으면 같은 말이 두 줄로 겹칩니다. */}
-        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
+        <div style={{ display:"flex", alignItems:"center", gap: 12, marginBottom: 16 }}>
           <EmojiChip e={cat.emoji} d={44} s={28} />
-          <p style={{ margin:0, fontSize: TYPE["body"], color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
+          <p style={{ margin: 0, fontSize: TYPE["body"], color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
         </div>
-        <div style={{ marginBottom:16 }}>
+        <div style={{ marginBottom: 16 }}>
           <FloorPlan lang={lang} heading={t(lang,"inStoreLocation")}
             highlightZone={RACK_BY_CODE[String(cat.racks||"").split(",")[0].trim()]?.zone}/>
         </div>
@@ -560,7 +560,7 @@ export default function KioskApp() {
           : prods.length>0 ? (
             <VirtualProductList items={prods} itemKey={(p,i) => `${productKey(p)}|${i}`}
               renderItem={(p) => <ProductCard p={p} onLocate={(prod) => navTo("location",{product:prod})}/>}/>
-          ) : <p style={{ textAlign:"center", padding:24, fontSize: TYPE["body"], color:C.t3 }}>{t(lang,"skuNote")}</p>}
+          ) : <p style={{ textAlign:"center", padding: 24, fontSize: TYPE["body"], color:C.t3 }}>{t(lang,"skuNote")}</p>}
       </div>
     );
   };
@@ -585,11 +585,11 @@ export default function KioskApp() {
     const activeLabels = LABELS.filter(l => grouped[l]?.length>0);
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        <div style={{ marginBottom:16 }}><SearchBar value={brandQ} onChange={setBrandQ} placeholder={t(lang,"brandSearch")}/></div>
+        <div style={{ marginBottom: 16 }}><SearchBar value={brandQ} onChange={setBrandQ} placeholder={t(lang,"brandSearch")}/></div>
         <p style={{ fontSize: TYPE["label"], color:C.t3, margin:"0 0 12px" }}>{t(lang,"brandsTotal",{n:filtered.length})}</p>
         <style>{`.brand-nav-wrap::-webkit-scrollbar{display:none}`}</style>
         <div className="brand-nav-wrap" style={{
-          display:"flex", overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20, paddingTop:8, paddingBottom:12,
+          display:"flex", overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft: 20, paddingRight: 20, paddingTop: 8, paddingBottom: 12,
           WebkitOverflowScrolling:"touch", msOverflowStyle:"none", scrollbarWidth:"none",
           borderBottom:`1px solid ${C.bd}`, background:C.wh, position:"sticky", top:44, zIndex:50
         }}>
@@ -606,8 +606,8 @@ export default function KioskApp() {
         </div>
         <div style={{ height:16 }}/>
         {activeLabels.map(label => (
-          <div key={label} id={`brand-${label}`} style={{ marginBottom:24 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+          <div key={label} id={`brand-${label}`} style={{ marginBottom: 24 }}>
+            <div style={{ display:"flex", alignItems:"center", gap: 10, marginBottom: 10 }}>
               <span style={{ fontSize: TYPE["title-lg"], fontWeight:800, color:C.priD }}>{label}</span>
               <div style={{ flex:1, height:1, background:C.bd }}/>
               <span style={{ fontSize: TYPE["label"], color:C.t3 }}>{grouped[label].length}</span>
@@ -620,9 +620,9 @@ export default function KioskApp() {
               return (
                 <div key={b} className="kiosk-product" onClick={() => navTo("brandDetail",{brandName:b})} style={{
                   display:"flex", alignItems:"center", justifyContent:"space-between",
-                  padding:"13px 0", borderBottom:`1px solid ${C.bd}10`, cursor:"pointer"
+                  padding:"12px 0", borderBottom:`1px solid ${C.bd}10`, cursor:"pointer"
                 }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap: 8 }}>
                     <span style={{ fontSize: TYPE["body"], fontWeight:hasProd?600:400, color:hasProd?C.t1:C.t2 }}>{b}</span>
                     {/* 민트 글자에 회색 기운 도는 배경이라 뿌옇게 뭉쳤습니다. 개수는 이
                           화면의 주인공이 아니고, 다른 화면에서도 회색 글자로만 적습니다. */}
@@ -644,14 +644,14 @@ export default function KioskApp() {
     return (
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ padding:"0 0 12px" }}>
-          <p style={{ margin:0, fontSize: TYPE["body"], color:C.t2 }}>{prods.length>0?t(lang,"showingProducts",{n:prods.length}):t(lang,"dataPending")}</p>
+          <p style={{ margin: 0, fontSize: TYPE["body"], color:C.t2 }}>{prods.length>0?t(lang,"showingProducts",{n:prods.length}):t(lang,"dataPending")}</p>
         </div>
         <div style={{ height:1, background:C.bd, margin:"0 0 8px" }}/>
         {!searchIndex.ready ? <Loading lang={lang}/> : (
           <>
             <VirtualProductList items={prods} itemKey={(p,i) => `${productKey(p)}|${i}`}
               renderItem={(p) => <ProductCard p={p} onLocate={(prod) => navTo("location",{product:prod})}/>}/>
-            {prods.length===0 && <p style={{ textAlign:"center", padding:32, fontSize: TYPE["body"], color:C.t3 }}>{t(lang,"dataPreparing")}</p>}
+            {prods.length===0 && <p style={{ textAlign:"center", padding: 32, fontSize: TYPE["body"], color:C.t3 }}>{t(lang,"dataPreparing")}</p>}
           </>
         )}
       </div>
@@ -661,7 +661,7 @@ export default function KioskApp() {
   const renderSearch = () => {
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        <div style={{ marginBottom:16 }}><SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/></div>
+        <div style={{ marginBottom: 16 }}><SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/></div>
         {searchQ ? (
           searchPending ? <Loading lang={lang}/> :
           searchResults.length>0 ? (
@@ -675,15 +675,15 @@ export default function KioskApp() {
             <div style={{ textAlign:"center", padding:"40px 20px" }}>
               <p style={{ fontSize: TYPE["hero"], margin:"0 0 12px" }}>🔍</p>
               <p style={{ fontSize: TYPE["title"], fontWeight:600, color:C.t1, margin:"0 0 6px" }}>{t(lang,"noResults")}</p>
-              <p style={{ fontSize: TYPE["body"], color:C.t2, margin:0 }}>{t(lang,"noResultsHint")}</p>
+              <p style={{ fontSize: TYPE["body"], color:C.t2, margin: 0 }}>{t(lang,"noResultsHint")}</p>
             </div>
           )
         ) : (
           <>
-            <div style={{ display:"flex", gap:8, marginBottom:14 }}>
+            <div style={{ display:"flex", gap: 8, marginBottom: 14 }}>
               {[["cat",t(lang,"filterCat")],["brand",t(lang,"filterBrand")]].map(([id,lb]) => (
                 <button key={id} onClick={() => setSearchFacet(id)} style={{
-                  flex:1, padding:"11px", borderRadius:8, cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["body"],
+                  flex:1, padding:"10px", borderRadius:8, cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["body"],
                   fontWeight:700, background: searchFacet===id ? C.priM : C.wh,
                   color: searchFacet===id ? C.wh : C.t2,
                   border:`1px solid ${searchFacet===id ? C.priM : C.bd}`
@@ -697,16 +697,16 @@ export default function KioskApp() {
                   onClick={() => item.type === "findBrand" ? setSearchFacet("brand") : navTo("catList",{catType:item.type})}
                   className="kiosk-card"
                   style={{
-                    display:"flex", alignItems:"center", gap:14, background:C.wh, borderRadius:8,
-                    padding:14, border:`1px solid ${C.bd}`, marginBottom:8, cursor:"pointer"
+                    display:"flex", alignItems:"center", gap: 14, background:C.wh, borderRadius:8,
+                    padding: 14, border:`1px solid ${C.bd}`, marginBottom: 8, cursor:"pointer"
                   }}
                 >
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
-                    <p style={{ margin:"0 0 7px", fontSize: TYPE["body"], fontWeight:600, lineHeight:1.45 }}>
+                    <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight:600, lineHeight:1.45 }}>
                       {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
                     </p>
-                    <p style={{ margin:0, fontSize: TYPE["body-sm"], color:C.t3 }}>
+                    <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t3 }}>
                       {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type)}
                     </p>
                   </div>
@@ -714,10 +714,10 @@ export default function KioskApp() {
                 </div>
               ))
             ) : (
-              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+              <div style={{ display:"flex", flexWrap:"wrap", gap: 8 }}>
                 {STOCKED_BRANDS.map(b => (
                   <span key={b} onClick={() => navTo("brandDetail",{brandName:b})} className="kiosk-tag" style={{
-                    background:C.wh, borderRadius:999, padding:"9px 15px", fontSize: TYPE["body"], color:C.t1,
+                    background:C.wh, borderRadius:999, padding:"8px 14px", fontSize: TYPE["body"], color:C.t1,
                     fontWeight:500, cursor:"pointer", border:`1px solid ${C.bd}`
                   }}>{b}</span>
                 ))}
@@ -734,7 +734,7 @@ export default function KioskApp() {
        목록이 같은 선에서 시작해야 합니다 — 목록에만 여백을 더 주었더니
        왼쪽 끝이 8px 어긋나 보였습니다. */
     <div style={{ padding:"12px 16px 24px" }}>
-      <div style={{ marginBottom:12 }}>
+      <div style={{ marginBottom: 12 }}>
         <FloorPlan lang={lang} heading={t(lang,"storeFloor")} onRackClick={(rack) => {
           const zone = ZONES_MAP.find(z => z.id===legacyZoneOf(rack.code));
           if (zone) navTo("catList", { catType: zone.catType });
@@ -742,14 +742,14 @@ export default function KioskApp() {
       </div>
       {ZONES_MAP.map(z => (
         <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
+          display:"flex", gap: 12, marginBottom: 8, background:C.wh, borderRadius:8,
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
           <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z), flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize: TYPE["title"] }}>{z.id}</div>
           <div style={{ flex:1 }}>
-            <p style={{ margin:"0 0 3px", fontSize: TYPE["body"], fontWeight:600, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
-            <p style={{ margin:0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
+            <p style={{ margin:"0 0 2px", fontSize: TYPE["body"], fontWeight:600, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
+            <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
         </div>
@@ -798,10 +798,10 @@ export default function KioskApp() {
 
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
-          <div style={{ padding:16 }}>
+        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom: 14, overflow:"hidden" }}>
+          <div style={{ padding: 16 }}>
             <p style={{ margin:"0 0 6px", fontSize: TYPE["body-sm"], color:C.priD, fontWeight:600, lineHeight:1.45 }}>{p.brand}</p>
-            <p style={{ margin:0, fontSize: TYPE["title"], fontWeight:700, color:C.t1, lineHeight:1.35 }}>{p.name}</p>
+            <p style={{ margin: 0, fontSize: TYPE["title"], fontWeight:700, color:C.t1, lineHeight:1.35 }}>{p.name}</p>
           </div>
           {/* 카테고리와 위치는 바로 아래 배지가 이미 말합니다. 여기서는 배지가
               말하지 않는 것만 보여주고, 그럴 것이 없으면 토글을 내지 않습니다.
@@ -809,8 +809,8 @@ export default function KioskApp() {
           {detailRows.length > 0 && (
             <>
               <div onClick={() => setInfoOpen(!infoOpen)} style={{
-                padding:"11px 16px", borderTop:`1px solid ${C.bd}`, cursor:"pointer",
-                display:"flex", alignItems:"center", justifyContent:"center", gap:6,
+                padding:"10px 16px", borderTop:`1px solid ${C.bd}`, cursor:"pointer",
+                display:"flex", alignItems:"center", justifyContent:"center", gap: 6,
                 background: infoOpen ? C.bgF : C.wh, transition:"background 0.15s"
               }}>
                 <span style={{ fontSize: TYPE["body-sm"], color:C.t2, fontWeight:500 }}>{t(lang,"detailToggle")}</span>
@@ -818,7 +818,7 @@ export default function KioskApp() {
               </div>
               {infoOpen && (
                 <div style={{ padding:"0 16px 16px", borderTop:`1px solid ${C.bd}` }}>
-                  <div style={{ paddingTop:14, display:"flex", flexDirection:"column", gap:10 }}>
+                  <div style={{ paddingTop: 14, display:"flex", flexDirection:"column", gap: 10 }}>
                     {detailRows.map(info => (
                       <div key={info.label} style={{ display:"flex", fontSize: TYPE["body"], lineHeight:1.5 }}>
                         <span style={{ color:C.t3, minWidth:80, flexShrink:0 }}>{info.label}</span>
@@ -833,13 +833,13 @@ export default function KioskApp() {
         </div>
 
         {/* 위치와 지도는 같은 답이라 한 상자에 담고 선으로만 나눕니다. */}
-        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px" }}>
+        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom: 14, overflow:"hidden" }}>
+          <div style={{ display:"flex", alignItems:"center", gap: 12, padding:"14px 16px" }}>
             <div style={{ width:42, height:42, borderRadius:8, background:chipColor(zoneInfo), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:800, fontSize: TYPE["title-lg"] }}>{zone}</div>
             <div style={{ flex:1 }}>
-              <p style={{ margin:"0 0 7px", fontSize: TYPE["body"], fontWeight:700, color:C.t1, lineHeight:1.45 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
-              <p style={{ margin:0, fontSize: TYPE["body-sm"], color:C.t2 }}>{rackInfo ? rackInfo.cat : zLbl}</p>
+              <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight:700, color:C.t1, lineHeight:1.45 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
+              <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2 }}>{rackInfo ? rackInfo.cat : zLbl}</p>
             </div>
           </div>
 
@@ -850,10 +850,10 @@ export default function KioskApp() {
         </div>
 
         {/* 3단계 안내 — 각 step kiosk-card 인터랙션 */}
-        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom:14, overflow:"hidden" }}>
+        <div style={{ background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`, marginBottom: 14, overflow:"hidden" }}>
           {steps.map((s,idx) => (
             <div key={s.n} className="kiosk-card" style={{
-              display:"flex", gap:14, alignItems:"center", padding:"16px 18px",
+              display:"flex", gap: 14, alignItems:"center", padding:"16px 16px",
               borderBottom: idx < steps.length - 1 ? `1px solid ${C.bd}` : "none",
               cursor:"default", borderRadius:0
             }}>
@@ -866,13 +866,13 @@ export default function KioskApp() {
               }}>{s.n}</div>
               <div style={{ flex:1 }}>
                 <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight:600, color:C.t1, lineHeight:1.45 }}>{s.t}</p>
-                <p style={{ margin:0, fontSize: TYPE["label"], color:C.t3 }}>{s.sub}</p>
+                <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t3 }}>{s.sub}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <button onClick={pop} className="kiosk-btn" style={{ width:"100%", marginBottom:24, padding:"15px", borderRadius:8,
+        <button onClick={pop} className="kiosk-btn" style={{ width:"100%", marginBottom: 24, padding:"14px", borderRadius:8,
           background:C.pri, color:C.wh, border:"none", fontSize: TYPE["title"], fontWeight:700, fontFamily:"inherit", cursor:"pointer" }}>
           {t(lang,"seeOther")}
         </button>
@@ -881,7 +881,7 @@ export default function KioskApp() {
         {related.length>0 && (
           <div>
             <p style={{ fontSize: TYPE["body"], fontWeight:700, color:C.t1, margin:"0 0 12px" }}>{t(lang,"relatedAlso")}</p>
-            <div style={{ display:"flex", gap:12, overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20, paddingTop:8, paddingBottom:12 }}>
+            <div style={{ display:"flex", gap: 12, overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft: 20, paddingRight: 20, paddingTop: 8, paddingBottom: 12 }}>
               {related.map((r,i) => (
                 <ThumbCard key={i} lang={lang} p={r} onPress={() => {
                   setInfoOpen(false);
@@ -970,7 +970,7 @@ export default function KioskApp() {
         100vh 는 실제 화면의 2.6배가 되고, 그만큼 빈 자리가 아래로 늘어납니다.
         바탕색은 body 가 깔아 주므로 짧은 화면에서도 흰 자리가 생기지 않습니다. */}
     <div style={{ maxWidth:SHELL_MAX, margin:"0 auto", background:C.bgF,
-      fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:64 }}>
+      fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom: 64 }}>
       <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}/>
       <div>{renderPage()}</div>
 
@@ -987,7 +987,7 @@ export default function KioskApp() {
               if(tab.id==="search") setSearchQ("");
             }} className="kiosk-nav-btn" style={{
               flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-              background:"none", border:"none", cursor:"pointer", padding:"14px 6px 18px",
+              background:"none", border:"none", cursor:"pointer", padding:"14px 6px 16px",
               fontFamily:"inherit", minWidth:0,
               borderTop: isA ? `2.5px solid ${C.pri}` : "2.5px solid transparent",
             }}>

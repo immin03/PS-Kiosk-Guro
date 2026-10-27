@@ -26,20 +26,20 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
     <div style={{
       minHeight: "100dvh", background: BRAND.wash, backgroundAttachment: "fixed",
       display: "flex", flexDirection: "column",
-      alignItems: "center", padding: "0 20px 40px",
+      alignItems: "center", padding:"0 20px 40px",
     }}>
       {/* 언어는 여기서도 바꿀 수 있어야 합니다 — 들어간 뒤에야 보이면 늦습니다. */}
-      <div style={{ width: "100%", display: "flex", justifyContent: "flex-end", padding: "14px 0" }}>
+      <div style={{ width: "100%", display: "flex", justifyContent: "flex-end", padding:"14px 0" }}>
         <LangToggle lang={lang} setLang={setLang} />
       </div>
 
-      <img src={logo} alt="PHAMA SQUARE" style={{ height: 14, objectFit: "contain", display: "block", marginTop: 28 }} />
+      <img src={logo} alt="PHAMA SQUARE" style={{ height: 14, objectFit: "contain", display: "block", marginTop: 24 }} />
       {/* 매장 이름은 첫 화면의 얼굴이라 자간을 좁히지 않습니다. */}
-      <p style={{ margin: "14px 0 0", fontSize: TYPE["title"], fontWeight: 700, color: BRAND.text,
+      <p style={{ margin:"14px 0 0", fontSize: TYPE["title"], fontWeight: 700, color: BRAND.text,
         letterSpacing: "0.02em", lineHeight: 1.45 }}>
         {t(lang, "gateTitle")}
       </p>
-      <p style={{ margin: "10px 0 0", fontSize: TYPE["body"], color: BRAND.gray, lineHeight: 1.45 }}>
+      <p style={{ margin:"10px 0 0", fontSize: TYPE["body"], color: BRAND.gray, lineHeight: 1.45 }}>
         {t(lang, "gateSub")}
       </p>
 
@@ -55,7 +55,7 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
             onClick={() => (c.href ? window.location.assign(c.href) : onEnter(c.tab))}
             style={{
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              gap: 10, textAlign: "center", padding: "26px 12px",
+              gap: 10, textAlign: "center", padding:"24px 12px",
               borderRadius: RADIUS.box, cursor: "pointer",
               background: BRAND.surface, border: `1px solid ${BRAND.border}`,
               fontFamily: "inherit", width: "100%",
