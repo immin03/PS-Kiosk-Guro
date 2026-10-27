@@ -146,3 +146,13 @@ export const SHADOW = tokens.shadow;
  * 작은 글자까지 700·800 이면 굵기로는 층이 없어 글자가 뭉쳐 보입니다.
  */
 export const WEIGHT = { title: tokens.weight.title, body: tokens.weight.body };
+
+/**
+ * 줄 간격.
+ *
+ * 다섯 층입니다. 값은 ps-design 의 키오스크 벌입니다 —
+ * 글자가 작고 2.5배 확대되므로 같은 층이라도 값이 다릅니다.
+ */
+export const LEADING = Object.fromEntries(
+  Object.entries(tokens.leading).map(([k, v]) => [k, v.kiosk]),
+);

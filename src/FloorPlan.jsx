@@ -1,7 +1,7 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel, markLabel, t } from "./i18n.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE, RADIUS, WEIGHT } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE, RADIUS, WEIGHT, LEADING } from "./theme.js";
 
 /* 매장 지도.
  *
@@ -528,7 +528,7 @@ export default function FloorPlan({
   const btn = {
     width: 26, height: 26, borderRadius: RADIUS.box, border: `1px solid ${BRAND.border}`,
     background: BRAND.surface, color: BRAND.text, fontSize: TYPE["body"], fontWeight: WEIGHT.title,
-    lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+    lineHeight: LEADING.flat, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   };
 
   return (

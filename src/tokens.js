@@ -83,6 +83,28 @@ export const tokens = {
     "body": 500,
     "hero": 800
   },
+  "leading": {
+    "flat": {
+      "base": 1,
+      "kiosk": 1
+    },
+    "hero": {
+      "base": 1.1,
+      "kiosk": 1.1
+    },
+    "tight": {
+      "base": 1.35,
+      "kiosk": 1.3
+    },
+    "base": {
+      "base": 1.6,
+      "kiosk": 1.45
+    },
+    "loose": {
+      "base": 1.65,
+      "kiosk": 1.55
+    }
+  },
   "space": [
     0,
     2,

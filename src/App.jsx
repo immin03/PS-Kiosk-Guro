@@ -16,7 +16,7 @@ import PromoBanner from "./PromoBanner.jsx";
 import EntryGate from "./EntryGate.jsx";
 import { categoriesOf, countOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE, SHADOW, RADIUS, WEIGHT } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE, SHADOW, RADIUS, WEIGHT, LEADING } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
 /* 화면 폭. 세로 키오스크(보통 540 CSS px)는 꽉 채우고, 넓은 화면에서는 적당히 멈춥니다.
@@ -134,7 +134,7 @@ const catGroupIcon = (cat) =>
    단색 아이콘으로 바꾸면서 안 쓰고 있었습니다. 카테고리는 이모지가 훨씬 빨리 읽힙니다. */
 const EmojiChip = ({ e, d = 46, s = 30, mb }) => (
   <span style={{ width:d, height:d, display:"inline-flex", alignItems:"center",
-    justifyContent:"center", flexShrink:0, marginBottom:mb, fontSize:s, lineHeight:1 }}
+    justifyContent:"center", flexShrink:0, marginBottom:mb, fontSize:s, lineHeight: LEADING.flat }}
     aria-hidden="true">{e}</span>
 );
 
@@ -163,7 +163,7 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
           color: rank<=3 ? C.wh : C.t3,
         }}>{rank}</div>
       )}
-      <p style={{ margin: 0, fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight:1.4,
+      <p style={{ margin: 0, fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.base,
         display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{p.name}</p>
       <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2 }}>{p.brand}</p>
       <div style={{ display:"flex", alignItems:"center", gap: 4, marginTop:"auto" }}>
@@ -178,12 +178,12 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
 function LangToggle({ lang, setLang }) {
   return (
     <div style={{ display:"inline-flex", alignItems:"center", gap: 2, background:C.wh,
-      border:`1px solid ${C.bd}`, borderRadius: RADIUS.pill, padding: 2, flexShrink:0, lineHeight:1 }}>
+      border:`1px solid ${C.bd}`, borderRadius: RADIUS.pill, padding: 2, flexShrink:0, lineHeight: LEADING.flat }}>
       {[["ko","KO"],["en","EN"],["zh","中"]].map(([id, lb]) => (
         <button key={id} type="button" onClick={() => setLang(id)} style={{
           border:"none", cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["label"], fontWeight: WEIGHT.title,
           letterSpacing:".04em", padding:"2px 0", width:30, textAlign:"center",
-          borderRadius: RADIUS.pill, lineHeight:1.1, minHeight:0,
+          borderRadius: RADIUS.pill, lineHeight: LEADING.hero, minHeight:0,
           background: lang===id ? C.pri : "transparent", color: lang===id ? C.wh : C.t2,
         }}>{lb}</button>
       ))}
@@ -200,7 +200,7 @@ function TopBar({ title, onBack, isHome, lang, setLang }) {
       borderBottom:`1px solid ${C.bd}` }}>
       {!isHome && onBack && (
         <button onClick={onBack} style={{ background:"none", border:"none", cursor:"pointer", padding:"4px 6px", display:"flex", borderRadius: RADIUS.box }}>
-          <span style={{ fontSize: TYPE["title-lg"], color:C.t1, lineHeight:1 }}>←</span>
+          <span style={{ fontSize: TYPE["title-lg"], color:C.t1, lineHeight: LEADING.flat }}>←</span>
         </button>
       )}
       {isHome ? (
@@ -257,9 +257,9 @@ function ProductCard({ p, onLocate }) {
       style={{ display:"flex", gap: 12, height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box",
         borderBottom:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer" }}>
       <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ margin:"0 0 4px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight:1.45,
+        <p style={{ margin:"0 0 4px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.base,
           overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</p>
-        <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight:1.3,
+        <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight: LEADING.tight,
           overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.brand} · {p.cat}</p>
       </div>
       <div className="kiosk-loc" style={{
@@ -480,10 +480,10 @@ export default function KioskApp() {
             }}
           >
             <EmojiChip e={item.emoji} d={46} s={30} mb={10} />
-            <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight:1.45 }}>
+            <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.base }}>
               {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
             </p>
-            <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2, lineHeight:1.45 }}>
+            <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2, lineHeight: LEADING.base }}>
               {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type)}
             </p>
           </div>
@@ -506,8 +506,8 @@ export default function KioskApp() {
             <div style={{ width:30, height:30, borderRadius: RADIUS.box, background:chipColor(z), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight: WEIGHT.title, fontSize: TYPE["body"] }}>{z.id}</div>
             <div>
-              <p style={{ margin:"0 0 2px", fontSize: TYPE["body-sm"], fontWeight: WEIGHT.title, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
-              <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
+              <p style={{ margin:"0 0 2px", fontSize: TYPE["body-sm"], fontWeight: WEIGHT.title, lineHeight: LEADING.tight }}>{zoneLabel(lang,z.id)}</p>
+              <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2, lineHeight: LEADING.tight }}>{t(lang,"zone."+z.id+".desc")}</p>
             </div>
           </div>
         ))}
@@ -531,7 +531,7 @@ export default function KioskApp() {
               border:`1px solid ${C.bd}`, cursor:"pointer"
             }}>
               <EmojiChip e={cat.emoji} d={46} s={30} mb={10} />
-              <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight:1.45 }}>{catLabel(lang,cat)}</p>
+              <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.base }}>{catLabel(lang,cat)}</p>
               <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2 }}>{t(lang,"productsCount",{n:cat.count})}</p>
             </div>
           ))}
@@ -703,7 +703,7 @@ export default function KioskApp() {
                 >
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
-                    <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, lineHeight:1.45 }}>
+                    <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, lineHeight: LEADING.base }}>
                       {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
                     </p>
                     <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t3 }}>
@@ -748,8 +748,8 @@ export default function KioskApp() {
           <div style={{ width:38, height:38, borderRadius: RADIUS.box, background:chipColor(z), flexShrink:0,
             display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight: WEIGHT.title, fontSize: TYPE["title"] }}>{z.id}</div>
           <div style={{ flex:1 }}>
-            <p style={{ margin:"0 0 2px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
-            <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
+            <p style={{ margin:"0 0 2px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, lineHeight: LEADING.tight }}>{zoneLabel(lang,z.id)}</p>
+            <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight: LEADING.tight }}>{t(lang,"zone."+z.id+".desc")}</p>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
         </div>
@@ -800,8 +800,8 @@ export default function KioskApp() {
       <div style={{ padding:"16px 20px 24px" }}>
         <div style={{ background:C.wh, borderRadius: RADIUS.box, border:`1px solid ${C.bd}`, marginBottom: 14, overflow:"hidden" }}>
           <div style={{ padding: 16 }}>
-            <p style={{ margin:"0 0 6px", fontSize: TYPE["body-sm"], color:C.priD, fontWeight: WEIGHT.title, lineHeight:1.45 }}>{p.brand}</p>
-            <p style={{ margin: 0, fontSize: TYPE["title"], fontWeight: WEIGHT.title, color:C.t1, lineHeight:1.35 }}>{p.name}</p>
+            <p style={{ margin:"0 0 6px", fontSize: TYPE["body-sm"], color:C.priD, fontWeight: WEIGHT.title, lineHeight: LEADING.base }}>{p.brand}</p>
+            <p style={{ margin: 0, fontSize: TYPE["title"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.tight }}>{p.name}</p>
           </div>
           {/* 카테고리와 위치는 바로 아래 배지가 이미 말합니다. 여기서는 배지가
               말하지 않는 것만 보여주고, 그럴 것이 없으면 토글을 내지 않습니다.
@@ -820,7 +820,7 @@ export default function KioskApp() {
                 <div style={{ padding:"0 16px 16px", borderTop:`1px solid ${C.bd}` }}>
                   <div style={{ paddingTop: 14, display:"flex", flexDirection:"column", gap: 10 }}>
                     {detailRows.map(info => (
-                      <div key={info.label} style={{ display:"flex", fontSize: TYPE["body"], lineHeight:1.5 }}>
+                      <div key={info.label} style={{ display:"flex", fontSize: TYPE["body"], lineHeight: LEADING.base }}>
                         <span style={{ color:C.t3, minWidth:80, flexShrink:0 }}>{info.label}</span>
                         <span style={{ fontWeight: WEIGHT.body, color:C.t1 }}>{info.value}</span>
                       </div>
@@ -838,7 +838,7 @@ export default function KioskApp() {
             <div style={{ width:42, height:42, borderRadius: RADIUS.box, background:chipColor(zoneInfo), flexShrink:0,
               display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight: WEIGHT.title, fontSize: TYPE["title-lg"] }}>{zone}</div>
             <div style={{ flex:1 }}>
-              <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight:1.45 }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
+              <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.base }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
               <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2 }}>{rackInfo ? rackInfo.cat : zLbl}</p>
             </div>
           </div>
@@ -865,7 +865,7 @@ export default function KioskApp() {
                 color: C.wh, fontSize: TYPE["body"], fontWeight: WEIGHT.title
               }}>{s.n}</div>
               <div style={{ flex:1 }}>
-                <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight:1.45 }}>{s.t}</p>
+                <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.base }}>{s.t}</p>
                 <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t3 }}>{s.sub}</p>
               </div>
             </div>
