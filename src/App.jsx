@@ -80,7 +80,7 @@ const C = {
   /* 화면의 민트는 929 C 한 값입니다. 딥그린(7722 C)과 7716 C 청록은
      화면에서 뺐습니다 — 민트 옆에 놓이면 혼자 가라앉습니다. */
   pri: BRAND.accent, priL: BRAND.accent, priD: BRAND.accent, priM: BRAND.accent,
-  acc: BRAND.accent, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
+  acc: BRAND.accent, btn: BRAND.btn, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
   t1: BRAND.ink, t2: BRAND.ink, t3: BRAND.gray, wh: BRAND.bg, bd: BRAND.border,
 };
 
@@ -860,7 +860,7 @@ export default function KioskApp() {
               {/* 넘버 — 크고 명확하게 */}
               <div style={{
                 width:32, height:32, borderRadius: RADIUS.box, flexShrink:0,
-                background: C.pri,
+                background: C.btn,
                 display:"flex", alignItems:"center", justifyContent:"center",
                 color: C.wh, fontSize: TYPE["body"], fontWeight: WEIGHT.title
               }}>{s.n}</div>
@@ -873,7 +873,7 @@ export default function KioskApp() {
         </div>
 
         <button onClick={pop} className="kiosk-btn" style={{ width:"100%", marginBottom: 24, padding:"14px", borderRadius: RADIUS.box,
-          background:C.pri, color:C.wh, border:"none", fontSize: TYPE["title"], fontWeight: WEIGHT.title, fontFamily:"inherit", cursor:"pointer" }}>
+          background:C.btn, color:C.wh, border:"none", fontSize: TYPE["title"], fontWeight: WEIGHT.title, fontFamily:"inherit", cursor:"pointer" }}>
           {t(lang,"seeOther")}
         </button>
 

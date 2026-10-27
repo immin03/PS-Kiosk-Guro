@@ -4,6 +4,7 @@ export const tokens = {
     "mint": "#00C8B3",
     "mint-dark": "#00A896",
     "mint-light": "#D9F4F0",
+    "mint-btn": "#00978F",
     "teal-deep": "#2D373D",
     "ink": "#10181E",
     "text-mid": "#4A5A5E",
