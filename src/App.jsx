@@ -79,7 +79,10 @@ const C = {
   /* 메인은 브랜드 accent1 밝은 민트입니다. 딥그린은 글자 대비가 필요한 자리에만 씁니다. */
   /* 화면의 민트는 929 C 한 값입니다. 딥그린(7722 C)과 7716 C 청록은
      화면에서 뺐습니다 — 민트 옆에 놓이면 혼자 가라앉습니다. */
-  pri: BRAND.accent, priL: BRAND.accent, priD: BRAND.accent, priM: BRAND.accent,
+  /* pri 는 테두리·강조선 — 브랜드 민트 그대로.
+     priM · priD 는 바탕이 되거나 글자로 올라가는 자리라 7716 C 를 씁니다.
+     민트 위 흰 글자는 대비 2.12, 흰 바탕 위 민트 글자는 2.12 로 둘 다 읽히지 않습니다. */
+  pri: BRAND.accent, priL: BRAND.accent, priD: BRAND.btn, priM: BRAND.btn,
   acc: BRAND.accent, btn: BRAND.btn, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
   t1: BRAND.ink, t2: BRAND.ink, t3: BRAND.gray, wh: BRAND.bg, bd: BRAND.border,
 };
@@ -184,7 +187,7 @@ function LangToggle({ lang, setLang }) {
           border:"none", cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["label"], fontWeight: WEIGHT.title,
           letterSpacing: TRACKING.wide, padding:"2px 0", width:30, textAlign:"center",
           borderRadius: RADIUS.pill, lineHeight: LEADING.hero, minHeight:0,
-          background: lang===id ? C.pri : "transparent", color: lang===id ? C.wh : C.t2,
+          background: lang===id ? C.btn : "transparent", color: lang===id ? C.wh : C.t2,
         }}>{lb}</button>
       ))}
     </div>
