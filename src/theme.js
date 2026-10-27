@@ -130,3 +130,11 @@ export const TYPE = Object.fromEntries(
  * 새 간격이 필요하면 먼저 이 표를 고칩니다.
  */
 export const SPACE = tokens.space;
+
+/**
+ * 그림자.
+ *
+ * 두 값뿐입니다 — 바닥에 붙은 것과 위에 뜬 것.
+ * 값이 여럿이면 카드마다 높이가 달라 보입니다.
+ */
+export const SHADOW = tokens.shadow;

@@ -16,7 +16,7 @@ import PromoBanner from "./PromoBanner.jsx";
 import EntryGate from "./EntryGate.jsx";
 import { categoriesOf, countOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE, SHADOW } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
 /* 화면 폭. 세로 키오스크(보통 540 CSS px)는 꽉 채우고, 넓은 화면에서는 적당히 멈춥니다.
@@ -229,7 +229,7 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
     <div style={{
       display:"flex", alignItems:"center", background:C.wh, borderRadius:8,
       padding:"16px 16px", border:`1px solid ${C.bd}`, gap: 10,
-      boxShadow:"0 2px 10px rgba(45,55,61,0.05)"
+      boxShadow: SHADOW.base
     }}>
       <span style={{ color:C.priM, flexShrink:0, display:"flex" }}><Icon name="search" size={20} color={C.priM} /></span>
       <input type="text" placeholder={placeholder || "Search"}
@@ -426,7 +426,7 @@ export default function KioskApp() {
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
         {searchQ && (
           <div style={{ marginTop: 8, background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`,
-            boxShadow:"0 6px 20px rgba(45,55,61,0.12)", overflow:"hidden", position:"relative", zIndex:50 }}>
+            boxShadow: SHADOW.float, overflow:"hidden", position:"relative", zIndex:50 }}>
             {searchPending ? <Loading lang={lang}/> : searchResults.length > 0 ? (
               <>
                 <p style={{ fontSize: TYPE["label"], color:C.t3, margin:"12px 20px 4px" }}>{t(lang,"resultsCount",{n:searchResults.length})}</p>
