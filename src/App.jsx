@@ -82,7 +82,7 @@ const C = {
   /* pri 는 테두리·강조선 — 브랜드 민트 그대로.
      priM · priD 는 바탕이 되거나 글자로 올라가는 자리라 7716 C 를 씁니다.
      민트 위 흰 글자는 대비 2.12, 흰 바탕 위 민트 글자는 2.12 로 둘 다 읽히지 않습니다. */
-  pri: BRAND.accent, priL: BRAND.accent, priD: BRAND.btn, priM: BRAND.btn,
+  pri: BRAND.accent, priL: BRAND.accent, priD: BRAND.primary, priM: BRAND.btn,
   acc: BRAND.accent, btn: BRAND.btn, deep: BRAND.primary, bgL: BRAND.accentTint, bgF: BRAND.bg, dk: BRAND.ink,
   t1: BRAND.ink, t2: BRAND.ink, t3: BRAND.gray, wh: BRAND.bg, bd: BRAND.border,
 };
@@ -687,9 +687,9 @@ export default function KioskApp() {
               {[["cat",t(lang,"filterCat")],["brand",t(lang,"filterBrand")]].map(([id,lb]) => (
                 <button key={id} onClick={() => setSearchFacet(id)} style={{
                   flex:1, padding:"10px", borderRadius: RADIUS.box, cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["body"],
-                  fontWeight: WEIGHT.title, background: searchFacet===id ? C.priM : C.wh,
-                  color: searchFacet===id ? C.wh : C.t2,
-                  border:`1px solid ${searchFacet===id ? C.priM : C.bd}`
+                  fontWeight: WEIGHT.title, background: searchFacet===id ? C.bgL : C.wh,
+                  color: searchFacet===id ? C.deep : C.t2,
+                  border:`1px solid ${searchFacet===id ? C.deep : C.bd}`
                 }}>{lb}</button>
               ))}
             </div>
