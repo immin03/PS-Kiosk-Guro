@@ -83,7 +83,7 @@ const C = {
      priM · priD 는 바탕이 되거나 글자로 올라가는 자리라 7716 C 를 씁니다.
      민트 위 흰 글자는 대비 2.12, 흰 바탕 위 민트 글자는 2.12 로 둘 다 읽히지 않습니다. */
   pri: BRAND.accent, priL: BRAND.accent, priD: BRAND.btn, priM: BRAND.btn,
-  acc: BRAND.accent, btn: BRAND.btn, bgL: BRAND.tint, bgF: BRAND.bg, dk: BRAND.ink,
+  acc: BRAND.accent, btn: BRAND.btn, deep: BRAND.primary, bgL: BRAND.accentTint, bgF: BRAND.bg, dk: BRAND.ink,
   t1: BRAND.ink, t2: BRAND.ink, t3: BRAND.gray, wh: BRAND.bg, bd: BRAND.border,
 };
 
@@ -187,7 +187,7 @@ function LangToggle({ lang, setLang }) {
           border:"none", cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["label"], fontWeight: WEIGHT.title,
           letterSpacing: TRACKING.wide, padding:"2px 0", width:30, textAlign:"center",
           borderRadius: RADIUS.pill, lineHeight: LEADING.hero, minHeight:0,
-          background: lang===id ? C.btn : "transparent", color: lang===id ? C.wh : C.t2,
+          background: lang===id ? C.bgL : "transparent", color: lang===id ? C.deep : C.t3,
         }}>{lb}</button>
       ))}
     </div>
