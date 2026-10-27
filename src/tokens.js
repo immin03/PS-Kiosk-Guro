@@ -105,6 +105,12 @@ export const tokens = {
       "kiosk": 1.55
     }
   },
+  "tracking": {
+    "tight": "-0.02em",
+    "flat": "0",
+    "wide": "0.06em",
+    "wider": "0.14em"
+  },
   "space": [
     0,
     2,

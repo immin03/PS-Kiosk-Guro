@@ -1,7 +1,7 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel, markLabel, t } from "./i18n.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE, RADIUS, WEIGHT, LEADING } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE, RADIUS, WEIGHT, LEADING, TRACKING } from "./theme.js";
 
 /* 매장 지도.
  *
@@ -540,7 +540,7 @@ export default function FloorPlan({
           /* 소제목은 화면 어디서나 한 값입니다 — 「카테고리 바로가기」와
              나란히 놓이는데 두께가 달라 층이 다르게 읽혔습니다. */
           <p style={{ margin: 0, fontSize: TYPE["body"], fontWeight: WEIGHT.title, color: BRAND.text,
-            letterSpacing: "-0.01em" }}>{heading}</p>
+            letterSpacing: TRACKING.tight }}>{heading}</p>
         )}
         <div style={{ marginLeft:"auto", display: "flex", gap: 6 }}>
           {(() => {

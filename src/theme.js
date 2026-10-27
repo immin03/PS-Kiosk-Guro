@@ -156,3 +156,11 @@ export const WEIGHT = { title: tokens.weight.title, body: tokens.weight.body };
 export const LEADING = Object.fromEntries(
   Object.entries(tokens.leading).map(([k, v]) => [k, v.kiosk]),
 );
+
+/**
+ * 자간.
+ *
+ * 네 층입니다. 한글은 커질수록 벌어 보여 큰 글자만 좁히고,
+ * 양의 자간은 영문 라벨·로고타입에만 씁니다.
+ */
+export const TRACKING = tokens.tracking;

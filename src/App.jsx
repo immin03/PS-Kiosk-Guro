@@ -16,7 +16,7 @@ import PromoBanner from "./PromoBanner.jsx";
 import EntryGate from "./EntryGate.jsx";
 import { categoriesOf, countOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE, SHADOW, RADIUS, WEIGHT, LEADING } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE, SHADOW, RADIUS, WEIGHT, LEADING, TRACKING } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
 /* 화면 폭. 세로 키오스크(보통 540 CSS px)는 꽉 채우고, 넓은 화면에서는 적당히 멈춥니다.
@@ -182,7 +182,7 @@ function LangToggle({ lang, setLang }) {
       {[["ko","KO"],["en","EN"],["zh","中"]].map(([id, lb]) => (
         <button key={id} type="button" onClick={() => setLang(id)} style={{
           border:"none", cursor:"pointer", fontFamily:"inherit", fontSize: TYPE["label"], fontWeight: WEIGHT.title,
-          letterSpacing:".04em", padding:"2px 0", width:30, textAlign:"center",
+          letterSpacing: TRACKING.wide, padding:"2px 0", width:30, textAlign:"center",
           borderRadius: RADIUS.pill, lineHeight: LEADING.hero, minHeight:0,
           background: lang===id ? C.pri : "transparent", color: lang===id ? C.wh : C.t2,
         }}>{lb}</button>
@@ -453,7 +453,7 @@ export default function KioskApp() {
       </div>
 
       {/* 카테고리 바로가기 */}
-      <p style={{ fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
+      <p style={{ fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, margin:"0 0 10px", letterSpacing: TRACKING.tight }}>{t(lang,"catShortcut")}</p>
       {/* 한 줄로 밀어 봅니다. 왼쪽은 화면 여백을 지키고 오른쪽은 열어 둬서
           다음 카드가 걸쳐 보이게 합니다 — 더 있다는 것이 보여야 밉니다. */}
       {/* overflow-x 를 열면 세로도 함께 잘립니다. 카드가 호버로 2px 뜨면서
@@ -994,7 +994,7 @@ export default function KioskApp() {
               <span style={{
                 fontSize: TYPE["body"], fontWeight: isA ? 700 : 500,
                 color: isA ? C.priD : C.t3,
-                letterSpacing:"-0.01em",
+                letterSpacing: TRACKING.tight,
                 whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"100%",
               }}>{tab.label}</span>
             </button>

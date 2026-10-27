@@ -1,4 +1,4 @@
-import { BRAND, RADIUS, TYPE, WEIGHT, LEADING } from "./theme.js";
+import { BRAND, RADIUS, TYPE, WEIGHT, LEADING, TRACKING } from "./theme.js";
 import { t } from "./i18n.js";
 
 /* 첫 화면.
@@ -36,7 +36,7 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
       <img src={logo} alt="PHAMA SQUARE" style={{ height: 14, objectFit: "contain", display: "block", marginTop: 24 }} />
       {/* 매장 이름은 첫 화면의 얼굴이라 자간을 좁히지 않습니다. */}
       <p style={{ margin:"14px 0 0", fontSize: TYPE["title"], fontWeight: WEIGHT.title, color: BRAND.text,
-        letterSpacing: "0.02em", lineHeight: LEADING.base }}>
+        letterSpacing: TRACKING.wide, lineHeight: LEADING.base }}>
         {t(lang, "gateTitle")}
       </p>
       <p style={{ margin:"10px 0 0", fontSize: TYPE["body"], color: BRAND.gray, lineHeight: LEADING.base }}>
