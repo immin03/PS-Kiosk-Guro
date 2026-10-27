@@ -167,3 +167,27 @@ export const LEADING = Object.fromEntries(
  * 양의 자간은 영문 라벨·로고타입에만 씁니다.
  */
 export const TRACKING = tokens.tracking;
+
+/**
+ * 바탕 위에서 읽히는 글자색.
+ *
+ * 지도 존 색은 매대를 가르는 기능색이라 바꿀 수 없습니다.
+ * 밝은 존(주황 · 노랑)에는 먹색이, 어두운 존(보라 · 딥민트)에는 흰색이
+ * 더 읽힙니다. 배경 밝기를 재서 둘 중 대비가 큰 쪽을 고릅니다.
+ */
+export function onColor(hex) {
+  const h = String(hex || "").replace("#", "");
+  if (h.length < 6) return tokens.color.bg;
+  const lin = (c) => {
+    const v = parseInt(c, 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  const L =
+    0.2126 * lin(h.slice(0, 2)) +
+    0.7152 * lin(h.slice(2, 4)) +
+    0.0722 * lin(h.slice(4, 6));
+  /* 흰 글자와 먹색 글자의 대비를 재서 큰 쪽을 고릅니다. */
+  const onWhite = 1.05 / (L + 0.05);
+  const onInk = (L + 0.05) / 0.0598;
+  return onWhite >= onInk ? tokens.color.bg : tokens.color.ink;
+}

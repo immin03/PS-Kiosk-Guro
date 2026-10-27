@@ -16,7 +16,7 @@ import PromoBanner from "./PromoBanner.jsx";
 import EntryGate from "./EntryGate.jsx";
 import { categoriesOf, countOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE, SHADOW, RADIUS, WEIGHT, LEADING, TRACKING } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK, TYPE, SHADOW, RADIUS, WEIGHT, LEADING, TRACKING, onColor } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
 /* 화면 폭. 세로 키오스크(보통 540 CSS px)는 꽉 채우고, 넓은 화면에서는 적당히 멈춥니다.
@@ -507,7 +507,7 @@ export default function KioskApp() {
             border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
           }}>
             <div style={{ width:30, height:30, borderRadius: RADIUS.box, background:chipColor(z), flexShrink:0,
-              display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight: WEIGHT.title, fontSize: TYPE["body"] }}>{z.id}</div>
+              display:"flex", alignItems:"center", justifyContent:"center", color:onColor(z.color), fontWeight: WEIGHT.title, fontSize: TYPE["body"] }}>{z.id}</div>
             <div>
               <p style={{ margin:"0 0 2px", fontSize: TYPE["body-sm"], fontWeight: WEIGHT.title, lineHeight: LEADING.tight }}>{zoneLabel(lang,z.id)}</p>
               <p style={{ margin: 0, fontSize: TYPE["label"], color:C.t2, lineHeight: LEADING.tight }}>{t(lang,"zone."+z.id+".desc")}</p>
@@ -749,7 +749,7 @@ export default function KioskApp() {
           padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
         }}>
           <div style={{ width:38, height:38, borderRadius: RADIUS.box, background:chipColor(z), flexShrink:0,
-            display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight: WEIGHT.title, fontSize: TYPE["title"] }}>{z.id}</div>
+            display:"flex", alignItems:"center", justifyContent:"center", color:onColor(z.color), fontWeight: WEIGHT.title, fontSize: TYPE["title"] }}>{z.id}</div>
           <div style={{ flex:1 }}>
             <p style={{ margin:"0 0 2px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, lineHeight: LEADING.tight }}>{zoneLabel(lang,z.id)}</p>
             <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2, lineHeight: LEADING.tight }}>{t(lang,"zone."+z.id+".desc")}</p>
@@ -839,7 +839,7 @@ export default function KioskApp() {
         <div style={{ background:C.wh, borderRadius: RADIUS.box, border:`1px solid ${C.bd}`, marginBottom: 14, overflow:"hidden" }}>
           <div style={{ display:"flex", alignItems:"center", gap: 12, padding:"14px 16px" }}>
             <div style={{ width:42, height:42, borderRadius: RADIUS.box, background:chipColor(zoneInfo), flexShrink:0,
-              display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight: WEIGHT.title, fontSize: TYPE["title-lg"] }}>{zone}</div>
+              display:"flex", alignItems:"center", justifyContent:"center", color:onColor(z.color), fontWeight: WEIGHT.title, fontSize: TYPE["title-lg"] }}>{zone}</div>
             <div style={{ flex:1 }}>
               <p style={{ margin:"0 0 6px", fontSize: TYPE["body"], fontWeight: WEIGHT.title, color:C.t1, lineHeight: LEADING.base }}>{t(lang,"locLine",{zone:zLbl, rack:p.rack})}</p>
               <p style={{ margin: 0, fontSize: TYPE["body-sm"], color:C.t2 }}>{rackInfo ? rackInfo.cat : zLbl}</p>
