@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PROMOTIONS } from "./promotions.js";
 import { STORE_PHOTO } from "./storePhoto.js";
-import { TYPE, RADIUS } from "./theme.js";
+import { TYPE, RADIUS, WEIGHT } from "./theme.js";
 
 /* 홈 상단 프로모션 배너.
  *
@@ -68,10 +68,10 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
               <span style={{
                 alignSelf: "flex-start", marginBottom: 8, padding:"4px 10px", borderRadius: RADIUS.pill,
                 background: "rgba(255,255,255,.2)", color: "#fff",
-                fontSize: TYPE["label"], fontWeight: 700, letterSpacing: ".04em",
+                fontSize: TYPE["label"], fontWeight: WEIGHT.title, letterSpacing: ".04em",
               }}>{p.tag}</span>
             )}
-            <p style={{ margin:"0 0 4px", fontSize: TYPE["title-lg"], fontWeight: 800, color: "#fff", lineHeight: 1.28, letterSpacing: "-0.01em" }}>{p.title}</p>
+            <p style={{ margin:"0 0 4px", fontSize: TYPE["title-lg"], fontWeight: WEIGHT.title, color: "#fff", lineHeight: 1.28, letterSpacing: "-0.01em" }}>{p.title}</p>
             <p style={{ margin: 0, fontSize: TYPE["body"], color: "rgba(255,255,255,.85)", lineHeight: 1.45 }}>{p.sub}</p>
             {p.limit && (
               <p style={{ margin:"6px 0 0", fontSize: TYPE["body-sm"], color: "rgba(255,255,255,.7)" }}>{p.limit}</p>

@@ -138,3 +138,11 @@ export const SPACE = tokens.space;
  * 값이 여럿이면 카드마다 높이가 달라 보입니다.
  */
 export const SHADOW = tokens.shadow;
+
+/**
+ * 굵기.
+ *
+ * 두 값뿐입니다 — 제목 600 · 그 밖 500.
+ * 작은 글자까지 700·800 이면 굵기로는 층이 없어 글자가 뭉쳐 보입니다.
+ */
+export const WEIGHT = { title: tokens.weight.title, body: tokens.weight.body };
