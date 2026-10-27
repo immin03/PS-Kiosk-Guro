@@ -3,6 +3,10 @@
 건강기능식품 · 뷰티 · 펫용품 1,679종을 안내하는 매장 키오스크 앱.
 React + Vite 기반이며, 빌드 결과물을 WebView로 감싸 Android APK로 배포한다.
 
+## 디자인 토큰
+
+색 · 글자 · 간격 · 모서리 · 그림자의 정본은 `ps-design` 입니다. `src/tokens.js` 는 그 빌드 산출물이라 손으로 고치지 않고, `src/theme.js` 가 그 표를 가리킵니다. 값을 바꾸려면 `ps-design/tokens.json` 을 고치고 `node build/make.mjs && node build/sync.mjs` 를 돌립니다.
+
 ## 요구 사항
 - Node.js 18 이상 (LTS 권장)
 
