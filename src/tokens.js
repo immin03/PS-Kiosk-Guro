@@ -25,49 +25,57 @@ export const tokens = {
       "base": 11,
       "wide": 12,
       "did": 20,
-      "note": "뱃지 · 언어"
+      "note": "뱃지 · 언어",
+      "kiosk": 10
     },
     "label": {
       "base": 12,
       "wide": 13,
       "did": 24,
-      "note": "묶음 이름표 · 각주"
+      "note": "묶음 이름표 · 각주",
+      "kiosk": 11
     },
     "body-sm": {
       "base": 13,
       "wide": 15,
       "did": 28,
-      "note": "본문 작은 것 · 버튼"
+      "note": "본문 작은 것 · 버튼",
+      "kiosk": 12
     },
     "body": {
       "base": 15,
       "wide": 17,
       "did": 32,
-      "note": "본문 · 카드 제목"
+      "note": "본문 · 카드 제목",
+      "kiosk": 13
     },
     "title": {
       "base": 18,
       "wide": 20,
       "did": 40,
-      "note": "소제목"
+      "note": "소제목",
+      "kiosk": 15
     },
     "title-lg": {
       "base": 22,
       "wide": 24,
       "did": 48,
-      "note": "카드 큰 제목"
+      "note": "카드 큰 제목",
+      "kiosk": 18
     },
     "display": {
       "base": 28,
       "wide": 32,
       "did": 60,
-      "note": "화면 제목"
+      "note": "화면 제목",
+      "kiosk": 22
     },
     "hero": {
       "base": 40,
       "wide": 52,
       "did": 88,
-      "note": "첫 화면 제목 — 여기만 한 층 더"
+      "note": "첫 화면 제목 — 여기만 한 층 더",
+      "kiosk": 32
     }
   },
   "weight": {

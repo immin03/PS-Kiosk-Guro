@@ -1,7 +1,7 @@
 import { useMemo, useRef, useEffect, useState } from "react";
 import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { zoneLabel, markLabel, t } from "./i18n.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU, TYPE } from "./theme.js";
 
 /* 매장 지도.
  *
@@ -527,7 +527,7 @@ export default function FloorPlan({
 
   const btn = {
     width: 26, height: 26, borderRadius: 8, border: `1px solid ${BRAND.border}`,
-    background: BRAND.surface, color: BRAND.text, fontSize: 14, fontWeight: 600,
+    background: BRAND.surface, color: BRAND.text, fontSize: TYPE["body"], fontWeight: 600,
     lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   };
 
@@ -539,7 +539,7 @@ export default function FloorPlan({
         {heading && (
           /* 소제목은 화면 어디서나 한 값입니다 — 「카테고리 바로가기」와
              나란히 놓이는데 두께가 달라 층이 다르게 읽혔습니다. */
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: BRAND.text,
+          <p style={{ margin: 0, fontSize: TYPE["body"], fontWeight: 700, color: BRAND.text,
             letterSpacing: "-0.01em" }}>{heading}</p>
         )}
         <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
@@ -548,7 +548,7 @@ export default function FloorPlan({
             return (
               <button
                 type="button" aria-label="지도 원래대로" disabled={!on}
-                style={{ ...btn, fontSize: 15, opacity: on ? 1 : 0.35, cursor: on ? "pointer" : "default" }}
+                style={{ ...btn, fontSize: TYPE["title"], opacity: on ? 1 : 0.35, cursor: on ? "pointer" : "default" }}
                 onClick={resetView}
               >
                 ↺

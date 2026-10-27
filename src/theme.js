@@ -110,3 +110,14 @@ export const ZONE_FALLBACK = ZONE_COLOR["기타"];
  * 가이드에 붉은 계열이 없어 이 한 자리만 예외로 둡니다.
  */
 export const YOU_HERE = "#F04438";
+
+/**
+ * 글자.
+ *
+ * 지금 화면에는 9 부터 34 까지 열여섯 가지가 섞여 있었습니다. 일곱 층으로 줄입니다.
+ * 값은 ps-design 의 키오스크 벌입니다 — 420px 로 짜고 2.5배 키우므로
+ * 본문 13px 이 1080px 화면에서 32px 로 보입니다.
+ */
+export const TYPE = Object.fromEntries(
+  Object.entries(tokens.type).map(([k, v]) => [k, v.kiosk]),
+);

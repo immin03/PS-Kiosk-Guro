@@ -1,4 +1,4 @@
-import { BRAND, RADIUS } from "./theme.js";
+import { BRAND, RADIUS, TYPE } from "./theme.js";
 import { t } from "./i18n.js";
 
 /* 첫 화면.
@@ -35,11 +35,11 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
 
       <img src={logo} alt="PHAMA SQUARE" style={{ height: 14, objectFit: "contain", display: "block", marginTop: 28 }} />
       {/* 매장 이름은 첫 화면의 얼굴이라 자간을 좁히지 않습니다. */}
-      <p style={{ margin: "14px 0 0", fontSize: 16, fontWeight: 700, color: BRAND.text,
+      <p style={{ margin: "14px 0 0", fontSize: TYPE["title"], fontWeight: 700, color: BRAND.text,
         letterSpacing: "0.02em", lineHeight: 1.45 }}>
         {t(lang, "gateTitle")}
       </p>
-      <p style={{ margin: "10px 0 0", fontSize: 13, color: BRAND.gray, lineHeight: 1.45 }}>
+      <p style={{ margin: "10px 0 0", fontSize: TYPE["body"], color: BRAND.gray, lineHeight: 1.45 }}>
         {t(lang, "gateSub")}
       </p>
 
@@ -61,12 +61,12 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
               fontFamily: "inherit", width: "100%",
             }}
           >
-            <span style={{ fontSize: 34, lineHeight: 1 }} aria-hidden>{c.emoji}</span>
+            <span style={{ fontSize: TYPE["hero"], lineHeight: 1 }} aria-hidden>{c.emoji}</span>
             <span>
-              <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: BRAND.text, lineHeight: 1.35 }}>
+              <span style={{ display: "block", fontSize: TYPE["title"], fontWeight: 700, color: BRAND.text, lineHeight: 1.35 }}>
                 {t(lang, c.key)}
               </span>
-              <span style={{ display: "block", marginTop: 4, fontSize: 12, color: BRAND.gray, lineHeight: 1.35 }}>
+              <span style={{ display: "block", marginTop: 4, fontSize: TYPE["body-sm"], color: BRAND.gray, lineHeight: 1.35 }}>
                 {t(lang, c.sub)}
               </span>
             </span>
