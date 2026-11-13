@@ -18,6 +18,9 @@ import GuideFrame from "./GuideFrame.jsx";
 import { GUIDE_PAGES, CONCERNS } from "./guide.js";
 
 /* 건강 고민 칩 그림 — 카테고리 카드처럼 이모지 한 글자 */
+/* 홈 묶음 제목 — 샘플(PS-OS 시안) 카드 머리 값: 15 / 600 / 제목색, 아래 12(2026-11-13 「타이틀 신규로 · 간격 여유 있게」) */
+const SECTION_TITLE = { fontSize:15, fontWeight:600, color:"#191C20", margin:"0 0 12px", lineHeight:1.45 };
+const SECTION_GAP = 32;
 const CONCERN_EMOJI = { fatigue:"⚡", sleep_stress:"😴", probiotics:"🦠", immunity:"🛡️", joint:"🦴", liver_hangover:"🍺" };
 import { categoriesOf, countOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
@@ -448,7 +451,7 @@ export default function KioskApp() {
       <PromoBanner bleed={20}/>
 
       {/* 통합 검색 */}
-      <div style={{ marginBottom:24, position:"relative" }}>
+      <div style={{ marginBottom:SECTION_GAP, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
         {searchQ && (
           <div style={{ marginTop:8, background:C.wh, borderRadius:8, border:`1px solid ${C.bd}`,
@@ -480,9 +483,9 @@ export default function KioskApp() {
 
       {/* 요즘 신경 쓰이는 건강 고민 — 누르면 건강 가이드의 그 주제로(2026-11-13 샘플에서 가져옴).
           칩은 한 줄로 밀어 보고, 올리면 테두리만 민트(회색 면 호버 없음) */}
-      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"concernTitle")}</p>
+      <p style={SECTION_TITLE}>{t(lang,"concernTitle")}</p>
       <div className="kiosk-swipe" style={{ display:"flex", gap:6, overflowX:"auto", scrollbarWidth:"none",
-        margin:"0 -20px 24px", padding:"0 20px" }}>
+        margin:`0 -20px ${SECTION_GAP}px`, padding:"0 20px" }}>
         {CONCERNS.map((c) => (
           <button key={c.id} type="button" className="kiosk-chip" onClick={() => {
             setActiveTab("guide"); setNav([{ page:"guide", path: GUIDE_PAGES.topic(c.id) }]);
@@ -495,7 +498,7 @@ export default function KioskApp() {
       </div>
 
       {/* 카테고리 바로가기 */}
-      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")} <span style={{ fontWeight:400, color:C.t3, marginLeft:4 }}>{HOME_CATS.length}</span></p>
+      <p style={SECTION_TITLE}>{t(lang,"catShortcut")} <span style={{ fontSize:13, fontWeight:400, color:"#98A2AE", marginLeft:4 }}>{HOME_CATS.length}</span></p>
       {/* 한 줄로 밀어 봅니다. 왼쪽은 화면 여백을 지키고 오른쪽은 열어 둬서
           다음 카드가 걸쳐 보이게 합니다 — 더 있다는 것이 보여야 밉니다. */}
       {/* overflow-x 를 열면 세로도 함께 잘립니다. 카드가 호버로 2px 뜨면서
@@ -503,7 +506,7 @@ export default function KioskApp() {
           바깥 여백을 같은 만큼 당겨 배치는 그대로 둡니다. */}
       <div className="kiosk-swipe" style={{
         display:"flex", gap:8, overflowX:"auto",
-        marginTop:-6, paddingTop:6, paddingBottom:8, marginBottom:16,
+        marginTop:-6, paddingTop:6, paddingBottom:8, marginBottom:SECTION_GAP - 8,
         marginLeft:-6, paddingLeft:6, marginRight:-20, paddingRight:20,
         WebkitOverflowScrolling:"touch", msOverflowStyle:"none", scrollbarWidth:"none",
       }}>
@@ -570,11 +573,11 @@ export default function KioskApp() {
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
           {cats.map(cat => (
             <div key={cat.id} onClick={() => navTo("catDetail",{cat})} className="kiosk-card" style={{
-              background:C.wh, borderRadius:8, padding:"20px 10px", textAlign:"center",
+              background:C.wh, borderRadius:8, padding:"12px 8px", textAlign:"center",
               border:`1px solid ${C.bd}`, cursor:"pointer"
             }}>
-              <EmojiChip e={cat.emoji} d={46} s={30} mb={10} />
-              <p style={{ margin:"0 0 6px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.45 }}>{catLabel(lang,cat)}</p>
+              <EmojiChip e={cat.emoji} d={36} s={26} mb={6} />
+              <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.45 }}>{catLabel(lang,cat)}</p>
               <p style={{ margin:0, fontSize:11, color:C.t2 }}>{t(lang,"productsCount",{n:cat.count})}</p>
             </div>
           ))}
