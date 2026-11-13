@@ -17,7 +17,11 @@ const slideUrl = (name) => SLIDES[`./promo/${name}`];
 const bgOf = (p) => `url(${(p.image && slideUrl(p.image)) || STORE_PHOTO})`;
 
 export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
-  const items = PROMOTIONS;
+  /* 프칼 건은 그날 기간 안에 있는 것만. 하나도 없으면 상시 건(src 상시) — scripts/sync-racks.mjs */
+  const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+  const live = PROMOTIONS.filter((p) => (!p.from || p.from <= today) && (!p.to || p.to >= today));
+  const cal = live.filter((p) => p.src === "프칼");
+  const items = cal.length ? cal : live.filter((p) => p.src !== "프칼");
   const [i, setI] = useState(0);
 
   useEffect(() => {

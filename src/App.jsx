@@ -191,7 +191,22 @@ function LangToggle({ lang, setLang }) {
   );
 }
 
-function TopBar({ title, onBack, isHome, lang, setLang }) {
+/* 첫 화면(매장 지도 · 상품 검색 · 이벤트 · 홈페이지 고르는 화면)으로 — 모든 화면 머리에 하나(2026-11-13 사용자).
+   홈에서는 왼쪽 끝, 다른 화면에서는 언어 바로 앞. */
+function StartButton({ onStart, lang }) {
+  if (!onStart) return null;
+  return (
+    <button type="button" onClick={onStart} aria-label={t(lang,"gateBack")} style={{ background:"none", border:`1px solid ${C.bd}`, cursor:"pointer",
+      padding:"4px 10px", display:"flex", alignItems:"center", gap:4, borderRadius:999, fontFamily:"inherit", fontSize:12, fontWeight:600, color:C.t2, flexShrink:0 }}>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>
+      </svg>
+      {t(lang,"gateBack")}
+    </button>
+  );
+}
+
+function TopBar({ title, onBack, isHome, lang, setLang, onStart }) {
   return (
     <div style={{ display:"flex", alignItems:"center", padding: isHome ? "14px 20px" : "8px 16px", gap:8,
       background: isHome ? C.bgF : C.wh, position:"sticky", top:0, zIndex:100,
@@ -211,12 +226,14 @@ function TopBar({ title, onBack, isHome, lang, setLang }) {
             maxWidth:"calc(100% - 180px)" }}>
             <img src={LOGO_IMG} alt="PHAMA SQUARE" style={{ height:11, maxWidth:"100%", objectFit:"contain", display:"block" }} />
           </div>
+          <StartButton onStart={onStart} lang={lang} />
           <div style={{ flex:1 }} />
           <LangToggle lang={lang} setLang={setLang} />
         </>
       ) : (
         <>
           <span style={{ flex:1, fontSize:16, fontWeight:700, color:C.t1 }}>{title}</span>
+          <StartButton onStart={onStart} lang={lang} />
           <LangToggle lang={lang} setLang={setLang} />
         </>
       )}
@@ -401,6 +418,13 @@ export default function KioskApp() {
     if (["search","brandDetail","location"].includes(cur.page)) ensureSearchIndex();
   }, [cur.page, cur.cat?.fileId, ensureCategory, ensureSearchIndex]);
   useEffect(() => { if (searchQ) ensureSearchIndex(); }, [searchQ, ensureSearchIndex]);
+  /* 다른 화면을 다녀와 홈으로 돌아오면 홈 검색칸을 비웁니다 — 전에 친 글자가 남아
+     「검색 결과가 없습니다」 상자가 그대로 떠 있었습니다(2026-11-13 사용자). */
+  const prevPage = useRef(cur.page);
+  useEffect(() => {
+    if (cur.page === "home" && prevPage.current !== "home") setSearchQ("");
+    prevPage.current = cur.page;
+  }, [cur.page]);
 
   const doSearch = (q) => {
     if (!q.trim()) return;
@@ -971,7 +995,8 @@ export default function KioskApp() {
         바탕색은 body 가 깔아 주므로 짧은 화면에서도 흰 자리가 생기지 않습니다. */}
     <div style={{ maxWidth:SHELL_MAX, margin:"0 auto", background:C.bgF,
       fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:64 }}>
-      <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}/>
+      <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}
+        onStart={() => { setEntered(false); setNav([{ page:"home" }]); setActiveTab("home"); setSearchQ(""); window.scrollTo({ top:0 }); }}/>
       <div>{renderPage()}</div>
 
       {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline */}

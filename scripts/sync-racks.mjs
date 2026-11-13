@@ -82,16 +82,35 @@ export const RACK_ZONE = Object.fromEntries(RACKS.map((r) => [r.code, r.zone]));
 let promoBody = null;
 if (existsSync(SOURCE_PROMO)) {
   const pdoc = JSON.parse(readFileSync(SOURCE_PROMO, "utf8"));
-  const list = (pdoc.running || pdoc.promotions || [])
+  /* 슬라이드 = 프로모션 캘린더(프칼, records) — 2026-11-13 사용자 「여기 들어가는 슬라이드는 프칼이랑 연동」.
+     구로가 걸린 건(구로 · 하남 · 구로 · 전체) 중 진행 중 · 기획 · 확정인 것만, 기간(period)을 그대로 실어
+     키오스크가 그날 날짜로 거릅니다(다시 빌드하지 않아도 끝난 건은 내려가고 시작한 건은 뜸).
+     프칼에 걸린 건이 하나도 없을 때만 예전 상시 목록(running)을 씁니다. */
+  const SHOW = ["진행 중", "기획", "확정"];
+  const forStore = (s) => /구로|전체/.test(String(s || ""));
+  const span = (p) => String(p || "").split("~").map((v) => v.trim());
+  const cal = (pdoc.records || [])
+    .filter((r) => SHOW.includes(r.status) && forStore(r.store) && span(r.period)[0])
+    .map((r) => {
+      const [from, to] = span(r.period);
+      const [title, sub] = String(r.name).split(/\s+—\s+/);
+      return { id: r.id, src: "프칼", status: r.status, from, to: to || null, tag: r.type || "기획전",
+        title, sub: sub || "", link: "https://www.phamasquare.com/event.html", image: r.kioskImage || null };
+    })
+    .sort((a, b) => a.from.localeCompare(b.from));
+  const running = (pdoc.running || pdoc.promotions || [])
     .filter((p) => p.status === "live")
     .filter((p) => (p.channels || []).includes("kiosk"))
     .filter((p) => !p.stores || p.stores.includes(STORE))
-    .sort((a, b) => (a.rank || 99) - (b.rank || 99));
+    .sort((a, b) => (a.rank || 99) - (b.rank || 99))
+    .map((p) => ({ ...p, src: "상시" }));
+  const list = cal.concat(running);
   promoBody = `/* 자동 생성 — 직접 고치지 마세요.
  * 정본: PS-OS catalog/promotions.json (${pdoc.meta?.updated || "날짜 미상"} 기준)
  * 갱신: node scripts/sync-racks.mjs
  *
- * 노출 순서(rank)는 이벤트 페이지 · 홈페이지와 같습니다. 생김새만 화면마다 다릅니다.
+ * 프칼(records) 건이 먼저, 상시(running) 건은 프칼 건이 그날 하나도 없을 때만 뜹니다(src 로 가름).
+ * 날짜(from · to)는 키오스크가 그날 기준으로 거릅니다.
  */
 export const PROMOTIONS = ${JSON.stringify(list, null, 2)};
 `;
