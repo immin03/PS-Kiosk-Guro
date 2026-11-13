@@ -68,7 +68,7 @@ const STRINGS = {
     "brandSearch": "브랜드명 검색",
     "brandFind": "브랜드 찾기",
     "brandFindSub": "{n}개 브랜드",
-    "catShortcut": "카테고리 바로가기",
+    "catShortcut": "카테고리로 둘러보기",
     "storeMap": "매장 지도",
     "catalogLoading": "상품을 불러오는 중입니다",
     "gateTitle": "파마스퀘어 익스프레스 구로점",
@@ -462,7 +462,7 @@ const STRINGS = {
     "brandSearch": "搜索品牌名",
     "brandFind": "品牌查找",
     "brandFindSub": "{n}个品牌",
-    "catShortcut": "分类快捷入口",
+    "catShortcut": "按分类浏览",
     /* 카테고리 이름 — 배치 정본의 카테고리 이름으로 찾습니다. 랙 번호로 찾으면
        매대를 옮길 때마다 이름이 어긋납니다(2026-09-18 A1~A6 · A31~A36 교체). */
     "cat.펫모래·패드": "宠物猫砂·尿垫",

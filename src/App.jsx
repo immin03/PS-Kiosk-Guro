@@ -481,12 +481,12 @@ export default function KioskApp() {
       {/* 요즘 신경 쓰이는 건강 고민 — 누르면 건강 가이드의 그 주제로(2026-11-13 샘플에서 가져옴).
           칩은 한 줄로 밀어 보고, 올리면 테두리만 민트(회색 면 호버 없음) */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"concernTitle")}</p>
-      <div className="kiosk-swipe" style={{ display:"flex", gap:8, overflowX:"auto", scrollbarWidth:"none",
+      <div className="kiosk-swipe" style={{ display:"flex", gap:6, overflowX:"auto", scrollbarWidth:"none",
         margin:"0 -20px 24px", padding:"0 20px" }}>
         {CONCERNS.map((c) => (
           <button key={c.id} type="button" className="kiosk-chip" onClick={() => {
             setActiveTab("guide"); setNav([{ page:"guide", path: GUIDE_PAGES.topic(c.id) }]);
-          }} style={{ flex:"0 0 auto", display:"inline-flex", alignItems:"center", gap:6, padding:"9px 14px 9px 12px",
+          }} style={{ flex:"0 0 auto", display:"inline-flex", alignItems:"center", gap:4, padding:"7px 12px 7px 10px",
             borderRadius:999, border:`1px solid ${C.bd}`, background:C.wh, cursor:"pointer", fontFamily:"inherit",
             fontSize:13, fontWeight:500, color:C.t1, whiteSpace:"nowrap" }}>
             <span style={{ fontSize:15, lineHeight:1 }}>{CONCERN_EMOJI[c.id]}</span>{t(lang, c.key)}
@@ -495,7 +495,7 @@ export default function KioskApp() {
       </div>
 
       {/* 카테고리 바로가기 */}
-      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
+      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")} <span style={{ fontWeight:400, color:C.t3, marginLeft:4 }}>{HOME_CATS.length}</span></p>
       {/* 한 줄로 밀어 봅니다. 왼쪽은 화면 여백을 지키고 오른쪽은 열어 둬서
           다음 카드가 걸쳐 보이게 합니다 — 더 있다는 것이 보여야 밉니다. */}
       {/* overflow-x 를 열면 세로도 함께 잘립니다. 카드가 호버로 2px 뜨면서
