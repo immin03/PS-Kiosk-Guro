@@ -540,7 +540,7 @@ export default function FloorPlan({
         {heading && (
           /* 소제목은 화면 어디서나 한 값입니다 — 「카테고리 바로가기」와
              나란히 놓이는데 두께가 달라 층이 다르게 읽혔습니다. */
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#191C20", lineHeight: 1.45 }}>{heading}</p>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#2D373D", lineHeight: 1.45 }}>{heading}</p>
         )}
         <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
           {(() => {
@@ -695,7 +695,7 @@ export default function FloorPlan({
                   (b.w - (color ? 6 : 3)) / runWidth(name)
                 )}
                 fontWeight={color ? 600 : 500}
-                fill={color ? "#191C20" : MARK_TEXT}
+                fill={color ? "#2D373D" : MARK_TEXT}
               >
                 {name}
               </text>

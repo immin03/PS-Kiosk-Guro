@@ -24,7 +24,7 @@ export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) 
 
   return (
     <div style={{
-      minHeight: "100dvh", background: BRAND.wash, backgroundAttachment: "fixed",
+      minHeight: "100dvh", background: "#FFFFFF", /* 바탕은 흰색 하나(2026-11-13, 민트 번짐 걷음) */
       display: "flex", flexDirection: "column",
       alignItems: "center", padding: "0 20px 40px",
     }}>

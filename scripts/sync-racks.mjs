@@ -76,6 +76,20 @@ export const RACK_BY_CODE = Object.fromEntries(RACKS.map((r) => [r.code, r]));
 /* 랙 카테고리. 정본 기준이라 예전 rack-sections.json 보다 이쪽이 맞습니다. */
 export const RACK_CAT = Object.fromEntries(RACKS.map((r) => [r.code, r.cat]));
 export const RACK_ZONE = Object.fromEntries(RACKS.map((r) => [r.code, r.zone]));
+
+/* 매대 안내 문구 — 카테고리마다 영문 이름 · 한 줄 소개 · 이런 분께 · 고르는 기준.
+   하남 매대 안내(QR 손님 페이지)와 같은 정본(racks.json cats[].sign)이라 두 화면 문구가 같습니다(2026-11-13). */
+export const CAT_SIGN = ${JSON.stringify(Object.fromEntries(Object.entries(store.cats || {}).filter(([, c]) => c.sign && (c.sign.head || c.sign.who)).map(([k, c]) => [k, {
+  en: c.sign.en || c.en || "", head: c.sign.head || "", sub: c.sign.headB || "", who: c.sign.who || [],
+  /* 「성분 — 설명」 이 쉼표로 이어져 있음. 설명에 이미 — 가 나온 뒤에 오는 「— 」 있는 조각만 새 줄로
+     (「비타민C, E — …」 가 「비타민C」 · 「E — …」 로 쪼개지던 것) */
+  why: String(c.sign.why || "").split(/,\s*/).reduce((out, part) => {
+    const last = out[out.length - 1];
+    if (last !== undefined && !(last.includes("—") && part.includes("—"))) out[out.length - 1] = last + ", " + part;
+    else out.push(part);
+    return out;
+  }, []).map((w) => w.trim()).filter(Boolean),
+}])), null, 2)};
 `;
 
 /* 프로모션 — 무엇을 먼저 보여줄지는 정본이 정하고, 생김새는 화면이 정합니다. */

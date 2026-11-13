@@ -3,6 +3,9 @@ export const LANGS = ["ko", "en", "zh"];
 
 const STRINGS = {
   "ko": {
+    "whoFor": "이런 분께",
+    "howToPick": "고르는 기준",
+    "rackShort": "매대 {rack}",
     "rackCount": "{n}칸",
     "concernTitle": "요즘 신경 쓰이는 건강 고민",
     "concern.fatigue": "피로",
@@ -163,6 +166,9 @@ const STRINGS = {
     "locationTitle": "제품 위치 안내"
   },
   "en": {
+    "whoFor": "Good for",
+    "howToPick": "How to choose",
+    "rackShort": "Rack {rack}",
     "rackCount": "{n} bays",
     "concernTitle": "Health concerns on your mind",
     "concern.fatigue": "Fatigue",
@@ -399,6 +405,9 @@ const STRINGS = {
     "locationTitle": "Product location"
   },
   "zh": {
+    "whoFor": "适合人群",
+    "howToPick": "选择要点",
+    "rackShort": "货架 {rack}",
     "rackCount": "{n}个货架",
     "concernTitle": "最近在意的健康问题",
     "concern.fatigue": "疲劳",

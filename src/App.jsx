@@ -16,11 +16,19 @@ import PromoBanner from "./PromoBanner.jsx";
 import EntryGate from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { GUIDE_PAGES, CONCERNS } from "./guide.js";
+import { EMOJI as CAT_EMOJI, key as catKey } from "./categories.js";
 
 /* 건강 고민 칩 그림 — 카테고리 카드처럼 이모지 한 글자 */
 /* 홈 묶음 제목 — 샘플(PS-OS 시안) 카드 머리 값: 15 / 600 / 제목색, 아래 12(2026-11-13 「타이틀 신규로 · 간격 여유 있게」) */
-const SECTION_TITLE = { fontSize:15, fontWeight:600, color:"#191C20", margin:"0 0 12px", lineHeight:1.45 };
+const SECTION_TITLE = { fontSize:15, fontWeight:600, color:"#2D373D", margin:"0 0 12px", lineHeight:1.45 };
 const SECTION_GAP = 32;
+/* 목록 · 카드 글자 한 벌(2026-11-13 「다 다르잖아, 통일」) — 제목 14 / 600 검정, 아랫줄 12 / 400 옅은 회색 */
+const LIST_T = { margin:"0 0 2px", fontSize:14, fontWeight:600, color:"#2D373D", lineHeight:1.4 };
+const LIST_S = { margin:0, fontSize:12, fontWeight:400, color:"#98A2AE", lineHeight:1.4 };
+/* 칩 한 꼴 — 건강 고민(누름) · 이런 분께(읽기) 같은 크기 · 테 · 글자(2026-11-13) */
+const CHIP = { display:"inline-flex", alignItems:"center", gap:4, padding:"7px 12px", borderRadius:999, border:"1px solid #E2E5E8",
+  background:"#FFFFFF", fontSize:13, fontWeight:500, color:"#2D373D", whiteSpace:"nowrap", fontFamily:"inherit", lineHeight:1.4 };
+const SECTION_COUNT = { fontSize:13, fontWeight:400, color:"#98A2AE", marginLeft:6 };
 /* 매장 지도 아래 구역 목록 — 원장 구역 차례(브랜드 존은 맨 아래), 칸 수는 원장 랙 수 */
 const ZONE_ORDER = ["건기식", "뷰티", "라이프", "펫", "키즈", "식품·음료", "프로모션", "브랜드존"];
 const ZONE_TYPE = { "건기식":"health", "뷰티":"beauty", "라이프":"life", "펫":"pet", "키즈":"kids", "식품·음료":"life", "프로모션":"life", "브랜드존":"brand" };
@@ -31,7 +39,7 @@ const MAP_ZONES = (() => {
 })();
 const CONCERN_EMOJI = { fatigue:"⚡", sleep_stress:"😴", probiotics:"🦠", immunity:"🛡️", joint:"🦴", liver_hangover:"🍺" };
 import { categoriesOf, countOf } from "./categories.js";
-import { RACK_BY_CODE, RACKS } from "./rackLayout.js";
+import { RACK_BY_CODE, RACKS, CAT_SIGN } from "./rackLayout.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
@@ -219,7 +227,7 @@ function StartButton({ onStart, lang }) {
   );
 }
 
-function TopBar({ title, onBack, isHome, lang, setLang, onStart }) {
+function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub }) {
   return (
     <div style={{ display:"flex", alignItems:"center", padding: isHome ? "14px 20px" : "8px 16px", gap:8,
       background: isHome ? C.bgF : C.wh, position:"sticky", top:0, zIndex:100,
@@ -245,7 +253,11 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart }) {
         </>
       ) : (
         <>
-          <span style={{ flex:1, fontSize:16, fontWeight:700, color:C.t1 }}>{title}</span>
+          {badge && <span style={{ flexShrink:0, display:"grid", placeItems:"center", minWidth:28, height:28, padding:"0 7px", borderRadius:8,
+            background:"#01C0A4", color:"#FFFFFF", fontSize:13, fontWeight:600, fontVariantNumeric:"tabular-nums" }}>{badge}</span>}
+          <span style={{ flex:1, minWidth:0, fontSize:16, fontWeight:700, color:C.t1, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+            {title}{sub && <small style={{ marginLeft:6, fontSize:12, fontWeight:400, color:"#98A2AE" }}>{sub}</small>}
+          </span>
           <StartButton onStart={onStart} lang={lang} />
           <LangToggle lang={lang} setLang={setLang} />
         </>
@@ -265,7 +277,7 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
       <input type="text" placeholder={placeholder || "Search"}
         value={value} onChange={e => onChange(e.target.value)} onFocus={onFocus}
         className="kiosk-input"
-        style={{ border:"none", outline:"none", flex:1, minWidth:0, fontSize:15, fontFamily:"inherit", background:"transparent", color:"#191C20" }} />
+        style={{ border:"none", outline:"none", flex:1, minWidth:0, fontSize:15, fontFamily:"inherit", background:"transparent", color:"#2D373D" }} />
       {value && (
         <button onClick={() => onChange("")} style={{ background:"none", border:"none", cursor:"pointer", padding:"2px 4px",
           display:"flex", color:C.t3 }}><Icon name="x" size={16} color={C.t3} /></button>
@@ -279,27 +291,26 @@ function Loading({ lang }) {
   return <p style={{ textAlign:"center", padding:"32px 0", fontSize:13, color:C.t3, margin:0 }}>{t(lang,"catalogLoading")}</p>;
 }
 
-function ProductCard({ p, onLocate }) {
-  /* 높이를 고정합니다. 긴 목록은 보이는 줄만 그리는데, 몇 번째 줄이 화면에
-     있는지를 이 높이로 셉니다. 이름과 브랜드는 한 줄씩이라 넘치지 않습니다. */
+/* 상품 줄(2026-11-13 개편) — 왼쪽 썸네일 · 브랜드(작게) → 제품명 · 오른쪽 매대 번호(글자만, 화살표 · 상자 없음).
+   카테고리는 카테고리 · 매대 화면 안에서 되풀이라 빼고, 섞여 나오는 검색 결과에만(showCat).
+   상품 사진은 아직 원장에 없어 카테고리 이모지 칸으로 자리만 잡음 — 사진이 생기면 p.img 를 그림.
+   높이는 고정(PRODUCT_ROW_HEIGHT) — 긴 목록은 보이는 줄만 그리며 이 높이로 셈 */
+function ProductCard({ p, onLocate, showCat }) {
+  const emoji = CAT_EMOJI[catKey(p.cat || "")] || "🛍️";
   return (
     <div className="kiosk-product" onClick={() => onLocate?.(p)}
       style={{ display:"flex", gap:12, height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box",
-        borderBottom:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer" }}>
+        borderBottom:"1px solid #EFF1F3", alignItems:"center", cursor:"pointer" }}>
+      <div style={{ width:48, height:48, borderRadius:8, border:"1px solid #EFF1F3", background:"#FFFFFF", flexShrink:0,
+        display:"grid", placeItems:"center", overflow:"hidden" }}>
+        {p.img ? <img src={p.img} alt="" style={{ width:"100%", height:"100%", objectFit:"contain" }} />
+          : <span style={{ fontSize:24, lineHeight:1 }}>{emoji}</span>}
+      </div>
       <div style={{ flex:1, minWidth:0 }}>
-        <p style={{ margin:"0 0 5px", fontSize:14, fontWeight:600, color:C.t1, lineHeight:1.45,
-          overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</p>
-        <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.3,
-          overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.brand} · {p.cat}</p>
+        <p style={{ ...LIST_T, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</p>
+        <p style={{ ...LIST_S, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.brand}{showCat && p.cat ? " · " + p.cat : ""}</p>
       </div>
-      <div className="kiosk-loc" style={{
-        background:C.wh, border:`1px solid ${C.bd}`, borderRadius:8,
-        padding:"6px 10px", display:"flex", alignItems:"center", gap:4,
-        flexShrink:0, marginLeft:8
-      }}>
-        <span style={{ fontSize:12, fontWeight:600, color:C.t1 }}>{p.rack}</span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
+      <span style={{ flexShrink:0, marginLeft:8, fontSize:13, fontWeight:600, color:"#626E7C", fontVariantNumeric:"tabular-nums" }}>{p.rack}</span>
     </div>
   );
 }
@@ -469,7 +480,7 @@ export default function KioskApp() {
                 <p style={{ fontSize:11, color:C.t3, margin:"12px 20px 4px" }}>{t(lang,"resultsCount",{n:searchResults.length})}</p>
                 <div style={{ padding:"0 20px" }}>
                   {searchResults.slice(0,5).map((p,i) => (
-                    <ProductCard key={i} p={p} onLocate={(prod) => {
+                    <ProductCard key={i} p={p} showCat onLocate={(prod) => {
                       doSearch(searchQ); setSearchQ(""); navTo("location",{product:prod});
                     }}/>
                   ))}
@@ -497,16 +508,14 @@ export default function KioskApp() {
         {CONCERNS.map((c) => (
           <button key={c.id} type="button" className="kiosk-chip" onClick={() => {
             setActiveTab("guide"); setNav([{ page:"guide", path: GUIDE_PAGES.topic(c.id) }]);
-          }} style={{ flex:"0 0 auto", display:"inline-flex", alignItems:"center", gap:4, padding:"7px 12px 7px 10px",
-            borderRadius:999, border:`1px solid ${C.bd}`, background:C.wh, cursor:"pointer", fontFamily:"inherit",
-            fontSize:13, fontWeight:500, color:C.t1, whiteSpace:"nowrap" }}>
+          }} style={{ ...CHIP, flex:"0 0 auto", cursor:"pointer" }}>
             <span style={{ fontSize:15, lineHeight:1 }}>{CONCERN_EMOJI[c.id]}</span>{t(lang, c.key)}
           </button>
         ))}
       </div>
 
       {/* 카테고리 바로가기 */}
-      <p style={SECTION_TITLE}>{t(lang,"catShortcut")} <span style={{ fontSize:13, fontWeight:400, color:"#98A2AE", marginLeft:4 }}>{HOME_CATS.length}</span></p>
+      <p style={SECTION_TITLE}>{t(lang,"catShortcut")} <span style={SECTION_COUNT}>{HOME_CATS.length}</span></p>
       {/* 한 줄로 밀어 봅니다. 왼쪽은 화면 여백을 지키고 오른쪽은 열어 둬서
           다음 카드가 걸쳐 보이게 합니다 — 더 있다는 것이 보여야 밉니다. */}
       {/* overflow-x 를 열면 세로도 함께 잘립니다. 카드가 호버로 2px 뜨면서
@@ -534,10 +543,10 @@ export default function KioskApp() {
             }}
           >
             <EmojiChip e={item.emoji} d={36} s={26} mb={6} />
-            <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.45 }}>
+            <p style={LIST_T}>
               {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
             </p>
-            <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.45 }}>
+            <p style={LIST_S}>
               {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type)}
             </p>
           </div>
@@ -585,8 +594,8 @@ export default function KioskApp() {
               border:`1px solid ${C.bd}`, cursor:"pointer"
             }}>
               <EmojiChip e={cat.emoji} d={36} s={26} mb={6} />
-              <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.45 }}>{catLabel(lang,cat)}</p>
-              <p style={{ margin:0, fontSize:11, color:C.t2 }}>{t(lang,"productsCount",{n:cat.count})}</p>
+              <p style={LIST_T}>{catLabel(lang,cat)}</p>
+              <p style={LIST_S}>{t(lang,"productsCount",{n:cat.count})}</p>
             </div>
           ))}
         </div>
@@ -600,16 +609,49 @@ export default function KioskApp() {
     const prods = loaded?.products || [];
     return (
       <div style={{ padding:"16px 20px 24px" }}>
-        {/* 이름은 헤더가 답니다. 여기서 또 적으면 같은 말이 두 줄로 겹칩니다. */}
-        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:16 }}>
-          <EmojiChip e={cat.emoji} d={44} s={28} />
-          <p style={{ margin:0, fontSize:13, color:C.t2 }}>{t(lang,"productsCountZone",{n:cat.count, zone:zoneLabel(lang,cat.zone)||cat.zone, rack:cat.racks})}</p>
-        </div>
-        <div style={{ marginBottom:16 }}>
-          <FloorPlan lang={lang} heading={t(lang,"inStoreLocation")}
-            highlightZone={RACK_BY_CODE[String(cat.racks||"").split(",")[0].trim()]?.zone}/>
-        </div>
-        <p style={{ fontSize:13, fontWeight:700, color:C.t2, margin:"0 0 8px" }}>{prods.length>0?t(lang,"productListN",{n:prods.length}):t(lang,"productList")}</p>
+        {/* 매대 안내(하남 QR 페이지)와 같은 내용 · 차례(2026-11-13): 요약 → 한 줄 소개 → 이런 분께 → 고르는 기준 → 매장 내 위치 → 상품 목록.
+            문구는 PS-OS racks.json cats[].sign(CAT_SIGN) — 두 화면이 같은 정본을 읽음. 이름은 머리줄이 답니다 */}
+        {(() => {
+          const sg = CAT_SIGN[cat.name] || {};
+          const firstRack = String(cat.racks || "").split(",")[0].trim();
+          return (
+            <>
+              {(sg.head || sg.sub) && (
+                <div style={{ padding:"8px 0 4px" }}>
+                  {sg.head && <p style={{ margin:0, fontSize:20, fontWeight:600, color:"#2D373D", lineHeight:1.4, wordBreak:"keep-all" }}>{sg.head}</p>}
+                  {sg.sub && <p style={{ margin:"6px 0 0", fontSize:14, color:"#626E7C", lineHeight:1.6, wordBreak:"keep-all" }}>{sg.sub}</p>}
+                </div>
+              )}
+              {sg.who && sg.who.length > 0 && (
+                <div style={{ marginTop:SECTION_GAP - 4 }}>
+                  <p style={SECTION_TITLE}>{t(lang,"whoFor")}</p>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                    {sg.who.map((w) => <span key={w} style={CHIP}>{w}</span>)}
+                  </div>
+                </div>
+              )}
+              {sg.why && sg.why.length > 0 && (
+                <div style={{ marginTop:SECTION_GAP - 4 }}>
+                  <p style={SECTION_TITLE}>{t(lang,"howToPick")}</p>
+                  {sg.why.map((w, i) => {
+                    const m = /^(.+?)\s+[—-]\s+(.+)$/.exec(w);
+                    return (
+                      <div key={i} style={{ padding:"12px 0", borderTop: i ? "1px solid #EFF1F3" : "1px solid #E2E5E8" }}>
+                        <p style={LIST_T}>{m ? m[1] : w}</p>
+                        {m && <p style={LIST_S}>{m[2]}</p>}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <div style={{ marginTop:SECTION_GAP - 4, marginBottom:SECTION_GAP - 4 }}>
+                <FloorPlan lang={lang} heading={t(lang,"inStoreLocation")}
+                  highlightZone={RACK_BY_CODE[firstRack]?.zone}/>
+              </div>
+            </>
+          );
+        })()}
+        <p style={SECTION_TITLE}>{t(lang,"productList")}{prods.length>0 && <span style={SECTION_COUNT}>{prods.length}</span>}</p>
         {!loaded ? <Loading lang={lang}/>
           : prods.length>0 ? (
             <VirtualProductList items={prods} itemKey={(p,i) => `${productKey(p)}|${i}`}
@@ -723,7 +765,7 @@ export default function KioskApp() {
               <p style={{ fontSize:12, color:C.t2, margin:"0 0 8px" }}><strong style={{color:C.t1}}>"{searchQ}"</strong> {t(lang,"productsCount",{n:searchResults.length})}</p>
               {/* 「비타민」 하나에 수백 줄이 나옵니다. 보이는 줄만 그립니다. */}
               <VirtualProductList items={searchResults} itemKey={(p,i) => `${productKey(p)}|${i}`}
-                renderItem={(p) => <ProductCard p={p} onLocate={(prod) => { doSearch(searchQ); navTo("location",{product:prod}); }}/>}/>
+                renderItem={(p) => <ProductCard p={p} showCat onLocate={(prod) => { doSearch(searchQ); navTo("location",{product:prod}); }}/>}/>
             </div>
           ) : (
             <div style={{ textAlign:"center", padding:"40px 20px" }}>
@@ -757,10 +799,10 @@ export default function KioskApp() {
                 >
                   <EmojiChip e={item.emoji} d={44} s={28} />
                   <div style={{ flex:1 }}>
-                    <p style={{ margin:"0 0 7px", fontSize:14, fontWeight:600, lineHeight:1.45 }}>
+                    <p style={LIST_T}>
                       {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
                     </p>
-                    <p style={{ margin:0, fontSize:12, color:C.t3 }}>
+                    <p style={LIST_S}>
                       {item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type)}
                     </p>
                   </div>
@@ -802,7 +844,7 @@ export default function KioskApp() {
             display:"flex", alignItems:"center", gap:10, padding:"13px 4px", cursor: z.type ? "pointer" : "default",
             borderTop: i ? "1px solid #EFF1F3" : "none" }}>
             <span style={{ width:10, height:10, borderRadius:2, background: ZONE_COLOR[z.zone] || ZONE_FALLBACK, flexShrink:0 }} />
-            <span style={{ flex:1, fontSize:14, fontWeight:500, color:"#191C20" }}>{zoneLabel(lang, z.zone) || z.zone}</span>
+            <span style={{ ...LIST_T, margin:0, flex:1 }}>{zoneLabel(lang, z.zone) || z.zone}</span>
             <span style={{ fontSize:13, color:"#98A2AE", fontVariantNumeric:"tabular-nums" }}>{t(lang,"rackCount",{n:z.n})}</span>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ display:"block", flexShrink:0 }}><path d="M6 3.5 10.5 8 6 12.5" stroke="#98A2AE" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
@@ -934,7 +976,7 @@ export default function KioskApp() {
         {/* 이 제품을 찾은 고객은 이 제품도 봤어요 */}
         {related.length>0 && (
           <div>
-            <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 12px" }}>{t(lang,"relatedAlso")}</p>
+            <p style={SECTION_TITLE}>{t(lang,"relatedAlso")}</p>
             <div style={{ display:"flex", gap:12, overflowX:"auto", marginLeft:-20, marginRight:-20, paddingLeft:20, paddingRight:20, paddingTop:8, paddingBottom:12 }}>
               {related.map((r,i) => (
                 <ThumbCard key={i} lang={lang} p={r} onPress={() => {
@@ -1022,7 +1064,8 @@ export default function KioskApp() {
       .kiosk-tag:hover{background:${BRAND.accentTint}!important;border-color:${C.pri}!important}
       .kiosk-tag:active{transform:scale(0.95)}
       .kiosk-product{transition:background 0.15s,box-shadow 0.15s!important}
-      .kiosk-product:hover{background:${C.bgF}!important;box-shadow:-20px 0 0 ${C.bgF},20px 0 0 ${C.bgF}!important}
+      /* 상품 줄 호버는 회색 면 대신 제품명만 민트(2026-11-13 「이상한 그레이 호버 쓰지 마」) */
+      @media (hover:hover){.kiosk-product:hover > div > p:first-child{color:#01C0A4!important}}
       .kiosk-btn{transition:opacity 0.15s,transform 0.1s!important}
       .kiosk-btn:hover{opacity:0.85}
       .kiosk-btn:active{transform:scale(0.97)}
@@ -1037,6 +1080,8 @@ export default function KioskApp() {
     <div style={{ maxWidth:SHELL_MAX, margin:"0 auto", background:C.bgF,
       fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:64 }}>
       <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}
+        badge={cur.page==="catDetail" ? String(cur.cat?.racks || "").split(",")[0].trim() : undefined}
+        sub={cur.page==="catDetail" ? (CAT_SIGN[cur.cat?.name] || {}).en : undefined}
         onStart={() => { setEntered(false); setNav([{ page:"home" }]); setActiveTab("home"); setSearchQ(""); window.scrollTo({ top:0 }); }}/>
       <div>{renderPage()}</div>
 
@@ -1044,6 +1089,11 @@ export default function KioskApp() {
       <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
         width:"100%", maxWidth:SHELL_MAX, background:C.wh,
         borderTop:`1px solid ${C.bd}`, display:"flex", zIndex:100 }}>
+        {/* 고른 탭 위의 민트 선 하나가 옆으로 미끄러져 옮겨 감(2026-11-13) */}
+        {(() => { const idx = tabs.findIndex((x) => x.id === activeTab); return idx < 0 ? null : (
+          <span aria-hidden="true" style={{ position:"absolute", top:-1, left:`${(100 / tabs.length) * idx}%`, width:`${100 / tabs.length}%`,
+            height:2.5, background:C.pri, transition:"left .28s cubic-bezier(.4,0,.2,1)", pointerEvents:"none" }} />
+        ); })()}
         {tabs.map(tab => {
           const isA = activeTab===tab.id;
           return (
@@ -1055,7 +1105,6 @@ export default function KioskApp() {
               flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
               background:"none", border:"none", cursor:"pointer", padding:"14px 6px 18px",
               fontFamily:"inherit", minWidth:0,
-              borderTop: isA ? `2.5px solid ${C.pri}` : "2.5px solid transparent",
             }}>
               <span style={{
                 fontSize:13, fontWeight: isA ? 700 : 500,
