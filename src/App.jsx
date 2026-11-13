@@ -14,6 +14,11 @@ import {
 import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
 import EntryGate from "./EntryGate.jsx";
+import GuideFrame from "./GuideFrame.jsx";
+import { GUIDE_PAGES, CONCERNS } from "./guide.js";
+
+/* 건강 고민 칩 그림 — 카테고리 카드처럼 이모지 한 글자 */
+const CONCERN_EMOJI = { fatigue:"⚡", sleep_stress:"😴", probiotics:"🦠", immunity:"🛡️", joint:"🦴", liver_hangover:"🍺" };
 import { categoriesOf, countOf } from "./categories.js";
 import { RACK_BY_CODE } from "./rackLayout.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
@@ -196,11 +201,8 @@ function LangToggle({ lang, setLang }) {
 function StartButton({ onStart, lang }) {
   if (!onStart) return null;
   return (
-    <button type="button" onClick={onStart} aria-label={t(lang,"gateBack")} style={{ background:"none", border:`1px solid ${C.bd}`, cursor:"pointer",
-      padding:"4px 10px", display:"flex", alignItems:"center", gap:4, borderRadius:999, fontFamily:"inherit", fontSize:12, fontWeight:600, color:C.t2, flexShrink:0 }}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>
-      </svg>
+    <button type="button" onClick={onStart} className="kiosk-start-btn" style={{ background:"none", border:"none", cursor:"pointer",
+      padding:"6px 8px", borderRadius:8, fontFamily:"inherit", fontSize:12, fontWeight:500, color:C.t3, flexShrink:0, whiteSpace:"nowrap" }}>
       {t(lang,"gateBack")}
     </button>
   );
@@ -243,16 +245,16 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart }) {
 
 function SearchBar({ value, onChange, placeholder, onFocus }) {
   return (
-    <div style={{
-      display:"flex", alignItems:"center", background:C.wh, borderRadius:8,
-      padding:"16px 16px", border:`1px solid ${C.bd}`, gap:10,
-      boxShadow:"0 2px 10px rgba(45,55,61,0.05)"
+    /* 샘플 홈 검색칸 꼴(2026-11-13): 그림자 없음 · 회색 돋보기 · 올리거나 누르면 테두리 민트 */
+    <div className="kiosk-search" style={{
+      display:"flex", alignItems:"center", background:"#FFFFFF", borderRadius:8, boxSizing:"border-box",
+      height:48, padding:"0 14px", border:"1px solid #E2E5E8", gap:8, transition:"border-color .15s",
     }}>
-      <span style={{ color:C.priM, flexShrink:0, display:"flex" }}><Icon name="search" size={20} color={C.priM} /></span>
+      <span style={{ flexShrink:0, display:"flex" }}><Icon name="search" size={18} color="#98A2AE" /></span>
       <input type="text" placeholder={placeholder || "Search"}
         value={value} onChange={e => onChange(e.target.value)} onFocus={onFocus}
         className="kiosk-input"
-        style={{ border:"none", outline:"none", flex:1, fontSize:16, fontFamily:"inherit", background:"transparent", color:C.t1 }} />
+        style={{ border:"none", outline:"none", flex:1, minWidth:0, fontSize:15, fontFamily:"inherit", background:"transparent", color:"#191C20" }} />
       {value && (
         <button onClick={() => onChange("")} style={{ background:"none", border:"none", cursor:"pointer", padding:"2px 4px",
           display:"flex", color:C.t3 }}><Icon name="x" size={16} color={C.t3} /></button>
@@ -404,7 +406,7 @@ export default function KioskApp() {
       setLang(DEFAULT_LANG);
       window.scrollTo({ top: 0 });
     };
-    const arm = () => { clearTimeout(timer); timer = setTimeout(reset, IDLE_RESET_MS); };
+    const arm = () => { clearTimeout(timer); timer = setTimeout(reset, cur.page === "guide" ? 300_000 : IDLE_RESET_MS); };
     const events = ["pointerdown", "keydown", "wheel", "touchstart"];
     events.forEach((e) => window.addEventListener(e, arm, { passive: true }));
     arm();
@@ -476,6 +478,22 @@ export default function KioskApp() {
         )}
       </div>
 
+      {/* 요즘 신경 쓰이는 건강 고민 — 누르면 건강 가이드의 그 주제로(2026-11-13 샘플에서 가져옴).
+          칩은 한 줄로 밀어 보고, 올리면 테두리만 민트(회색 면 호버 없음) */}
+      <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"concernTitle")}</p>
+      <div className="kiosk-swipe" style={{ display:"flex", gap:8, overflowX:"auto", scrollbarWidth:"none",
+        margin:"0 -20px 24px", padding:"0 20px" }}>
+        {CONCERNS.map((c) => (
+          <button key={c.id} type="button" className="kiosk-chip" onClick={() => {
+            setActiveTab("guide"); setNav([{ page:"guide", path: GUIDE_PAGES.topic(c.id) }]);
+          }} style={{ flex:"0 0 auto", display:"inline-flex", alignItems:"center", gap:6, padding:"9px 14px 9px 12px",
+            borderRadius:999, border:`1px solid ${C.bd}`, background:C.wh, cursor:"pointer", fontFamily:"inherit",
+            fontSize:13, fontWeight:500, color:C.t1, whiteSpace:"nowrap" }}>
+            <span style={{ fontSize:15, lineHeight:1 }}>{CONCERN_EMOJI[c.id]}</span>{t(lang, c.key)}
+          </button>
+        ))}
+      </div>
+
       {/* 카테고리 바로가기 */}
       <p style={{ fontSize:13, fontWeight:700, color:C.t1, margin:"0 0 10px", letterSpacing:"-0.01em" }}>{t(lang,"catShortcut")}</p>
       {/* 한 줄로 밀어 봅니다. 왼쪽은 화면 여백을 지키고 오른쪽은 열어 둬서
@@ -498,13 +516,14 @@ export default function KioskApp() {
             onClick={() => item.type === "findBrand" ? navTo("brand") : navTo("catList",{catType:item.type})}
             className="kiosk-card"
             style={{
-              background:C.wh, borderRadius:8, padding:"20px 12px", border:`1px solid ${C.bd}`, cursor:"pointer",
+              /* 높이를 줄임(2026-11-13 「박스가 너무 길어」) — 위아래 20 → 12, 그림 칸 46 → 36 */
+              background:C.wh, borderRadius:8, padding:"12px 10px", border:`1px solid ${C.bd}`, cursor:"pointer",
               display:"flex", flexDirection:"column", alignItems:"center", textAlign:"center",
-              flex:"0 0 auto", width:118
+              flex:"0 0 auto", width:110
             }}
           >
-            <EmojiChip e={item.emoji} d={46} s={30} mb={10} />
-            <p style={{ margin:"0 0 6px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.45 }}>
+            <EmojiChip e={item.emoji} d={36} s={26} mb={6} />
+            <p style={{ margin:"0 0 2px", fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.45 }}>
               {item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type)}
             </p>
             <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.45 }}>
@@ -929,6 +948,7 @@ export default function KioskApp() {
     search: t(lang,"tabSearch"),
     map: t(lang,"storeMap"),
     location: t(lang,"locationTitle"),
+    guide: t(lang,"tabGuide"),
   };
 
   const renderPage = () => {
@@ -940,6 +960,7 @@ export default function KioskApp() {
       case "brandDetail": return renderBrandDetail();
       case "search": return renderSearch();
       case "map": return renderMap();
+      case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.survey} lang={lang} />;
       case "location": return renderLocation();
       default: return renderHome();
     }
@@ -948,6 +969,7 @@ export default function KioskApp() {
   const tabs = [
     { id:"home", label:t(lang,"tabHome") },
     { id:"search", label:t(lang,"tabSearch") },
+    { id:"guide", label:t(lang,"tabGuide") },
     { id:"map", label:t(lang,"storeMap") },
   ];
 
@@ -977,6 +999,12 @@ export default function KioskApp() {
       .kiosk-tag{transition:background 0.15s,border-color 0.15s,transform 0.1s!important}
       html,body{background:${C.bgF}}
       .kiosk-swipe::-webkit-scrollbar{display:none}
+      .kiosk-chip{transition:border-color .15s,color .15s}
+      @media (hover:hover){.kiosk-chip:hover{border-color:${C.pri}!important}}
+      .kiosk-search:focus-within{border-color:#01C0A4!important}
+      .kiosk-input::placeholder{color:#98A2AE!important}
+      @media (hover:hover){.kiosk-search:hover{border-color:#01C0A4!important}}
+      @media (hover:hover){.kiosk-start-btn:hover{background:${C.bgF}!important;color:${C.t1}!important}}
       .kiosk-input::placeholder{color:${BRAND.hint}}
       .kiosk-tag:hover{background:${BRAND.accentTint}!important;border-color:${C.pri}!important}
       .kiosk-tag:active{transform:scale(0.95)}
@@ -999,7 +1027,7 @@ export default function KioskApp() {
         onStart={() => { setEntered(false); setNav([{ page:"home" }]); setActiveTab("home"); setSearchQ(""); window.scrollTo({ top:0 }); }}/>
       <div>{renderPage()}</div>
 
-      {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline */}
+      {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline(배포본 꼴 그대로). 탭에 건강 가이드만 더함(2026-11-13) */}
       <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
         width:"100%", maxWidth:SHELL_MAX, background:C.wh,
         borderTop:`1px solid ${C.bd}`, display:"flex", zIndex:100 }}>
@@ -1008,7 +1036,7 @@ export default function KioskApp() {
           return (
             <button key={tab.id} onClick={() => {
               setActiveTab(tab.id);
-              setNav([{ page:tab.id }]);
+              setNav([{ page:tab.id, ...(tab.id === "guide" ? { path: GUIDE_PAGES.survey } : {}) }]);
               if(tab.id==="search") setSearchQ("");
             }} className="kiosk-nav-btn" style={{
               flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
