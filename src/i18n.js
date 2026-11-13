@@ -3,6 +3,7 @@ export const LANGS = ["ko", "en", "zh"];
 
 const STRINGS = {
   "ko": {
+    "rackCount": "{n}칸",
     "concernTitle": "요즘 신경 쓰이는 건강 고민",
     "concern.fatigue": "피로",
     "concern.sleep": "수면 · 스트레스",
@@ -55,7 +56,7 @@ const STRINGS = {
     "mark.앤드3": "앤드3",
     "mark.앤드4": "앤드4",
     "mark.앤드5": "앤드5",
-    "zone.뷰티": "뷰티 · 라이프 스타일",
+    "zone.뷰티": "뷰티",
     "zone.펫": "펫",
     "zone.키즈": "키즈",
     "zone.라이프": "라이프 스타일",
@@ -162,6 +163,7 @@ const STRINGS = {
     "locationTitle": "제품 위치 안내"
   },
   "en": {
+    "rackCount": "{n} bays",
     "concernTitle": "Health concerns on your mind",
     "concern.fatigue": "Fatigue",
     "concern.sleep": "Sleep · stress",
@@ -214,7 +216,7 @@ const STRINGS = {
     "mark.앤드3": "End 3",
     "mark.앤드4": "End 4",
     "mark.앤드5": "End 5",
-    "zone.뷰티": "Beauty · Lifestyle",
+    "zone.뷰티": "Beauty",
     "zone.펫": "Pet",
     "zone.키즈": "Kids",
     "zone.라이프": "Living & Hygiene",
@@ -397,6 +399,7 @@ const STRINGS = {
     "locationTitle": "Product location"
   },
   "zh": {
+    "rackCount": "{n}个货架",
     "concernTitle": "最近在意的健康问题",
     "concern.fatigue": "疲劳",
     "concern.sleep": "睡眠 · 压力",
@@ -449,7 +452,7 @@ const STRINGS = {
     "mark.앤드3": "端架3",
     "mark.앤드4": "端架4",
     "mark.앤드5": "端架5",
-    "zone.뷰티": "美妆 · 生活",
+    "zone.뷰티": "美妆",
     "zone.펫": "宠物",
     "zone.키즈": "儿童",
     "zone.라이프": "生活用品",

@@ -21,9 +21,17 @@ import { GUIDE_PAGES, CONCERNS } from "./guide.js";
 /* 홈 묶음 제목 — 샘플(PS-OS 시안) 카드 머리 값: 15 / 600 / 제목색, 아래 12(2026-11-13 「타이틀 신규로 · 간격 여유 있게」) */
 const SECTION_TITLE = { fontSize:15, fontWeight:600, color:"#191C20", margin:"0 0 12px", lineHeight:1.45 };
 const SECTION_GAP = 32;
+/* 매장 지도 아래 구역 목록 — 원장 구역 차례(브랜드 존은 맨 아래), 칸 수는 원장 랙 수 */
+const ZONE_ORDER = ["건기식", "뷰티", "라이프", "펫", "키즈", "식품·음료", "프로모션", "브랜드존"];
+const ZONE_TYPE = { "건기식":"health", "뷰티":"beauty", "라이프":"life", "펫":"pet", "키즈":"kids", "식품·음료":"life", "프로모션":"life", "브랜드존":"brand" };
+const MAP_ZONES = (() => {
+  const n = {};
+  RACKS.forEach((r) => { n[r.zone] = (n[r.zone] || 0) + 1; });
+  return ZONE_ORDER.filter((z) => n[z]).map((z) => ({ zone: z, n: n[z], type: ZONE_TYPE[z] }));
+})();
 const CONCERN_EMOJI = { fatigue:"⚡", sleep_stress:"😴", probiotics:"🦠", immunity:"🛡️", joint:"🦴", liver_hangover:"🍺" };
 import { categoriesOf, countOf } from "./categories.js";
-import { RACK_BY_CODE } from "./rackLayout.js";
+import { RACK_BY_CODE, RACKS } from "./rackLayout.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK } from "./theme.js";
 
 /* 옛 존 코드(A~E)는 랙 코드 앞글자에서 나옵니다. 카테고리 화면 이동에 그대로 씁니다. */
@@ -786,20 +794,20 @@ export default function KioskApp() {
           if (zone) navTo("catList", { catType: zone.catType });
         }}/>
       </div>
-      {ZONES_MAP.map(z => (
-        <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-          display:"flex", gap:12, marginBottom:8, background:C.wh, borderRadius:8,
-          padding:"14px 16px", border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
-        }}>
-          <div style={{ width:38, height:38, borderRadius:8, background:chipColor(z), flexShrink:0,
-            display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:15 }}>{z.id}</div>
-          <div style={{ flex:1 }}>
-            <p style={{ margin:"0 0 3px", fontSize:14, fontWeight:600, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
-            <p style={{ margin:0, fontSize:12, color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
+      {/* 구역 목록 — PS-OS 매장 배치 원장(racks.json)의 구역 그대로, 브랜드 존은 맨 아래(2026-11-13 사용자).
+          PS-OS 「구역」 표처럼 색 네모 · 이름 · 칸 수 한 줄, 상자 없음. 옛 A~E 글자 카드는 지도에 없는 글자라 걷음 */}
+      <div style={{ marginTop:20 }}>
+        {MAP_ZONES.map((z, i) => (
+          <div key={z.zone} className="kiosk-zone-row" onClick={() => z.type && navTo("catList",{catType:z.type})} style={{
+            display:"flex", alignItems:"center", gap:10, padding:"13px 4px", cursor: z.type ? "pointer" : "default",
+            borderTop: i ? "1px solid #EFF1F3" : "none" }}>
+            <span style={{ width:10, height:10, borderRadius:2, background: ZONE_COLOR[z.zone] || ZONE_FALLBACK, flexShrink:0 }} />
+            <span style={{ flex:1, fontSize:14, fontWeight:500, color:"#191C20" }}>{zoneLabel(lang, z.zone) || z.zone}</span>
+            <span style={{ fontSize:13, color:"#98A2AE", fontVariantNumeric:"tabular-nums" }}>{t(lang,"rackCount",{n:z.n})}</span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ display:"block", flexShrink:0 }}><path d="M6 3.5 10.5 8 6 12.5" stroke="#98A2AE" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.t3} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:"block",opacity:0.5}}><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 
@@ -1003,6 +1011,8 @@ export default function KioskApp() {
       html,body{background:${C.bgF}}
       .kiosk-swipe::-webkit-scrollbar{display:none}
       .kiosk-chip{transition:border-color .15s,color .15s}
+      .kiosk-map-btn{transition:border-color .15s}
+      @media (hover:hover){.kiosk-map-btn:not(:disabled):hover{border-color:#01C0A4!important}.kiosk-zone-row:hover span:nth-child(2){color:#01C0A4}}
       @media (hover:hover){.kiosk-chip:hover{border-color:${C.pri}!important}}
       .kiosk-search:focus-within{border-color:#01C0A4!important}
       .kiosk-input::placeholder{color:#98A2AE!important}

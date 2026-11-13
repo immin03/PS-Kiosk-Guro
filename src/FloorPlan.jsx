@@ -10,8 +10,8 @@ import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from ".
  * 이제 랙 하나하나가 제 자리에 그려지고, 경로는 실제로 비어 있는 칸만 밟습니다.
  */
 
-const MARK_FILL = "#E5E5E5";
-const MARK_TEXT = "#2D373D";
+const MARK_FILL = "#EFF1F3"; // 집기(계산대 · 입구 · 체험존) — 옅은 회색 한 칸(PS-OS line-soft)
+const MARK_TEXT = "#626E7C";
 
 /* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 지도의 집기 이름과 같아야 합니다. */
 export const ORIGIN_MARK = "엘리베이터 입구";
@@ -525,11 +525,12 @@ export default function FloorPlan({
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
 
+  /* PS-OS 보조 버튼 꼴(흰 면 · 테두리 · 모서리 8 · 30 칸) — 글자 기호 대신 선 그림, 올리면 테두리 민트(2026-11-13) */
   const btn = {
-    width: 26, height: 26, borderRadius: 8, border: `1px solid ${BRAND.border}`,
-    background: BRAND.surface, color: BRAND.text, fontSize: 14, fontWeight: 600,
-    lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+    width: 30, height: 30, borderRadius: 8, border: "1px solid #E2E5E8", padding: 0,
+    background: "#FFFFFF", color: "#2D373D", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
   };
+  const ico = (d) => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>;
 
   return (
     <div style={{ position: "relative" }}>
@@ -547,15 +548,16 @@ export default function FloorPlan({
             return (
               <button
                 type="button" aria-label="지도 원래대로" disabled={!on}
-                style={{ ...btn, fontSize: 15, opacity: on ? 1 : 0.35, cursor: on ? "pointer" : "default" }}
+                className="kiosk-map-btn"
+                style={{ ...btn, opacity: on ? 1 : 0.35, cursor: on ? "pointer" : "default" }}
                 onClick={resetView}
               >
-                ↺
+                {ico(<><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></>)}
               </button>
             );
           })()}
-          <button type="button" aria-label="지도 확대" style={btn} onClick={() => zoomBy(1.4)}>+</button>
-          <button type="button" aria-label="지도 축소" style={btn} onClick={() => zoomBy(1 / 1.4)}>−</button>
+          <button type="button" aria-label="지도 확대" className="kiosk-map-btn" style={btn} onClick={() => zoomBy(1.4)}>{ico(<><path d="M12 5v14"/><path d="M5 12h14"/></>)}</button>
+          <button type="button" aria-label="지도 축소" className="kiosk-map-btn" style={btn} onClick={() => zoomBy(1 / 1.4)}>{ico(<path d="M5 12h14"/>)}</button>
         </div>
       </div>
 
@@ -679,9 +681,9 @@ export default function FloorPlan({
             >
               <rect
                 x={b.x} y={b.y} width={b.w} height={b.h} rx="1.6"
-                fill={color || MARK_FILL} fillOpacity={color ? 0.14 : 1}
-                stroke={color || "none"} strokeOpacity={color ? 0.55 : 0}
-                strokeWidth={color ? 0.3 : 0}
+                fill={color || MARK_FILL} fillOpacity={color ? 0.1 : 1}
+                stroke={color || "none"} strokeOpacity={color ? 0.45 : 0}
+                strokeWidth={color ? 0.2 : 0}
               />
               {color && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
               <text
@@ -692,8 +694,8 @@ export default function FloorPlan({
                   color ? 2.6 : 2.1,
                   (b.w - (color ? 6 : 3)) / runWidth(name)
                 )}
-                fontWeight={color ? 700 : 500}
-                fill={color ? BRAND.text : MARK_TEXT}
+                fontWeight={color ? 600 : 500}
+                fill={color ? "#191C20" : MARK_TEXT}
               >
                 {name}
               </text>
@@ -712,7 +714,7 @@ export default function FloorPlan({
               {b.range && (
                 <text
                   x={b.x + 2.6} y={b.y + 6.6}
-                  fontSize="2.1" fontWeight="600" fill={color} fillOpacity="0.85"
+                  fontSize="2.1" fontWeight="500" fill="#626E7C"
                 >
                   {b.range}
                 </text>
