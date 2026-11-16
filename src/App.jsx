@@ -303,11 +303,13 @@ export default function KioskApp() {
   const [entered, setEntered] = useState(
     () => new URLSearchParams(window.location.search).get("start") !== "gate"
   );
-  const [nav, setNav] = useState([{ page:"home" }]);
+  /* ?tab=search · map · guide 로 열면 그 탭에서 시작(2026-11-17) — 건강 가이드 바닥 탭이 키오스크 탭으로 넘어올 때 쓴다 */
+  const TAB0 = (() => { const v = new URLSearchParams(window.location.search).get("tab"); return ["home","search","guide","map"].includes(v) ? v : "home"; })();
+  const [nav, setNav] = useState([{ page:TAB0 }]);
   const cur = nav[nav.length - 1];
   const push = useCallback((pg) => setNav(p => [...p, pg]), []);
   const pop = useCallback(() => setNav(p => p.length > 1 ? p.slice(0,-1) : p), []);
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState(TAB0);
   const [searchQ, setSearchQ] = useState("");
   const [brandQ, setBrandQ] = useState("");
   const [infoOpen, setInfoOpen] = useState(false);
