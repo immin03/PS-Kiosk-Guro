@@ -12,7 +12,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test",
-    "sync:racks": "node scripts/sync-racks.mjs && node scripts/publish-catalog.mjs",
+    "sync:racks": "node scripts/sync-racks.mjs && node scripts/sync-products.mjs && node scripts/publish-catalog.mjs",
     "check:racks": "node scripts/sync-racks.mjs --check"
   },
   "dependencies": {
