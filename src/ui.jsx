@@ -129,17 +129,22 @@ export function Btn({ children, onClick, kind = "primary", full = true }) {
 /* 고르기 칸 — 옅은 회색 판 위 고른 칸만 흰색. 글자는 위아래 가운데(높이 고정 · line-height 1) */
 export function Seg({ items, value, onChange, small, full }) {
   const h = small ? 26 : 36;
+  /* 고른 칸의 흰 판이 옆으로 미끄러진다(2026-11-17 「슬라이드 기능 · 좌우 폭 줄여」) — 칸 폭을 똑같이 나눠 판 하나를 칸 수만큼 옮긴다.
+     작은 것(언어)은 칸 30 · 사이 0 으로 좁힘(전엔 34 + 사이 2) */
+  const n = items.length, at = Math.max(0, items.findIndex(([id]) => id === value));
   return (
-    <div className="ui-seg" role="group" style={{ display: "flex", gap: 2, padding: 3, borderRadius: small ? 999 : 10, background: PLATE,
-      width: full ? "100%" : undefined, boxSizing: "border-box", flexShrink: 0 }}>
+    <div className="ui-seg" role="group" style={{ position: "relative", display: full ? "grid" : "inline-grid", gridTemplateColumns: `repeat(${n}, 1fr)`,
+      padding: 3, borderRadius: small ? 999 : 10, background: PLATE, width: full ? "100%" : undefined, boxSizing: "border-box", flexShrink: 0 }}>
+      <span aria-hidden="true" style={{ position: "absolute", top: 3, left: 3, width: `calc((100% - 6px) / ${n})`, height: h, borderRadius: small ? 999 : 8,
+        background: "#FFFFFF", boxShadow: "0 1px 2px rgba(45,55,61,.12)", transform: `translateX(${at * 100}%)`,
+        transition: "transform .22s cubic-bezier(.3,.7,.2,1)", pointerEvents: "none" }} />
       {items.map(([id, label]) => {
         const on = id === value;
         return (
-          <button key={id} type="button" aria-pressed={on} onClick={() => onChange(id)} style={{ flex: full ? 1 : "0 0 auto",
-            minWidth: small ? 34 : undefined, height: h, padding: small ? "0 8px" : "0 14px", border: "none", borderRadius: small ? 999 : 8,
-            background: on ? "#FFFFFF" : "transparent", boxShadow: on ? "0 1px 2px rgba(45,55,61,.12)" : "none",
-            color: on ? INK : MUTED, fontFamily: "inherit", fontSize: small ? 12 : 14, fontWeight: on ? 600 : 500,
-            lineHeight: 1, display: "grid", placeItems: "center", cursor: "pointer" }}>{label}</button>
+          <button key={id} type="button" aria-pressed={on} onClick={() => onChange(id)} style={{ position: "relative",
+            minWidth: small ? 30 : undefined, height: h, padding: small ? "0 4px" : "0 14px", border: "none", borderRadius: small ? 999 : 8,
+            background: "transparent", color: on ? INK : MUTED, fontFamily: "inherit", fontSize: small ? 12 : 14, fontWeight: on ? 600 : 500,
+            lineHeight: 1, display: "grid", placeItems: "center", cursor: "pointer", transition: "color .22s ease" }}>{label}</button>
         );
       })}
     </div>
