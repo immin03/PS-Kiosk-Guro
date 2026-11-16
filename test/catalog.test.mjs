@@ -5,7 +5,7 @@ import { getVirtualRange, filterProducts, productKey, PRODUCT_ROW_HEIGHT } from 
 import { buildStats, buildRelease } from "../scripts/publish-catalog.mjs";
 import { createCatalogClient } from "../src/data/catalogClient.js";
 import { resolveBaseRelativeUrl } from "../src/baseRelativeUrl.js";
-import { ALL_PRODUCTS, ALL_BRANDS } from "../src/catalogData.js";
+import { ALL_PRODUCTS, ALL_BRANDS } from "../src/stores/guro/catalogData.js"; /* 시험은 구로(기본 지점) 기준 */
 import { CATEGORIES, categoriesOf, productsOf } from "../src/categories.js";
 import { COUNT_BY_RACK, COUNT_BY_BRAND, STOCKED_BRANDS } from "../src/catalogStats.js";
 import { RACK_BY_CODE } from "../src/rackLayout.js";

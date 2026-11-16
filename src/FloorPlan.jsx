@@ -1,5 +1,8 @@
 import { useMemo, useRef, useEffect, useState } from "react";
-import { GRID, MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
+import { GRID, MARKS as ALL_MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
+import { STORE_CONFIG } from "./store.js";
+/* 지점이 숨기라 한 집기는 처음부터 뺀다(하남 기둥 · 바구니 등) */
+const MARKS = STORE_CONFIG.hideMarks ? ALL_MARKS.filter((m) => !STORE_CONFIG.hideMarks.test(m.kind)) : ALL_MARKS;
 import { zoneLabel, markLabel, t } from "./i18n.js";
 import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
 
@@ -14,7 +17,8 @@ const MARK_FILL = "#EFF1F3"; // 집기(계산대 · 입구 · 체험존) — 옅
 const MARK_TEXT = "#626E7C";
 
 /* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 지도의 집기 이름과 같아야 합니다. */
-export const ORIGIN_MARK = "엘리베이터 입구";
+/* 지도 시작 자리(현재 위치) — 지점 설정(src/store.js)에서. 구로 엘리베이터 입구 · 하남 입구 */
+export const ORIGIN_MARK = STORE_CONFIG.origin;
 
 /* 길 안내에 이름을 댈 만한 집기. 앤드1~4 같은 내부 용어는 제외합니다. */
 const WAYPOINT = /입구|계산|파마베스트|체험존|행사|음료/;
@@ -417,7 +421,8 @@ export default function FloorPlan({
   /* 처음에는 존 덩어리만 보여 매장 구조가 한눈에 들어오게 하고,
      블록을 누르면 그 안의 랙 이름을 폅니다. */
   const [openBlock, setOpenBlock] = useState(null);
-  const grouped = detail === "all" && !target && !openBlock;
+  /* 구역 도식(SCHEMATIC)은 구로 손그림이라 구로에서만. 하남은 PS-OS 배치 그대로 랙 지도로 시작(2026-11-17) */
+  const grouped = STORE_CONFIG.schematic && detail === "all" && !target && !openBlock;
   const box = useRef(null);
   const gesture = useRef(null);
 
@@ -585,7 +590,7 @@ export default function FloorPlan({
         aria-label={
           target
             ? `매장 지도 — ${target.code} ${target.cat} 위치`
-            : "파마스퀘어 구로점 매장 지도"
+            : "파마스퀘어 " + STORE_CONFIG.name + " 매장 지도"
         }
       >
         <rect x={FULL.x} y={FULL.y} width={FULL.w} height={FULL.h} rx="1.5" fill="#FFFFFF" />

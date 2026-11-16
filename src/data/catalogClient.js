@@ -10,6 +10,7 @@
  *   지워 다음에 다시 시도합니다.
  */
 import { resolveBaseRelativeUrl } from "../baseRelativeUrl.js";
+import { STORE } from "../store.js";
 
 const trim = (value) => String(value || "").replace(/^\/+|\/+$/g, "");
 const joinUrl = (base, child) => `${String(base || ".").replace(/\/+$/, "")}/${trim(child)}`;
@@ -79,4 +80,5 @@ export function createCatalogClient({ dataRoot = "./data", fetchJson = defaultFe
 }
 
 const base = typeof import.meta.env !== "undefined" ? import.meta.env.BASE_URL : "./";
-export const catalogClient = createCatalogClient({ dataRoot: resolveBaseRelativeUrl(base, "data") });
+/* 지점마다 조각 폴더가 따로(public/data/<지점>/) */
+export const catalogClient = createCatalogClient({ dataRoot: resolveBaseRelativeUrl(base, "data/" + STORE) });

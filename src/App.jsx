@@ -88,7 +88,8 @@ const topSub = (lang, type) =>
 const BRAND_CARD = { label: "브랜드 존", emoji: "💎", type: "brand" };
 const FIND_BRAND_CARD = { label: "브랜드 찾기", emoji: "🔎", type: "findBrand" };
 /* 다섯이면 한 칸이 비어 어색합니다. 브랜드 찾기를 더해 세 칸씩 두 줄로 맞춥니다. */
-const HOME_CATS = [...TOP_CATS, BRAND_CARD, FIND_BRAND_CARD];
+/* 그 지점에 상품이 하나도 없는 분류는 걷는다(2026-11-17 하남 — 키즈 매대가 없어 「0개 상품」 칸이 떴다) */
+const HOME_CATS = [...TOP_CATS, BRAND_CARD, FIND_BRAND_CARD].filter((c) => c.type === "findBrand" || countOf(c.type) > 0);
 
 const legacyZoneOf = (code) => {
   const c = String(code || "");

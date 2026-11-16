@@ -13,14 +13,13 @@
  *
  * 정본 위치는 sync-racks.mjs 와 같다 — PS_OS_RACKS 의 폴더(기본 ~/Projects/ps-os/catalog).
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT = resolve(HERE, "..", "src", "catalogData.js");
-const STORE = "guro";
+const STORES = { guro: "구로", hanam: "하남" };
 const DIR = dirname(process.env.PS_OS_RACKS || resolve(os.homedir(), "Projects", "ps-os", "catalog", "racks.json"));
 const POG = resolve(DIR, "pog.json"), PRODUCTS = resolve(DIR, "products.json");
 
@@ -73,8 +72,11 @@ async function overlay() {
   return "덮기 — " + notes.join(" · ");
 }
 const overlayNote = await overlay();
+let bad = 0;
+for (const STORE of Object.keys(STORES)) {
+const OUT = resolve(HERE, "..", "src", "stores", STORE, "catalogData.js");
 const store = pog.stores.find((s) => s.id === STORE);
-if (!store) { console.error(`POG 에 '${STORE}' 지점이 없습니다.`); process.exit(1); }
+if (!store) { console.error(`POG 에 '${STORE}' 지점이 없습니다.`); bad++; continue; }
 
 const products = [], brands = [], seenBrand = new Set(), placed = new Set();
 let dropped = 0;
@@ -83,7 +85,7 @@ for (const [rack, r] of Object.entries(store.racks)) {
     const m = it.bc ? byBc.get(it.bc) : null;
     if (m && m.st === "판매 종료") { dropped++; continue; }
     /* 상품 원장에서 구로를 취급 매장에서 뺀 상품은 진열이 남아 있어도 싣지 않는다 */
-    if (m && Array.isArray(m.s) && m.s.length && !m.s.includes("구로")) { dropped++; continue; }
+    if (m && Array.isArray(m.s) && m.s.length && !m.s.includes(STORES[STORE])) { dropped++; continue; }
     const name = (m?.n || it.n || "").trim(), brand = (m?.br || it.br || "").trim();
     if (!name) continue;
     const cat = r.cat || "";
@@ -93,7 +95,7 @@ for (const [rack, r] of Object.entries(store.racks)) {
     if (brand && !seenBrand.has(brand)) { seenBrand.add(brand); brands.push(brand); }
   }
 }
-const unplaced = master.items.filter((x) => (x.s || []).includes("구로") && x.st !== "판매 종료" && !placed.has(x.bc)).length;
+const unplaced = master.items.filter((x) => (x.s || []).includes(STORES[STORE]) && x.st !== "판매 종료" && !placed.has(x.bc)).length;
 
 const body = `/* 자동 생성 — 직접 고치지 마세요. 갱신: node scripts/sync-products.mjs
  * 정본: PS-OS catalog/pog.json(구로 랙 자리) + catalog/products.json(상품 원장 ${master.meta?.updated || ""}).
@@ -105,11 +107,14 @@ export const ALL_BRANDS = ${JSON.stringify(brands, null, 2)};
 export const ALL_PRODUCTS = ${JSON.stringify(products, null, 2)};
 `;
 
-const note = overlayNote + " · " + `상품 ${products.length} · 브랜드 ${brands.length} (판매 종료 ${dropped} 뺌, 자리 없는 구로 취급 ${unplaced} 은 싣지 않음)`;
+const note = overlayNote + " · " + `상품 ${products.length} · 브랜드 ${brands.length} (판매 종료 ${dropped} 뺌, 자리 없는 ${STORES[STORE]} 취급 ${unplaced} 은 싣지 않음)`;
 if (process.argv.includes("--check")) {
   const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
-  if (cur !== body) { console.error("src/catalogData.js 가 상품 원장과 다릅니다 — node scripts/sync-products.mjs"); process.exit(1); }
-  console.log("상품 원장과 같음 — " + note); process.exit(0);
+  if (cur !== body) { console.error("src/catalogData.js 가 상품 원장과 다릅니다 — node scripts/sync-products.mjs"); bad++; continue; }
+  console.log(STORE + " 상품 원장과 같음 — " + note); continue;
 }
+mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, body);
-console.log("src/catalogData.js 갱신 — " + note);
+console.log(STORE + " catalogData 갱신 — " + note);
+}
+if (bad) process.exit(1);

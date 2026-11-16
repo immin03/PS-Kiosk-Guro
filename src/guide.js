@@ -1,3 +1,4 @@
+import { STORE } from "./store.js";
 /* AI 건강 가이드(PS-AI-Guide) — 키오스크 안에서 띄웁니다.
  *
  * 설문 · 결과 · 쿠폰 · 백과사전은 가이드 쪽 서버(Netlify Functions)와 함께 돌아서
@@ -29,6 +30,9 @@ export function guideUrl(path, lang) {
   const url = new URL(`${GUIDE_BASE}/${path}`);
   url.searchParams.set("lang", lang);
   /* 돌아올 곳 — 이 키오스크 주소. 가이드가 여기에 ?locate= 를 붙여 부릅니다. */
-  url.searchParams.set("kiosk", window.location.origin + window.location.pathname);
+  /* 지점(?store=)까지 실어 돌아왔을 때 같은 지점으로 열리게(2026-11-17 하남) */
+  const back = new URL(window.location.origin + window.location.pathname);
+  if (STORE !== "guro") back.searchParams.set("store", STORE);
+  url.searchParams.set("kiosk", back.toString());
   return url.toString();
 }

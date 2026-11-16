@@ -23,7 +23,10 @@ import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { ALL_BRANDS, ALL_PRODUCTS } from "../src/catalogData.js";
+/* 지점별(2026-11-17 하남 키오스크) — KIOSK_STORE 로 고른 지점의 상품만 public/data/<지점>/ 과 src/stores/<지점>/catalogStats.js 로.
+   npm run catalog 가 지점마다 한 번씩 부른다 */
+const STORE = process.env.KIOSK_STORE || "guro";
+const { ALL_BRANDS, ALL_PRODUCTS } = await import(`../src/stores/${STORE}/catalogData.js`);
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const json = (value) => `${JSON.stringify(value)}\n`;
@@ -83,13 +86,13 @@ export function buildRelease({ products, brands, categories, productsOf }) {
 
 async function main() {
   const stats = buildStats(ALL_PRODUCTS, ALL_BRANDS);
-  await writeFile(path.join(root, "src/catalogStats.js"), statsModule(stats), "utf8");
+  await writeFile(path.join(root, `src/stores/${STORE}/catalogStats.js`), statsModule(stats), "utf8");
 
   /* 요약을 쓴 뒤에 불러와야 categories.js 가 새 개수를 읽습니다. */
   const { CATEGORIES, productsOf } = await import("../src/categories.js");
   const release = buildRelease({ products: ALL_PRODUCTS, brands: ALL_BRANDS, categories: CATEGORIES, productsOf });
 
-  const dataRoot = path.join(root, "public/data");
+  const dataRoot = path.join(root, "public/data", STORE);
   const releases = path.join(dataRoot, "releases");
   const target = path.join(releases, release.version);
   await rm(target, { recursive: true, force: true });
@@ -106,7 +109,7 @@ async function main() {
   }
 
   const cats = CATEGORIES.length;
-  console.log(`상품 조각 ${release.version} — 상품 ${stats.total}개 · 브랜드 ${stats.stocked.length}개 · 카테고리 ${cats}개`);
+  console.log(`${STORE} 상품 조각 ${release.version} — 상품 ${stats.total}개 · 브랜드 ${stats.stocked.length}개 · 카테고리 ${cats}개`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

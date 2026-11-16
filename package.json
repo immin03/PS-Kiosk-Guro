@@ -5,14 +5,14 @@
   "type": "module",
   "description": "파마스퀘어 구로점 키오스크 앱",
   "scripts": {
-    "catalog": "node scripts/publish-catalog.mjs",
+    "catalog": "KIOSK_STORE=guro node scripts/publish-catalog.mjs && KIOSK_STORE=hanam node scripts/publish-catalog.mjs",
     "predev": "npm run catalog",
     "dev": "vite",
     "prebuild": "npm run catalog",
     "build": "vite build",
     "preview": "vite preview",
     "test": "node --test",
-    "sync:racks": "node scripts/sync-racks.mjs && node scripts/sync-products.mjs && node scripts/publish-catalog.mjs",
+    "sync:racks": "node scripts/sync-racks.mjs && node scripts/sync-products.mjs && npm run catalog",
     "check:racks": "node scripts/sync-racks.mjs --check"
   },
   "dependencies": {
