@@ -557,8 +557,9 @@ export default function FloorPlan({
               </button>
             );
           })()}
-          <button type="button" aria-label="지도 확대" className="kiosk-map-btn" style={btn} onClick={() => zoomBy(1.4)}>{ico(<><path d="M12 5v14"/><path d="M5 12h14"/></>)}</button>
+          {/* 축소 · 확대 차례(2026-11-17 사용자 「보통 - + 아냐?」) */}
           <button type="button" aria-label="지도 축소" className="kiosk-map-btn" style={btn} onClick={() => zoomBy(1 / 1.4)}>{ico(<path d="M5 12h14"/>)}</button>
+          <button type="button" aria-label="지도 확대" className="kiosk-map-btn" style={btn} onClick={() => zoomBy(1.4)}>{ico(<><path d="M12 5v14"/><path d="M5 12h14"/></>)}</button>
         </div>
       </div>
 
