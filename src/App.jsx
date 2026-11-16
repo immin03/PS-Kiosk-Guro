@@ -244,7 +244,7 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub }) {
           {/* 로고는 헤더 한가운데에 둡니다. 좁은 화면에서 언어 토글 밑으로
               들어가지 않게 남는 폭까지만 씁니다. */}
           <div style={{ position:"absolute", left:"50%", top:"calc(50% + 2px)", transform:"translate(-50%,-50%)",
-            maxWidth:"calc(100% - 180px)" }}>
+            maxWidth:"calc(100% - 290px)" }}>
             <img src={LOGO_IMG} alt="PHAMA SQUARE" style={{ height:11, maxWidth:"100%", objectFit:"contain", display:"block" }} />
           </div>
           <StartButton onStart={onStart} lang={lang} />
@@ -560,21 +560,7 @@ export default function KioskApp() {
           if (zone) navTo("catList", { catType: zone.catType });
         }}/>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-        {ZONES_MAP.map(z => (
-          <div key={z.id} onClick={() => navTo("catList",{catType:z.catType})} className="kiosk-card" style={{
-            display:"flex", gap:10, background:C.wh, borderRadius:8, padding:"10px 12px",
-            border:`1px solid ${C.bd}`, alignItems:"center", cursor:"pointer"
-          }}>
-            <div style={{ width:30, height:30, borderRadius:8, background:chipColor(z), flexShrink:0,
-              display:"flex", alignItems:"center", justifyContent:"center", color:C.wh, fontWeight:700, fontSize:13 }}>{z.id}</div>
-            <div>
-              <p style={{ margin:"0 0 2px", fontSize:12, fontWeight:600, lineHeight:1.35 }}>{zoneLabel(lang,z.id)}</p>
-              <p style={{ margin:0, fontSize:11, color:C.t2, lineHeight:1.35 }}>{t(lang,"zone."+z.id+".desc")}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      {zoneRows()}
     </div>
   );
 
@@ -825,6 +811,22 @@ export default function KioskApp() {
     );
   };
 
+  /* 구역 목록 — 홈 · 매장 지도 화면이 같이 씀(PS-OS 원장 구역, 브랜드 존 맨 아래) */
+  const zoneRows = () => (
+      <div style={{ marginTop:20 }}>
+        {MAP_ZONES.map((z, i) => (
+          <div key={z.zone} className="kiosk-zone-row" onClick={() => z.type && navTo("catList",{catType:z.type})} style={{
+            display:"flex", alignItems:"center", gap:10, padding:"13px 4px", cursor: z.type ? "pointer" : "default",
+            borderTop: i ? "1px solid #EFF1F3" : "none" }}>
+            <span style={{ width:10, height:10, borderRadius:2, background: ZONE_COLOR[z.zone] || ZONE_FALLBACK, flexShrink:0 }} />
+            <span style={{ ...LIST_T, margin:0, flex:1 }}>{zoneLabel(lang, z.zone) || z.zone}</span>
+            <span style={{ fontSize:13, color:"#98A2AE", fontVariantNumeric:"tabular-nums" }}>{t(lang,"rackCount",{n:z.n})}</span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ display:"block", flexShrink:0 }}><path d="M6 3.5 10.5 8 6 12.5" stroke="#98A2AE" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </div>
+        ))}
+      </div>
+  );
+
   const renderMap = () => (
     /* 지도는 이 화면의 본체라 바깥 여백을 줄였습니다. 지도 카드와 아래
        목록이 같은 선에서 시작해야 합니다 — 목록에만 여백을 더 주었더니
@@ -838,18 +840,7 @@ export default function KioskApp() {
       </div>
       {/* 구역 목록 — PS-OS 매장 배치 원장(racks.json)의 구역 그대로, 브랜드 존은 맨 아래(2026-11-13 사용자).
           PS-OS 「구역」 표처럼 색 네모 · 이름 · 칸 수 한 줄, 상자 없음. 옛 A~E 글자 카드는 지도에 없는 글자라 걷음 */}
-      <div style={{ marginTop:20 }}>
-        {MAP_ZONES.map((z, i) => (
-          <div key={z.zone} className="kiosk-zone-row" onClick={() => z.type && navTo("catList",{catType:z.type})} style={{
-            display:"flex", alignItems:"center", gap:10, padding:"13px 4px", cursor: z.type ? "pointer" : "default",
-            borderTop: i ? "1px solid #EFF1F3" : "none" }}>
-            <span style={{ width:10, height:10, borderRadius:2, background: ZONE_COLOR[z.zone] || ZONE_FALLBACK, flexShrink:0 }} />
-            <span style={{ ...LIST_T, margin:0, flex:1 }}>{zoneLabel(lang, z.zone) || z.zone}</span>
-            <span style={{ fontSize:13, color:"#98A2AE", fontVariantNumeric:"tabular-nums" }}>{t(lang,"rackCount",{n:z.n})}</span>
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ display:"block", flexShrink:0 }}><path d="M6 3.5 10.5 8 6 12.5" stroke="#98A2AE" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-        ))}
-      </div>
+      {zoneRows()}
     </div>
   );
 
