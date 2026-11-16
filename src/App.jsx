@@ -479,10 +479,11 @@ export default function KioskApp() {
 
       {/* 첫 화면이 하던 이벤트 · 홈페이지 — 홈 안의 목록 줄로(2026-11-17 홈을 메인으로) */}
       <Section title={t(lang,"moreTitle")}>
-        <Rows>
+        {/* 2단(2026-11-17 사용자) — 두 칸 사이 20, 줄 선 없이 */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", columnGap:20 }}>
           <Row lead={<Thumb emoji="🎟️" />} title={t(lang,"gateEvent")} sub={t(lang,"gateEventSub")} onClick={() => window.location.assign(SITE_EVENT)} />
           <Row lead={<Thumb emoji="🌐" />} title={t(lang,"gateSite")} sub={t(lang,"gateSiteSub")} onClick={() => window.location.assign(SITE)} />
-        </Rows>
+        </div>
       </Section>
 
       <Section>
@@ -646,7 +647,8 @@ export default function KioskApp() {
   const zoneRows = () => (
     <div style={{ marginTop:12 }}>
       <Rows>{MAP_ZONES.map((z) => (
-        <Row key={z.zone} lead={<Dot color={ZONE_COLOR[z.zone] || ZONE_FALLBACK} />} title={zoneLabel(lang, z.zone) || z.zone}
+        /* 점 앞 들여쓰기 12(2026-11-17 사용자 「좌측 들여쓰기 좀 넣어」) — 줄 선은 그대로 끝까지 */
+        <Row key={z.zone} lead={<span style={{ paddingLeft:12, display:"flex" }}><Dot color={ZONE_COLOR[z.zone] || ZONE_FALLBACK} /></span>} title={zoneLabel(lang, z.zone) || z.zone}
           trail={t(lang,"rackCount",{n:z.n})} onClick={z.type ? () => navTo("catList",{catType:z.type}) : undefined} />
       ))}</Rows>
     </div>
