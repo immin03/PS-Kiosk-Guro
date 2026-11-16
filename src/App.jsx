@@ -13,7 +13,7 @@ import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
 import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
-import EntryGate from "./EntryGate.jsx";
+import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { GUIDE_PAGES, CONCERNS } from "./guide.js";
 import { EMOJI as CAT_EMOJI, key as catKey } from "./categories.js";
@@ -299,8 +299,9 @@ export default function KioskApp() {
   }, [lang]);
   /* 첫 화면 — 매장 지도 · 이벤트 · 홈페이지 중에 고릅니다.
      ?start=app 을 붙이면 건너뜁니다(설치·점검용). */
+  /* 홈이 메인(2026-11-17 사용자). 옛 첫 화면(2×2)은 ?start=gate 로만 — PS-OS 고객 화면 › 정책 › 레거시 화면에 기록 */
   const [entered, setEntered] = useState(
-    () => new URLSearchParams(window.location.search).get("start") === "app"
+    () => new URLSearchParams(window.location.search).get("start") !== "gate"
   );
   const [nav, setNav] = useState([{ page:"home" }]);
   const cur = nav[nav.length - 1];
@@ -472,6 +473,14 @@ export default function KioskApp() {
         <div className="ui-swipe" style={{ display:"flex", gap:8, overflowX:"auto", margin:`0 -${PAD}px`, padding:`0 ${PAD}px` }}>
           {HOME_CATS.map(item => <Tile key={item.label} width={104} emoji={item.emoji} title={homeCatLabel(item)} onClick={() => openCat(item)} />)}
         </div>
+      </Section>
+
+      {/* 첫 화면이 하던 이벤트 · 홈페이지 — 홈 안의 목록 줄로(2026-11-17 홈을 메인으로) */}
+      <Section title={t(lang,"moreTitle")}>
+        <Rows>
+          <Row lead={<Thumb emoji="🎟️" />} title={t(lang,"gateEvent")} sub={t(lang,"gateEventSub")} onClick={() => window.location.assign(SITE_EVENT)} />
+          <Row lead={<Thumb emoji="🌐" />} title={t(lang,"gateSite")} sub={t(lang,"gateSiteSub")} onClick={() => window.location.assign(SITE)} />
+        </Rows>
       </Section>
 
       <Section>
@@ -809,7 +818,7 @@ export default function KioskApp() {
       <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}
         badge={cur.page==="catDetail" ? String(cur.cat?.racks || "").split(",")[0].trim() : undefined}
         sub={cur.page==="catDetail" ? (CAT_SIGN[cur.cat?.name] || {}).en : undefined}
-        onStart={() => { setEntered(false); setNav([{ page:"home" }]); setActiveTab("home"); setSearchQ(""); window.scrollTo({ top:0 }); }}/>
+        onStart={undefined}/>
       <div>{renderPage()}</div>
 
       {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline(배포본 꼴 그대로). 탭에 건강 가이드만 더함(2026-11-13) */}
