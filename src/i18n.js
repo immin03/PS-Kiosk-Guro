@@ -3,6 +3,8 @@ export const LANGS = ["ko", "en", "zh"];
 
 const STRINGS = {
   "ko": {
+    "catAll": "전체 카테고리",
+    "locTitle": "매대 위치",
     "whoFor": "이런 분께",
     "howToPick": "고르는 기준",
     "rackShort": "매대 {rack}",
@@ -166,6 +168,8 @@ const STRINGS = {
     "locationTitle": "제품 위치 안내"
   },
   "en": {
+    "catAll": "All categories",
+    "locTitle": "Shelf location",
     "whoFor": "Good for",
     "howToPick": "How to choose",
     "rackShort": "Rack {rack}",
@@ -405,6 +409,8 @@ const STRINGS = {
     "locationTitle": "Product location"
   },
   "zh": {
+    "catAll": "全部分类",
+    "locTitle": "货架位置",
     "whoFor": "适合人群",
     "howToPick": "选择要点",
     "rackShort": "货架 {rack}",

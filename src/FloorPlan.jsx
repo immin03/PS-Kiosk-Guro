@@ -680,10 +680,10 @@ export default function FloorPlan({
               style={block ? { cursor: "pointer" } : undefined}
             >
               <rect
-                x={b.x} y={b.y} width={b.w} height={b.h} rx="1.6"
-                fill={color || MARK_FILL} fillOpacity={color ? 0.1 : 1}
-                stroke={color || "none"} strokeOpacity={color ? 0.45 : 0}
-                strokeWidth={color ? 0.2 : 0}
+                x={b.x} y={b.y} width={b.w} height={b.h} rx="2"
+                /* 구역은 옅은 색 면만(테두리 없음), 집기(계산대 · 입구 · 체험존)는 점선 칸 — 둘이 한눈에 갈림(2026-11-17 지도 다듬기) */
+                fill={color || "#FFFFFF"} fillOpacity={color ? 0.12 : 1}
+                stroke={color ? "none" : "#D9DDE1"} strokeWidth={color ? 0 : 0.25} strokeDasharray={color ? undefined : "0.8 0.6"}
               />
               {color && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
               <text
