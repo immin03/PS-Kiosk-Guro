@@ -15,6 +15,7 @@ import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner from "./PromoBanner.jsx";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
+import { usage, installUsage } from "./usage.js";
 import { GUIDE_PAGES, CONCERNS } from "./guide.js";
 import { EMOJI as CAT_EMOJI, key as catKey } from "./categories.js";
 import { UI_CSS, Section, Row, Rows, Thumb, Tile, Chip, ChipRow, Btn, Seg, Badge, Dot, GAP, PAD, INK, MUTED, MINT } from "./ui.jsx";
@@ -436,6 +437,25 @@ export default function KioskApp() {
     [searchIndex.products, searchQ]
   );
   const searchPending = !!searchQ.trim() && !searchIndex.ready;
+
+  /* 방문 기록(usage.js, 2026-11-17) — 화면이 바뀌면 탭 이름을, 카테고리 · 브랜드 · 상품 위치를 열면 그 이름을(pick),
+     검색어가 1.5초 멈추면 찾은 말과 결과 수를 남깁니다. 지도 탭 · 상품 위치는 매장 지도(store-map)로 따로 셉니다.
+     손님 구분 · 구좌(?src) · 보내기는 usage.js 가 맡습니다. 보는 곳은 PS-OS 고객 화면 › 방문 분석 */
+  useEffect(() => {
+    const pick = cur.page === "location" ? (cur.product?.name || "")
+      : cur.page === "brandDetail" ? (cur.brandName || "")
+      : cur.page === "catDetail" && cur.cat ? catLabel("ko", cur.cat)
+      : cur.page === "catList" && cur.catType ? (cur.catType === "brand" ? "브랜드존" : topCatLabel("ko", cur.catType)) : "";
+    usage.view(!entered ? "gate" : cur.page, pick);
+  }, [entered, cur]);
+  useEffect(() => installUsage(), []);
+  const lastLogged = useRef("");
+  useEffect(() => {
+    const q = searchQ.trim();
+    if (!q || !searchIndex.ready || q === lastLogged.current) return;
+    const id = setTimeout(() => { lastLogged.current = q; usage.search(q, searchResults.length); }, 1500);
+    return () => clearTimeout(id);
+  }, [searchQ, searchIndex.ready, searchResults.length]);
 
   const homeCatLabel = (item) => item.type === "brand" ? zoneLabel(lang,"브랜드존") : item.type === "findBrand" ? t(lang,"brandFind") : topCatLabel(lang,item.type);
   const homeCatSub = (item) => item.type === "findBrand" ? t(lang,"brandFindSub",{ n: BRAND_TOTAL }) : topSub(lang, item.type);
