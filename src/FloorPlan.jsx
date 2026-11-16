@@ -188,7 +188,8 @@ const SCHEMATIC_BOX = { x: 0, y: 0, w: 100, h: 46 };
 
 /* 매대와 집기가 실제로 놓인 범위 */
 const BOUNDS = (() => {
-  const all = [...RACKS, ...MARKS];
+  /* 하남은 매장이 가로로 길고 사무실 · 음료 자리가 왼쪽에 떨어져 있어, 매대와 현재 위치(키오스크)만으로 틀을 잡아 매대를 크게 보인다 */
+  const all = STORE_CONFIG.hideMarks ? [...RACKS, ...MARKS.filter((m) => m.kind === STORE_CONFIG.origin)] : [...RACKS, ...MARKS];
   const x = Math.min(...all.map((o) => o.c));
   const y = Math.min(...all.map((o) => o.r));
   return {
