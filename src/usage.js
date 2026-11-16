@@ -1,3 +1,4 @@
+import { STORE } from "./store.js";
 /* 방문 기록 — 손님이 어느 탭을 보고, 무엇을 찾고, 어느 카테고리 · 상품 위치를 열었는지를 PS-OS 표(psos_usage_events)에 쌓습니다.
    하남 매대 안내(랙 QR)와 같은 꼴입니다. 보는 곳은 PS-OS 매장 운영 › 고객 화면 › 방문 분석. DB 쪽은 ps-os 저장소 supabase/psos-usage-screens.sql.
 
@@ -150,6 +151,7 @@ export const mode = hasWin
       referrer: document.referrer, storage: typeof localStorage !== "undefined" ? localStorage : null })
   : { counted: false, send: false, staff: false, src: "" };
 export const usage = createUsage({
+  store: STORE, /* 지점(src/store.js) — 하남 키오스크도 같은 코드라 지점을 실어 보낸다(2026-11-17) */
   src: mode.src,
   storage: mode.send && typeof localStorage !== "undefined" ? localStorage : null,
   fetchFn: mode.send && typeof fetch !== "undefined" ? (...a) => fetch(...a) : null,
