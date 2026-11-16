@@ -547,12 +547,13 @@ export default function FloorPlan({
             const on = view.k > 1 || openBlock;
             return (
               <button
-                type="button" aria-label="지도 원래대로" disabled={!on}
+                type="button" aria-label="지도 전체 보기" disabled={!on}
                 className="kiosk-map-btn"
                 style={{ ...btn, opacity: on ? 1 : 0.35, cursor: on ? "pointer" : "default" }}
                 onClick={resetView}
               >
-                {ico(<><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></>)}
+                {/* PS-OS 에이전트 「전체 화면으로 열기」 아이콘과 같은 꼴(2026-11-17 사용자) — 지도 전체를 한 판에 다시 맞춘다 */}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M9.5 2.5h4v4M6.5 13.5h-4v-4M13.5 2.5 9.2 6.8M2.5 13.5l4.3-4.3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
             );
           })()}

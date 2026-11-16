@@ -231,7 +231,7 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub }) {
         <>
           <StartButton onStart={onStart} lang={lang} />
           <div style={{ flex:1, minWidth:0, display:"flex", justifyContent:"center" }}>
-            <img src={LOGO_IMG} alt="PHAMA SQUARE" style={{ height:15, maxWidth:"100%", objectFit:"contain", display:"block" }} />
+            <img src={LOGO_IMG} alt="PHAMA SQUARE" style={{ height:12, maxWidth:"100%", objectFit:"contain", display:"block" }} />
           </div>
           <LangToggle lang={lang} setLang={setLang} />
         </>

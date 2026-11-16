@@ -10,17 +10,18 @@
  *   Seg      고르기 칸 — 옅은 회색 판 + 고른 칸 흰색(언어 · 카테고리/브랜드)
  *   Badge    번호 칸(매대 번호 · 단계 번호) — 민트 면 · 흰 글자
  * 값: 검정 #2D373D(파마 블랙 라이트) · 회색 #626E7C / #98A2AE · 선 #E2E5E8 / #EFF1F3 · 판 #F2F4F5 · 민트 #01C0A4
- * 호버(마우스 있을 때만): 줄은 제목이 민트, 상자로 된 것(카드 · 칩 · 보조 버튼)은 테두리만 민트. 회색 면 호버 없음 */
+ * 호버(마우스 있을 때만): 줄은 은은한 회색 판(2026-11-17 사용자 「리스트 전부 호버 은은하게 그레이로」), 상자로 된 것(카드 · 칩 · 보조 버튼)은 테두리만 민트 */
 
 export const INK = "#2D373D", SUB = "#626E7C", MUTED = "#98A2AE", LINE = "#E2E5E8", SOFT = "#EFF1F3", PLATE = "#F2F4F5", MINT = "#01C0A4";
 export const GAP = 28;   /* 묶음 사이 */
 export const PAD = 20;   /* 화면 좌우 */
 
 export const UI_CSS = `
-.ui-row{transition:color .15s}
+.ui-row{position:relative;isolation:isolate}
+.ui-row.is-go::before{content:"";position:absolute;inset:0 -10px;border-radius:8px;background:${SOFT};opacity:0;transition:opacity .15s;z-index:-1;pointer-events:none}
 .ui-tile,.ui-chip,.ui-btn2{transition:border-color .15s}
 @media (hover:hover){
-  .ui-row.is-go:hover .ui-row-t{color:${MINT}}
+  .ui-row.is-go:hover::before{opacity:.6}
   .ui-tile:hover,.ui-chip.is-go:hover,.ui-btn2:hover{border-color:${MINT}!important}
   .ui-btn1:hover{filter:brightness(.95)}
   .ui-seg button[aria-pressed="false"]:hover{color:${INK}}
