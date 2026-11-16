@@ -34,6 +34,45 @@ for (const f of [POG, PRODUCTS]) {
 const pog = JSON.parse(readFileSync(POG, "utf8"));
 const master = JSON.parse(readFileSync(PRODUCTS, "utf8"));
 const byBc = new Map(master.items.map((x) => [x.bc, x]));
+
+/* 화면에서 고친 값 · POS 값 덮기(2026-11-17 사용자 「알아서 해 줘, 어차피 더미 데이터」).
+ * PS-OS 물류 · 진열 › 상품 원장(/products)에서 고친 칸(psos_product_edit_now: 브랜드 · 현황 · 취급 매장 …)과
+ * 「엑셀 › POS 올리기」 의 가장 최근 기준일 상품 벌(psos_pos_product: 상품명 · 브랜드 · 판매가)을 products.json 위에 덮는다.
+ * 순서는 화면과 같다 — products.json → POS 칸 → 고친 칸.
+ * 읽기는 본사 권한이라 빌드 환경에 PS_SUPABASE_URL · PS_SUPABASE_KEY 가 있을 때만 한다. 없거나 표가 아직 없으면 건너뛰고 말만 남긴다 */
+async function overlay() {
+  const url = (process.env.PS_SUPABASE_URL || "").replace(/\/$/, ""), key = process.env.PS_SUPABASE_KEY || "";
+  if (!url || !key) return "덮기 건너뜀(PS_SUPABASE_URL · PS_SUPABASE_KEY 없음)";
+  const get = async (path) => {
+    const r = await fetch(url + "/rest/v1/" + path, { headers: { apikey: key, Authorization: "Bearer " + key } });
+    if (!r.ok) throw new Error(path.split("?")[0] + " " + r.status);
+    return r.json();
+  };
+  const notes = [];
+  try {
+    const last = await get("psos_pos_product?select=as_of&order=as_of.desc&limit=1");
+    if (last[0]) {
+      let off = 0, n = 0;
+      for (;;) {
+        const rows = await get(`psos_pos_product?select=barcode,name,brand,price&as_of=eq.${last[0].as_of}&order=barcode&limit=1000&offset=${off}`);
+        rows.forEach((r) => { const m = byBc.get(r.barcode); if (!m) return; if (r.name) m.n = r.name; if (r.brand) m.br = r.brand; if (r.price != null) m.p = r.price; n++; });
+        if (rows.length < 1000) break; off += 1000;
+      }
+      notes.push(`POS ${last[0].as_of} ${n}줄`);
+    } else notes.push("POS 벌 없음");
+  } catch (e) { notes.push("POS 못 읽음(" + e.message + ")"); }
+  try {
+    let off = 0, n = 0;
+    for (;;) {
+      const rows = await get(`psos_product_edit_now?select=barcode,value&order=barcode&limit=1000&offset=${off}`);
+      rows.forEach((r) => { const m = byBc.get(r.barcode); if (!m || !r.value) return; Object.assign(m, r.value); n++; });
+      if (rows.length < 1000) break; off += 1000;
+    }
+    notes.push(`고친 칸 ${n}줄`);
+  } catch (e) { notes.push("고친 칸 못 읽음(" + e.message + ")"); }
+  return "덮기 — " + notes.join(" · ");
+}
+const overlayNote = await overlay();
 const store = pog.stores.find((s) => s.id === STORE);
 if (!store) { console.error(`POG 에 '${STORE}' 지점이 없습니다.`); process.exit(1); }
 
@@ -43,6 +82,8 @@ for (const [rack, r] of Object.entries(store.racks)) {
   for (const it of r.items || []) {
     const m = it.bc ? byBc.get(it.bc) : null;
     if (m && m.st === "판매 종료") { dropped++; continue; }
+    /* 상품 원장에서 구로를 취급 매장에서 뺀 상품은 진열이 남아 있어도 싣지 않는다 */
+    if (m && Array.isArray(m.s) && m.s.length && !m.s.includes("구로")) { dropped++; continue; }
     const name = (m?.n || it.n || "").trim(), brand = (m?.br || it.br || "").trim();
     if (!name) continue;
     const cat = r.cat || "";
@@ -64,7 +105,7 @@ export const ALL_BRANDS = ${JSON.stringify(brands, null, 2)};
 export const ALL_PRODUCTS = ${JSON.stringify(products, null, 2)};
 `;
 
-const note = `상품 ${products.length} · 브랜드 ${brands.length} (판매 종료 ${dropped} 뺌, 자리 없는 구로 취급 ${unplaced} 은 싣지 않음)`;
+const note = overlayNote + " · " + `상품 ${products.length} · 브랜드 ${brands.length} (판매 종료 ${dropped} 뺌, 자리 없는 구로 취급 ${unplaced} 은 싣지 않음)`;
 if (process.argv.includes("--check")) {
   const cur = existsSync(OUT) ? readFileSync(OUT, "utf8") : "";
   if (cur !== body) { console.error("src/catalogData.js 가 상품 원장과 다릅니다 — node scripts/sync-products.mjs"); process.exit(1); }

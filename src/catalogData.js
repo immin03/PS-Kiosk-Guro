@@ -17841,19 +17841,6 @@ export const ALL_PRODUCTS = [
     "price": 13900
   },
   {
-    "name": "더착한염색120 5호",
-    "brand": "TS",
-    "cat": "티에스",
-    "rack": "D6",
-    "zone": "D",
-    "en": "",
-    "benefit": "티에스 · 섹션 D6",
-    "spec": "",
-    "sale": 0,
-    "bc": "8809616011651",
-    "price": 13900
-  },
-  {
     "name": "지디샴푸800",
     "brand": "TS",
     "cat": "티에스",

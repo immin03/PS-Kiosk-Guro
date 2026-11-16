@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "currentVersion": "4a64182df5c4dd6e",
-  "baseUrl": "releases/4a64182df5c4dd6e/",
+  "currentVersion": "80a6505ee5a28c00",
+  "baseUrl": "releases/80a6505ee5a28c00/",
   "resources": {
     "brands": "brands.json",
     "searchIndex": "search-index.json",
