@@ -501,9 +501,18 @@ export default function KioskApp() {
       {/* 첫 화면이 하던 이벤트 · 홈페이지 — 홈 안의 목록 줄로(2026-11-17 홈을 메인으로) */}
       <Section title={t(lang,"moreTitle")}>
         {/* 2단(2026-11-17 사용자) — 두 칸 사이 20, 줄 선 없이 */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", columnGap:20 }}>
-          <Row lead={<Thumb emoji="🎟️" />} title={t(lang,"gateEvent")} sub={t(lang,"gateEventSub")} onClick={() => window.location.assign(SITE_EVENT)} />
-          <Row lead={<Thumb emoji="🌐" />} title={t(lang,"gateSite")} sub={t(lang,"gateSiteSub")} onClick={() => window.location.assign(SITE)} />
+        {/* 버튼 상자 둘(2026-11-17 사용자 「그냥 버튼으로 묶어, 박스로」) — 카테고리 카드와 같은 선 · 모서리, 올리면 테두리 민트 */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+          {[["🎟️","gateEvent","gateEventSub",SITE_EVENT],["🌐","gateSite","gateSiteSub",SITE]].map(([em,k,sk,href]) => (
+            <div key={k} className="ui-tile" role="button" onClick={() => window.location.assign(href)}
+              style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
+              <span aria-hidden="true" style={{ fontSize:24, lineHeight:1, flexShrink:0 }}>{em}</span>
+              <span style={{ minWidth:0 }}>
+                <span style={{ display:"block", fontSize:14, fontWeight:600, color:"#2D373D", lineHeight:1.4 }}>{t(lang,k)}</span>
+                <span style={{ display:"block", fontSize:12, color:"#98A2AE", lineHeight:1.4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{t(lang,sk)}</span>
+              </span>
+            </div>
+          ))}
         </div>
       </Section>
 
