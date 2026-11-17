@@ -18,8 +18,8 @@ function pick() {
 export const STORE = STORES.includes(pick()) ? pick() : "guro";
 
 export const STORE_CONFIG = {
-  guro:  { name: "구로점", nameEn: "Guro", nameZh: "九老店", origin: "엘리베이터 입구", schematic: true },
-  hanam: { name: "하남점", nameEn: "Hanam", nameZh: "河南店", origin: "키오스크", schematic: false,
+  guro:  { id: "guro", name: "구로점", nameEn: "Guro", nameZh: "九老店", origin: "엘리베이터 입구", schematic: true },
+  hanam: { id: "hanam", name: "하남점", nameEn: "Hanam", nameZh: "河南店", origin: "키오스크", schematic: true,
     /* 손님 지도에 안 그리는 집기 — 기둥 · 바구니 · 진열 소품 · 경계선은 매대 찾기에 잡음 */
     hideMarks: /기둥|경계 벽|카트|바구니|반구|이동식|2단 구좌|소형 구좌|DID/ },
 }[STORE];

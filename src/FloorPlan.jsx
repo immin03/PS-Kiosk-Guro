@@ -165,7 +165,7 @@ const BLOCKS = buildBlocks();
  *
  * 매장의 세 줄만 지킵니다. 위는 벽면 랙과 계산대, 가운데는 매대, 아래는
  * 손님이 드나드는 자리. 가로 100 · 세로 46 을 기준으로 적습니다. */
-const SCHEMATIC = [
+const SCHEMATIC_GURO = [
   { id: "b",     zone: "브랜드",   range: "B1–B6",   x: 2,  y: 2,  w: 40, h: 9 },
   { id: "bkids", zone: "키즈",     range: "B7–B8",   x: 44, y: 2,  w: 14, h: 9 },
   { id: "drink", mark: "음료판매대",                 x: 60, y: 2,  w: 14, h: 9 },
@@ -184,6 +184,34 @@ const SCHEMATIC = [
   { id: "stair", mark: "계단 입구",                   x: 50, y: 34, w: 16, h: 10 },
   { id: "exp",   mark: "체험존",                      x: 68, y: 34, w: 30, h: 10 },
 ];
+/* 하남 구역 도식(2026-11-17 사용자 「하남 지도 ㄱㄱ」) — PS-OS racks.json 하남 좌표(가로 566 · 세로 253)를 같은 100 × 46 틀로 옮겨 그렸다.
+ * 왼쪽은 계산대 · 키오스크 · 입구, 위 벽면 1–14, 오른쪽 벽면 15–22, 아래 벽면 23–25, 가운데 곤돌라 A–K · 30–34 · 행사. 번호는 매장 사인 번호 */
+const SCHEMATIC_HANAM = [
+  { id: "pos",    mark: "계산대",                          x: 1,  y: 11, w: 22, h: 10 },
+  { id: "kiosk",  mark: "키오스크", here: true,             x: 1,  y: 24, w: 22, h: 9 },
+  { id: "door",   mark: "입구",                            x: 1,  y: 36, w: 22, h: 9 },
+  { id: "office", mark: "사무실",                          x: 1,  y: 1,  w: 12, h: 8 },
+  { id: "w1",     zone: "건기식",   range: "1–9",          x: 14, y: 1,  w: 44, h: 8 },
+  { id: "w2",     zone: "펫",       range: "10–12",        x: 59, y: 1,  w: 14, h: 8 },
+  { id: "w3",     zone: "뷰티",     range: "13",           x: 74, y: 1,  w: 8,  h: 8 },
+  { id: "w4",     zone: "라이프",   range: "14",           x: 83, y: 1,  w: 7,  h: 8 },
+  { id: "r1",     zone: "브랜드존", range: "15–17",        x: 91, y: 1,  w: 8.6,  h: 13 },
+  { id: "r2",     zone: "뷰티",     range: "18–20",        x: 91, y: 15, w: 8.6,  h: 12 },
+  { id: "r3",     zone: "건기식",   range: "21–22",        x: 91, y: 28, w: 8.6,  h: 9 },
+  { id: "ga",     zone: "건기식",   range: "A–E",          x: 26, y: 11, w: 30, h: 8 },
+  { id: "gf",     zone: "뷰티",     range: "F",            x: 57, y: 11, w: 7,  h: 8 },
+  { id: "gg",     zone: "라이프",   range: "G",            x: 65, y: 11, w: 7,  h: 8 },
+  { id: "gh",     zone: "브랜드존", range: "H–I",          x: 73, y: 11, w: 17, h: 8 },
+  { id: "evt",    zone: "프로모션", range: "행사",          x: 26, y: 21, w: 12, h: 12 },
+  { id: "m1",     zone: "브랜드존", range: "33–34",        x: 40, y: 21, w: 11, h: 8 },
+  { id: "m2",     zone: "건기식",   range: "31–32",        x: 52, y: 21, w: 11, h: 8 },
+  { id: "m3",     zone: "브랜드존", range: "30",           x: 64, y: 21, w: 7,  h: 8 },
+  { id: "c26",    zone: "뷰티",     range: "26–29",        x: 72, y: 21, w: 8,  h: 16 },
+  { id: "jk",     zone: "브랜드존", range: "J–K",          x: 81, y: 21, w: 9, h: 16 },
+  { id: "b25",    zone: "라이프",   range: "25",           x: 64, y: 38, w: 7,  h: 8 },
+  { id: "b23",    zone: "뷰티",     range: "23–24",        x: 72, y: 38, w: 18, h: 8 },
+];
+const SCHEMATIC = STORE_CONFIG.id === "hanam" ? SCHEMATIC_HANAM : SCHEMATIC_GURO;
 const SCHEMATIC_BOX = { x: 0, y: 0, w: 100, h: 46 };
 
 /* 매대와 집기가 실제로 놓인 범위 */
