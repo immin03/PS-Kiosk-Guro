@@ -9,6 +9,7 @@
  *   Btn      버튼 — 주(민트 면 · 흰 글자) · 보조(흰 면 · 테두리)
  *   Seg      고르기 칸 — 옅은 회색 판 + 고른 칸 흰색(언어 · 카테고리/브랜드)
  *   Badge    번호 칸(매대 번호 · 단계 번호) — 민트 면 · 흰 글자
+ * 글자 한 벌(2026-11-18 전수 점검): 크기 12 · 13 · 14 · 15 · 17 · 20, 굵기 400 · 500 · 600 — 회색 글자에 600 · 700 · 11px 이하 금지. 건강 가이드 css/kiosk-align.css 와 같은 값
  * 값: 검정 #2D373D(파마 블랙 라이트) · 회색 #626E7C / #98A2AE · 선 #E2E5E8 / #EFF1F3 · 판 #F2F4F5 · 민트 #01C0A4
  * 호버(마우스 있을 때만): 줄은 은은한 회색 판(2026-11-17 사용자 「리스트 전부 호버 은은하게 그레이로」), 상자로 된 것(카드 · 칩 · 보조 버튼)은 테두리만 민트 */
 
@@ -80,7 +81,7 @@ export function Row({ lead, title, sub, trail, onClick, chevron = !!onClick, hei
         <p className="ui-row-t" style={{ margin: 0, fontSize: 14, fontWeight: 600, color: INK, lineHeight: 1.4, ...one }}>{title}</p>
         {sub && <p style={{ margin: "2px 0 0", fontSize: 12, color: MUTED, lineHeight: 1.4, ...one }}>{sub}</p>}
       </div>
-      {trail != null && <span style={{ flexShrink: 0, fontSize: 13, color: MUTED, fontVariantNumeric: "tabular-nums" }}>{trail}</span>}
+      {trail != null && <span style={{ flexShrink: 0, fontSize: 12, color: MUTED, fontVariantNumeric: "tabular-nums" }}>{trail}</span>}
       {chevron && CHEV}
     </div>
   );
@@ -97,7 +98,7 @@ export function Tile({ emoji, title, onClick, width }) {
       display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "14px 8px 12px", border: `1px solid ${LINE}`,
       borderRadius: 10, background: "#FFFFFF", cursor: "pointer", textAlign: "center" }}>
       <span aria-hidden="true" style={{ fontSize: 28, lineHeight: 1, height: 32, display: "grid", placeItems: "center" }}>{emoji}</span>
-      <span style={{ fontSize: 13, fontWeight: 600, color: INK, lineHeight: 1.35, wordBreak: "keep-all",
+      <span style={{ fontSize: 14, fontWeight: 600, color: INK, lineHeight: 1.35, wordBreak: "keep-all",
         display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{title}</span>
     </div>
   );

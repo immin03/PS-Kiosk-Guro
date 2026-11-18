@@ -186,16 +186,16 @@ function ThumbCard({ p, onPress, rank, lang = "ko" }) {
           width:20, height:20, borderRadius:8, flexShrink:0,
           background: rank===1 ? C.priD : rank<=3 ? C.priM : C.bgL,
           display:"flex", alignItems:"center", justifyContent:"center",
-          fontSize:10, fontWeight:800,
+          fontSize:12, fontWeight:600,
           color: rank<=3 ? C.wh : C.t3,
         }}>{rank}</div>
       )}
       <p style={{ margin:0, fontSize:13, fontWeight:600, color:C.t1, lineHeight:1.4,
         display:"-webkit-box", WebkitLineClamp:3, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{p.name}</p>
-      <p style={{ margin:0, fontSize:11, color:C.t2 }}>{p.brand}</p>
+      <p style={{ margin:0, fontSize:12, color:MUTED }}>{p.brand}</p>
       <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:"auto" }}>
         {sp.hot && <span style={{ fontSize:9 }}>🔥</span>}
-        <span style={{ fontSize:9, color: sp.hot ? C.priM : C.t3, fontWeight: sp.hot ? 600 : 400 }}>{sp.label}</span>
+        <span style={{ fontSize:12, color: sp.hot ? MINT : MUTED, fontWeight:400 }}>{sp.label}</span>
       </div>
     </div>
   );
@@ -893,8 +893,9 @@ export default function KioskApp() {
               fontFamily:"inherit", minWidth:0,
             }}>
               <span style={{
-                fontSize:13, fontWeight: isA ? 700 : 500,
-                color: isA ? C.priD : C.t3,
+                /* 글자 한 벌(2026-11-18) — 고른 탭 13/600 민트, 나머지 13/500 #98A2AE(옛 #9FB3B5 · 700 걷음) */
+                fontSize:13, fontWeight: isA ? 600 : 500,
+                color: isA ? MINT : MUTED,
                 letterSpacing:"-0.01em",
                 whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", maxWidth:"100%",
               }}>{tab.label}</span>

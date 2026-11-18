@@ -86,10 +86,10 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
               <span style={{
                 alignSelf: "flex-start", marginBottom: 9, padding: "4px 10px", borderRadius: 999,
                 background: "rgba(255,255,255,.2)", color: "#fff",
-                fontSize: 11, fontWeight: 700, letterSpacing: ".04em",
+                fontSize: 12, fontWeight: 600, letterSpacing: ".02em",
               }}>{p.tag}</span>
             )}
-            <p style={{ margin: "0 0 5px", fontSize: 19, fontWeight: 600, color: "#fff", lineHeight: 1.28, letterSpacing: "-0.01em" }}>{p.title}</p>
+            <p style={{ margin: "0 0 5px", fontSize: 20, fontWeight: 600, color: "#fff", lineHeight: 1.28, letterSpacing: "-0.01em" }}>{p.title}</p>
             <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,.85)", lineHeight: 1.45 }}>{p.sub}</p>
             {p.limit && (
               <p style={{ margin: "6px 0 0", fontSize: 12, color: "rgba(255,255,255,.7)" }}>{p.limit}</p>
