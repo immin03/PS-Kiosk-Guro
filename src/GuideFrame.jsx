@@ -42,6 +42,14 @@ export default function GuideFrame({ path, lang, nonce = 0 }) {
 
   const src = guideUrl(path, lang);
 
+  /* 「여는 중」 문구는 0.4초 넘게 걸릴 때만(2026-11-18 사용자 「번쩍임 확인」) — 빨리 열려도 매번 문구가 한 번 번쩍 지나갔다 */
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (state !== "loading") { setSlow(false); return; }
+    const id = setTimeout(() => setSlow(true), 400);
+    return () => clearTimeout(id);
+  }, [state, tryNo, src]);
+
   if (state === "offline") {
     return (
       <div style={{ height: h, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
@@ -60,7 +68,7 @@ export default function GuideFrame({ path, lang, nonce = 0 }) {
 
   return (
     <div style={{ position: "relative", height: h, background: BRAND.bg }}>
-      {state === "loading" && (
+      {state === "loading" && slow && (
         <p style={{ position: "absolute", inset: 0, margin: 0, display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: TYPE["body"], color: BRAND.gray }}>{t(lang, "guideLoading")}</p>
       )}
@@ -71,7 +79,7 @@ export default function GuideFrame({ path, lang, nonce = 0 }) {
         onLoad={() => setState("ready")}
         allow="clipboard-write"
         style={{ position: "relative", display: "block", width: "100%", height: "100%", border: "none",
-          opacity: state === "ready" ? 1 : 0, transition: "opacity 0.2s" }}
+          opacity: state === "ready" ? 1 : 0 }}
       />
     </div>
   );
