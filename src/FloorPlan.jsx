@@ -390,6 +390,15 @@ export function routeSteps(rackCode) {
   };
 }
 
+/* 한 구역의 랙 전부를 감싼 범위(덩어리 여럿에 걸친 구역도 한 번에 연다) */
+function zoneBlock(zone) {
+  const racks = RACKS.filter((r) => r.zone === zone);
+  if (!racks.length) return null;
+  const c = Math.min(...racks.map((r) => r.c)), r0 = Math.min(...racks.map((r) => r.r));
+  const c1 = Math.max(...racks.map((r) => r.c + r.w)), r1 = Math.max(...racks.map((r) => r.r + r.h));
+  return { zone, racks, c, r: r0, w: c1 - c, h: r1 - r0 };
+}
+
 export default function FloorPlan({
   lang = "ko",
   highlightZone,
@@ -482,7 +491,8 @@ export default function FloorPlan({
      채우도록 한 번 더 키웁니다. 좁은 구역은 이미 차 있어 그대로입니다. */
   useEffect(() => {
     if (!openBlock) return;
-    const k = Math.min(3, Math.max(1, (vb.h * 0.7) / (openBlock.h + 2)));
+    /* 폭도 함께 본다 — 높이만 맞추면 가로로 긴 구역(펫 3칸)이 양옆이 잘려 한 칸만 보였다 */
+    const k = Math.min(3, (vb.w * 0.92) / (openBlock.w + 4), Math.max(1, (vb.h * 0.7) / (openBlock.h + 2)));
     if (k > 1.05) setView((v) => clamp({ ...v, k }));
     /* vb 는 openBlock 에서 계산되므로 openBlock 만 지켜보면 됩니다. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -704,11 +714,12 @@ export default function FloorPlan({
           const color = b.zone ? zc(b.zone) : null;
           /* 구역이 통째로 한 덩어리인 곳은 그 덩어리를, 키즈처럼 다른 구역
              안에 몇 칸만 있는 곳은 그 칸이 든 덩어리를 엽니다. */
-          const block = b.zone && (
-            BLOCKS.find((x) => x.zone === b.zone) ||
-            BLOCKS.find((x) => x.racks.some((r) => r.zone === b.zone))
-          );
+          /* 구역을 누르면 그 구역 랙 전부를 감싼 범위를 연다 — 덩어리 하나만 열면 펫처럼
+             여러 덩어리로 갈린 구역이 한 칸만 보였다(2026-11-19 사용자 「펫존 전체가 보여야지」) */
+          const block = b.zone && zoneBlock(b.zone);
           const name = b.mark ? markLabel(lang, b.mark) : zoneLabel(lang, b.zone) || b.zone;
+          /* 좁은 상자는 이름을 폭에 맞춰 줄이다 깨알이 됐다 — 읽히는 크기 밑이면 이름을 빼고 색 점 · 번호만 둔다(구역 색은 아래 목록이 풀어 준다) */
+          const nameSize = Math.min(color ? 2.6 : 2.1, (b.w - (color ? 6 : 3)) / runWidth(name));
           return (
             <g
               key={b.id}
@@ -722,19 +733,16 @@ export default function FloorPlan({
                 stroke={color ? "none" : "#D9DDE1"} strokeWidth={color ? 0 : 0.25} strokeDasharray={color ? undefined : "0.8 0.6"}
               />
               {color && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
-              <text
+              {nameSize >= (color ? 1.5 : 1.5) && <text
                 x={color ? b.x + 4.4 : b.x + b.w / 2} y={b.y + 3.5}
                 textAnchor={color ? "start" : "middle"}
                 /* 좁은 상자에서 이름이 밖으로 흘러나오지 않게 폭에 맞춥니다. */
-                fontSize={Math.min(
-                  color ? 2.6 : 2.1,
-                  (b.w - (color ? 6 : 3)) / runWidth(name)
-                )}
+                fontSize={nameSize}
                 fontWeight={color ? 600 : 500}
                 fill={color ? "#2D373D" : MARK_TEXT}
               >
                 {name}
-              </text>
+              </text>}
               {b.here && (
                 <>
                   <circle cx={b.x + b.w - 3.2} cy={b.y + b.h / 2} r="1.1" fill={YOU} />

@@ -133,7 +133,9 @@ for (const STORE of Object.keys(STORES)) {
           /* 장표(2026-11-19 사용자 「대표 한 장만 배너에, 누르면 나머지 장표가 슬라이드」) — kioskImages 첫 장이 배너, 전부가 상세 넘겨 보기.
              장표는 문구가 박힌 디자인이라 글자를 얹지 않는다(imageHasText) */
           image: (r.kioskImages && r.kioskImages[0]) || r.kioskImage || null,
-          images: r.kioskImages || (r.kioskImage ? [r.kioskImage] : []),
+          /* 누르면 열리는 상세는 피드(4:5) 장표가 있으면 그것(2026-11-19 사용자 「피드 있잖아」), 없으면 키오스크 장표 */
+          images: r.kioskDetail || r.kioskImages || (r.kioskImage ? [r.kioskImage] : []),
+          detailVideo: r.kioskDetailVideo || null,
           video: r.kioskVideo || null,
           imageHasText: !!(r.kioskImages && r.kioskImages.length) };
       })

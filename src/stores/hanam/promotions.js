@@ -18,10 +18,9 @@
     "link": "https://www.phamasquare.com/event.html",
     "image": "2611-suneung-1.jpg",
     "images": [
-      "2611-suneung-1.jpg",
-      "2611-suneung-2.jpg",
-      "2611-suneung-3.jpg"
+      "2611-suneung-feed.jpg"
     ],
+    "detailVideo": null,
     "video": null,
     "imageHasText": true
   },
@@ -37,14 +36,15 @@
     "link": "https://www.phamasquare.com/event.html",
     "image": "2611-winter-0.jpg",
     "images": [
-      "2611-winter-0.jpg",
-      "2611-winter-1.jpg",
-      "2611-winter-2.jpg",
-      "2611-winter-3.jpg",
-      "2611-winter-4.jpg",
-      "2611-winter-5.jpg",
-      "2611-winter-6.jpg"
+      "2611-winter-feed-1.jpg",
+      "2611-winter-feed-2.jpg",
+      "2611-winter-feed-3.jpg",
+      "2611-winter-feed-4.jpg",
+      "2611-winter-feed-5.jpg",
+      "2611-winter-feed-6.jpg",
+      "2611-winter-feed-7.jpg"
     ],
+    "detailVideo": null,
     "video": null,
     "imageHasText": true
   },
@@ -60,12 +60,13 @@
     "link": "https://www.phamasquare.com/event.html",
     "image": "2611-roulette-0.jpg",
     "images": [
-      "2611-roulette-0.jpg",
+      "2611-roulette-feed.jpg",
       "2611-roulette-1.jpg",
       "2611-roulette-2.jpg",
       "2611-roulette-3.jpg",
       "2611-roulette-4.jpg"
     ],
+    "detailVideo": "2611-roulette-feed.mp4",
     "video": "2611-roulette-0.mp4",
     "imageHasText": true
   }

@@ -185,8 +185,8 @@ export function PromoSlides({ promo }) {
           height: hs[i] || "auto", transition: "height .3s" }}>
         <div style={{ display: "flex", alignItems: "flex-start", transform: `translateX(calc(${-i * 100}% + ${dx}px))`, transition: dx ? "none" : "transform .4s cubic-bezier(.3,.7,.2,1)" }}>
           {imgs.map((name, k) => (
-            k === 0 && promo.video && slideUrl(promo.video) ? (
-              <video key={name} src={slideUrl(promo.video)} poster={slideUrl(name)} autoPlay muted loop playsInline
+            k === 0 && promo.detailVideo && slideUrl(promo.detailVideo) ? (
+              <video key={name} src={slideUrl(promo.detailVideo)} poster={slideUrl(name)} autoPlay muted loop playsInline
                 onLoadedData={(e) => { const h = e.currentTarget.offsetHeight; setHs((o) => ({ ...o, [k]: h })); }}
                 style={{ flex: "0 0 100%", width: "100%", height: "auto", display: "block", pointerEvents: "none" }} />
             ) : (
