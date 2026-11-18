@@ -126,7 +126,7 @@ export function createUsage({ store = "guro", src = "", url = SUPABASE_URL, key 
 }
 
 /* 직원 기기 · 미리보기 · 개발 서버 가리기 — 주소와 저장소만 보고 정합니다(시험에서 따로 부름) */
-export function visitMode({ search = "", hostname = "", inFrame = false, referrer = "", storage, cookie = "" } = {}) {
+export function visitMode({ search = "", hostname = "", inFrame = false, referrer = "", ancestors = [], storage, cookie = "" } = {}) {
   const qs = new URLSearchParams(search);
   let staff = false;
   try {
@@ -138,7 +138,9 @@ export function visitMode({ search = "", hostname = "", inFrame = false, referre
     if (s !== "0" && /(^|;\s*)ps_staff=1(;|$)/.test(cookie)) staff = true;
   } catch (e) {}
   /* PS-OS 새 주소(os.phamasquare.com, 2026-11-18 이사)도 — 옛 규칙은 ps-os 만 봐서 고객 화면 미리보기가 손님으로 세졌다 */
-  const psosPreview = inFrame && /ps-os|os\.phamasquare\.com|psos\.pages\.dev|localhost|127\.0\.0\.1/.test(referrer);
+  /* 리퍼러는 바로 위 창만 알려 준다 — PS-OS 미리보기 안 키오스크 안 가이드처럼 겹으로 뜨면 놓친다. 위 창 전부(ancestorOrigins)도 본다(2026-11-19) */
+  const PSOS = /ps-os|os\.phamasquare\.com|psos\.pages\.dev|localhost|127\.0\.0\.1/;
+  const psosPreview = inFrame && (PSOS.test(referrer) || Array.from(ancestors || []).some((o) => PSOS.test(o)));
   const onDev = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(hostname);
   const flag = qs.get("usage");
   const counted = !staff && !psosPreview && flag !== "off";
@@ -151,7 +153,7 @@ export function visitMode({ search = "", hostname = "", inFrame = false, referre
 const hasWin = typeof window !== "undefined" && typeof location !== "undefined";
 export const mode = hasWin
   ? visitMode({ search: location.search, hostname: location.hostname, inFrame: window.top !== window.self,
-      referrer: document.referrer, storage: typeof localStorage !== "undefined" ? localStorage : null, cookie: document.cookie || "" })
+      referrer: document.referrer, ancestors: (location.ancestorOrigins && Array.from(location.ancestorOrigins)) || [], storage: typeof localStorage !== "undefined" ? localStorage : null, cookie: document.cookie || "" })
   : { counted: false, send: false, staff: false, src: "" };
 export const usage = createUsage({
   store: STORE, /* 지점(src/store.js) — 하남 키오스크도 같은 코드라 지점을 실어 보낸다(2026-11-17) */
