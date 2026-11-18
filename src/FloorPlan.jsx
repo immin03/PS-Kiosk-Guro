@@ -167,57 +167,62 @@ const BLOCKS = buildBlocks();
  *
  * 매장의 세 줄만 지킵니다. 위는 벽면 랙과 계산대, 가운데는 매대, 아래는
  * 손님이 드나드는 자리. 가로 100 · 세로 46 을 기준으로 적습니다. */
+/* 두 지점 도식은 같은 틀(2026-11-19 사용자 「여백 난장판, 구로 · 하남 전면 개편」):
+ *   바깥 여백 P = 1, 칸 사이 G = 1.2 — 모든 칸이 같은 틈.
+ *   칸의 왼쪽 · 오른쪽 끝은 위아래 줄끼리 같은 선에 맞춘다(열 맞춤).
+ *   글자는 칸 왼쪽 위 한 자리 — 이름 2.0 · 번호 1.8, 점은 쓰지 않는다.
+ * 가로 100 · 세로 46. */
 const SCHEMATIC_GURO = [
-  { id: "b",     zone: "브랜드",   range: "B1–B6",   x: 2,  y: 2,  w: 40, h: 9 },
-  { id: "bkids", zone: "키즈",     range: "B7–B8",   x: 44, y: 2,  w: 14, h: 9 },
-  { id: "drink", mark: "음료판매대",                 x: 60, y: 2,  w: 14, h: 9 },
-  { id: "event", zone: "프로모션", range: "B9–B10",  x: 76, y: 2,  w: 12, h: 9 },
-  { id: "pay",   mark: "계산대",                     x: 90, y: 2,  w: 8,  h: 9 },
-  /* 계산대는 좁아 이름만 들어갑니다. 셀프 계산대는 바로 옆이라 함께 읽힙니다. */
-
-  /* 펫은 첫 곤돌라(A1~A6), 건기식은 그 오른쪽 전부(A7~A36)입니다 — 2026-09-18 교체. */
-  { id: "pet",   zone: "펫",       range: "A1–A6",   x: 2,  y: 13, w: 14, h: 19 },
-  { id: "a",     zone: "건기식",   range: "A7–A36",  x: 18, y: 13, w: 40, h: 19 },
-  { id: "c",     zone: "뷰티",     range: "C1–C25",  x: 60, y: 13, w: 23, h: 19 },
-  { id: "d",     zone: "브랜드존", range: "D1–D15",  x: 85, y: 13, w: 13, h: 19 },
-
-  { id: "elev",  mark: "엘리베이터 입구", here: true, x: 2,  y: 34, w: 22, h: 10 },
-  { id: "best",  mark: "파마베스트", zone: "프로모션", x: 26, y: 34, w: 22, h: 10 },
-  { id: "stair", mark: "계단 입구",                   x: 50, y: 34, w: 16, h: 10 },
-  { id: "exp",   mark: "체험존",                      x: 68, y: 34, w: 30, h: 10 },
+  /* 1줄(뒤 벽) y 1–10 */
+  { id: "b",     zone: "브랜드",   range: "B1–B6",   x: 1,    y: 1,    w: 40,   h: 9 },
+  { id: "bkids", zone: "키즈",     range: "B7–B8",   x: 42.2, y: 1,    w: 14,   h: 9 },
+  { id: "drink", mark: "음료판매대",                 x: 57.4, y: 1,    w: 15,   h: 9 },
+  { id: "event", zone: "프로모션", range: "B9–B10",  x: 73.6, y: 1,    w: 13.2, h: 9 },
+  { id: "pay",   mark: "계산대",                     x: 88,   y: 1,    w: 11,   h: 9 },
+  /* 2줄(매대) y 11.2–34.8 — 위 줄 칸 끝에 맞춤 */
+  { id: "pet",   zone: "펫",       range: "A1–A6",   x: 1,    y: 11.2, w: 14,   h: 23.6 },
+  { id: "a",     zone: "건기식",   range: "A7–A36",  x: 16.2, y: 11.2, w: 40,   h: 23.6 },
+  { id: "c",     zone: "뷰티",     range: "C1–C25",  x: 57.4, y: 11.2, w: 29.4, h: 23.6 },
+  { id: "d",     zone: "브랜드존", range: "D1–D15",  x: 88,   y: 11.2, w: 11,   h: 23.6 },
+  /* 3줄(드나드는 자리) y 36–45 */
+  { id: "elev",  mark: "엘리베이터 입구", here: true, x: 1,    y: 36,   w: 22,   h: 9 },
+  { id: "best",  mark: "파마베스트", zone: "프로모션", x: 24.2, y: 36,   w: 21,   h: 9 },
+  { id: "stair", mark: "계단 입구",                   x: 46.4, y: 36,   w: 18,   h: 9 },
+  { id: "exp",   mark: "체험존",                      x: 65.6, y: 36,   w: 33.4, h: 9 },
 ];
-/* 하남 구역 도식(2026-11-17 사용자 「하남 지도 ㄱㄱ」) — PS-OS racks.json 하남 좌표(가로 566 · 세로 253)를 같은 100 × 46 틀로 옮겨 그렸다.
- * 왼쪽은 계산대 · 키오스크 · 입구, 위 벽면 1–14, 오른쪽 벽면 15–22, 아래 벽면 23–25, 가운데 곤돌라 A–K · 30–34 · 행사. 번호는 매장 사인 번호 */
+/* 하남 — 평면도 배치: 왼쪽 위 사무실 자리엔 벽 음료, 왼쪽 열은 계산대 · 키오스크 · 입구, 오른쪽 벽 15–22, 아래 벽 23–25.
+ * 열: 왼쪽 1–22 · 가운데 23.2–88.8 · 오른쪽 90–99. 가운데 열 안의 세로선(47.2 · 48.4 · 67.6 · 68.8 · 78.2 · 79.4)을 줄마다 같이 쓴다 */
 const SCHEMATIC_HANAM = [
-  /* 평면도(1층 배치도) 그대로 — 왼쪽 위는 사무실 자리라 비워 두고(이름은 안 적음) 벽면 1–9 는 그 오른쪽에서 시작,
-     계산대(포스 · 셀프)는 경계벽 오른쪽 가운데 줄, 키오스크는 입구 바로 위 작은 칸, 입구는 아래 벽(2026-11-19 사용자) */
-  { id: "pos",    mark: "계산대",                          x: 1,  y: 11, w: 22, h: 10 },
-  { id: "kiosk",  mark: "키오스크", here: true, small: true, x: 13.4, y: 24.5, w: 9.6, h: 7 },
-  { id: "door",   mark: "입구",                            x: 1,  y: 35, w: 22, h: 10 },
-  { id: "drink",  zone: "식품·음료", range: "음료",       x: 1,  y: 1,  w: 12, h: 8 },   /* 왼쪽 벽 음료 냉장(정본 랙 「음료」) */
-  { id: "w1",     zone: "건기식",   range: "1–9",          x: 14, y: 1,  w: 40, h: 8 },
-  { id: "w2",     zone: "펫",       range: "10–12",        x: 55, y: 1,  w: 13, h: 8 },
-  { id: "w3",     zone: "뷰티",     range: "13",           x: 69, y: 1,  w: 10, h: 8 },
-  { id: "w4",     zone: "라이프",   range: "14",           x: 80, y: 1,  w: 10, h: 8 },
-  { id: "r1",     zone: "브랜드존", range: "15–17",        x: 91, y: 1,  w: 8.6,  h: 13 },
-  { id: "r2",     zone: "뷰티",     range: "18–20",        x: 91, y: 15, w: 8.6,  h: 12 },
-  { id: "r3",     zone: "건기식",   range: "21–22",        x: 91, y: 28, w: 8.6,  h: 9 },
-  { id: "ga",     zone: "건기식",   range: "A–E",          x: 26, y: 11, w: 26, h: 8 },
-  { id: "gf",     zone: "뷰티",     range: "F",            x: 53, y: 11, w: 9,  h: 8 },
-  { id: "gg",     zone: "라이프",   range: "G",            x: 63, y: 11, w: 9,  h: 8 },
-  { id: "gh",     zone: "브랜드존", range: "H–I",          x: 73, y: 11, w: 17, h: 8 },
-  { id: "evt",    zone: "프로모션", range: "행사",          x: 26, y: 21, w: 11, h: 12 },
-  { id: "m1",     zone: "브랜드존", range: "33–34",        x: 38, y: 21, w: 11, h: 8 },
-  { id: "m2",     zone: "건기식",   range: "31–32",        x: 50, y: 21, w: 11, h: 8 },
-  { id: "m3",     zone: "브랜드존", range: "30",           x: 62, y: 21, w: 9,  h: 8 },
-  { id: "c26",    zone: "뷰티",     range: "26–29",        x: 72, y: 21, w: 9,  h: 16 },
-  { id: "jk",     zone: "브랜드존", range: "J–K",          x: 82, y: 21, w: 8.4, h: 16 },
-  { id: "b25",    zone: "라이프",   range: "25",           x: 62, y: 38, w: 9,  h: 8 },
-  { id: "b23",    zone: "뷰티",     range: "23–24",        x: 72, y: 38, w: 18, h: 8 },
+  { id: "drink",  zone: "식품·음료", range: "음료",   x: 1,    y: 1,    w: 12,   h: 8 },
+  { id: "w1",     zone: "건기식",   range: "1–9",     x: 14.2, y: 1,    w: 33,   h: 8 },
+  { id: "w2",     zone: "펫",       range: "10–12",   x: 48.4, y: 1,    w: 19.2, h: 8 },
+  { id: "w3",     zone: "뷰티",     range: "13",      x: 68.8, y: 1,    w: 9.4,  h: 8 },
+  { id: "w4",     zone: "라이프",   range: "14",      x: 79.4, y: 1,    w: 9.4,  h: 8 },
+  { id: "r1",     zone: "브랜드존", range: "15–17",   x: 90,   y: 1,    w: 9,    h: 17.2 },
+  { id: "r2",     zone: "뷰티",     range: "18–20",   x: 90,   y: 19.4, w: 9,    h: 17 },
+  { id: "r3",     zone: "건기식",   range: "21–22",   x: 90,   y: 37.6, w: 9,    h: 7.4 },
+
+  { id: "pos",    mark: "계산대",                     x: 1,    y: 10.2, w: 21,   h: 8 },
+  { id: "ga",     zone: "건기식",   range: "A–E",     x: 23.2, y: 10.2, w: 24,   h: 8 },
+  { id: "gf",     zone: "뷰티",     range: "F",       x: 48.4, y: 10.2, w: 9,    h: 8 },
+  { id: "gg",     zone: "라이프",   range: "G",       x: 58.6, y: 10.2, w: 9,    h: 8 },
+  { id: "gh",     zone: "브랜드존", range: "H–I",     x: 68.8, y: 10.2, w: 20,   h: 8 },
+
+  { id: "kiosk",  mark: "키오스크", here: true,       x: 9,    y: 19.4, w: 13,   h: 8 },
+  { id: "evt",    zone: "프로모션", range: "행사",     x: 23.2, y: 19.4, w: 11.4, h: 17 },
+  { id: "m1",     zone: "브랜드존", range: "33–34",   x: 35.8, y: 19.4, w: 11.4, h: 8 },
+  { id: "m2",     zone: "건기식",   range: "31–32",   x: 48.4, y: 19.4, w: 9,    h: 8 },
+  { id: "m3",     zone: "브랜드존", range: "30",      x: 58.6, y: 19.4, w: 9,    h: 8 },
+  { id: "c26",    zone: "뷰티",     range: "26–29",   x: 68.8, y: 19.4, w: 9.4,  h: 17 },
+  { id: "jk",     zone: "브랜드존", range: "J–K",     x: 79.4, y: 19.4, w: 9.4,  h: 17 },
+
+  { id: "door",   mark: "입구",                       x: 1,    y: 37.6, w: 21,   h: 7.4 },
+  { id: "b25",    zone: "라이프",   range: "25",      x: 58.6, y: 37.6, w: 9,    h: 7.4 },
+  { id: "b23",    zone: "뷰티",     range: "23–24",   x: 68.8, y: 37.6, w: 20,   h: 7.4 },
 ];
-/* 좁은 칸에서만 쓰는 짧은 구역 이름(전체 이름은 지도 아래 목록에) */
-const SHORT_ZONE = { 건기식: "건기식", 라이프: "라이프", 브랜드존: "브랜드", "식품·음료": "식품 · 음료" };
 const SCHEMATIC = STORE_CONFIG.id === "hanam" ? SCHEMATIC_HANAM : SCHEMATIC_GURO;
+/* 칸이 좁아 전체 이름이 안 들어갈 때만 쓰는 짧은 이름(전체 이름은 지도 아래 목록에) */
+const SHORT_ZONE = { 건기식: "건기식", 라이프: "라이프", 브랜드존: "브랜드", "식품·음료": "음료" };
 const SCHEMATIC_BOX = { x: 0, y: 0, w: 100, h: 46 };
 
 /* 매대와 집기가 실제로 놓인 범위 */
@@ -715,84 +720,40 @@ export default function FloorPlan({
          * 정확한 자리는 상자를 눌렀을 때 나오는 실좌표 지도가 맡습니다. */}
         {grouped && SCHEMATIC.map((b) => {
           const color = b.zone ? zc(b.zone) : null;
-          /* 구역이 통째로 한 덩어리인 곳은 그 덩어리를, 키즈처럼 다른 구역
-             안에 몇 칸만 있는 곳은 그 칸이 든 덩어리를 엽니다. */
-          /* 구역을 누르면 그 구역 랙 전부를 감싼 범위를 연다 — 덩어리 하나만 열면 펫처럼
-             여러 덩어리로 갈린 구역이 한 칸만 보였다(2026-11-19 사용자 「펫존 전체가 보여야지」) */
+          /* 구역을 누르면 그 구역 랙 전부를 감싼 범위를 연다(펫처럼 여러 덩어리로 갈린 구역도 한 번에) */
           const block = b.zone && zoneBlock(b.zone);
-          const name = b.mark ? markLabel(lang, b.mark) : zoneLabel(lang, b.zone) || b.zone;
-          /* 좁은 상자: 점을 빼고 그 자리에 이름을 쓴다 — 점보다 작은 한글이라도 낫다(2026-11-19 사용자).
-             넓은 상자는 점 + 이름, 좁으면 점 없이 이름(긴 이름은 짧은 이름으로), 번호도 같은 왼쪽 선에 맞춘다 */
-          /* 구역 이름은 한 크기(NAME)로 — 구로 손님 지도처럼 칸마다 글자 크기가 달라지지 않게(2026-11-19 사용자 「글자크기 맞추고」).
-             점 + 이름이 들어가면 그대로, 안 되면 점을 빼고(점보다 작은 한글이라도 낫다), 그래도 안 되면 짧은 이름 */
-          const NAME = 2.0;
-          const fitDot = (x) => (b.w - 5.4) / runWidth(x), fitBare = (x) => (b.w - 3.2) / runWidth(x);
-          let dot = true, label = name, nameSize = NAME;
-          if (!color) { dot = false; nameSize = Math.min(NAME, (b.w - 3) / runWidth(name)); }
-          else if (fitDot(name) >= NAME) dot = true;
-          else {
-            dot = false;
-            const short = lang === "ko" && SHORT_ZONE[b.zone];
-            label = fitBare(name) >= NAME || !short ? name : short;
-            nameSize = Math.min(NAME, fitBare(label));
-          }
-          const tx = color ? (dot ? b.x + 4.4 : b.x + 1.8) : b.x + b.w / 2;
+          const full = b.mark ? markLabel(lang, b.mark) : zoneLabel(lang, b.zone) || b.zone;
+          /* 글자 자리 하나: 칸 왼쪽 위 안쪽 1.4. 이름 2.0, 안 들어가면 짧은 이름, 그래도 안 되면 그 칸만 줄임 */
+          const PAD = 1.4, NAME = 2.0, NUM = 1.8, room = b.w - PAD * 2;
+          const short = lang === "ko" && b.zone && SHORT_ZONE[b.zone];
+          const label = runWidth(full) * NAME <= room || !short ? full : short;
+          const size = Math.min(NAME, room / runWidth(label));
+          const fill = b.zone ? zf(b.zone) : "#FFFFFF";
           return (
-            <g
-              key={b.id}
-              onClick={block ? () => zoomToBlock(block) : undefined}
-              style={block ? { cursor: "pointer" } : undefined}
-            >
-              <rect
-                x={b.x} y={b.y} width={b.w} height={b.h} rx="2"
-                /* 구역은 옅은 색 면만(테두리 없음), 집기(계산대 · 입구 · 체험존)는 점선 칸 — 둘이 한눈에 갈림(2026-11-17 지도 다듬기) */
-                fill={color ? zf(b.zone) : "#FFFFFF"}
-                stroke={color ? "none" : "#D9DDE1"} strokeWidth={color ? 0 : 0.25} strokeDasharray={color ? undefined : "0.8 0.6"}
-              />
-              {color && dot && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
-              {<text
-                x={tx} y={b.small ? b.y + b.h / 2 + 0.75 : b.y + 3.5}
-                textAnchor={color ? "start" : "middle"}
-                /* 좁은 상자에서 이름이 밖으로 흘러나오지 않게 폭에 맞춥니다. */
-                fontSize={nameSize}
-                fontWeight={color ? 600 : 500}
-                fill={color ? "#2D373D" : MARK_TEXT}
-              >
-                {label}
-              </text>}
-              {b.here && b.small && (
-                /* 점과 「현재 위치」는 한 줄로 붙여 키오스크 칸 왼쪽에(2026-11-19 사용자 「같이 있어야지」) */
-                <>
-                  <circle cx={3.6} cy={b.y + b.h / 2} r="1.1" fill={YOU} />
-                  <circle cx={3.6} cy={b.y + b.h / 2} r="2" fill="none" stroke={YOU} strokeWidth="0.35" opacity="0.5">
-                    <animate attributeName="r" values="1.4;2.8;1.4" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.8s" repeatCount="indefinite" />
-                  </circle>
-                  <text x={5.4} y={b.y + b.h / 2 + 0.68} fontSize="1.9" fontWeight="700" fill={YOU}>
-                    {t(lang, "youAreHere")}
-                  </text>
-                </>
-              )}
-              {b.here && !b.small && (
-                <>
-                  <circle cx={b.x + b.w - 3.2} cy={b.y + b.h / 2} r="1.1" fill={YOU} />
-                  <circle cx={b.x + b.w - 3.2} cy={b.y + b.h / 2} r="2" fill="none" stroke={YOU} strokeWidth="0.35" opacity="0.5">
-                    <animate attributeName="r" values="1.4;2.8;1.4" dur="1.8s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.8s" repeatCount="indefinite" />
-                  </circle>
-                  <text x={b.x + 2.6} y={b.y + 7.4} fontSize="1.9" fontWeight="700" fill={YOU}>
-                    {t(lang, "youAreHere")}
-                  </text>
-                </>
-              )}
+            <g key={b.id} onClick={block ? () => zoomToBlock(block) : undefined} style={block ? { cursor: "pointer" } : undefined}>
+              <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="1.6"
+                fill={fill}
+                stroke={b.zone ? "none" : "#D9DDE1"} strokeWidth={b.zone ? 0 : 0.22}
+                strokeDasharray={b.zone ? undefined : "0.8 0.6"} />
+              <text x={b.x + PAD} y={b.y + PAD + size * 0.82} fontSize={size}
+                fontWeight={b.zone ? 600 : 500} fill={b.zone ? "#2D373D" : MARK_TEXT}>{label}</text>
               {b.range && (
-                <text
-                  x={dot ? b.x + 2.6 : b.x + 1.8} y={b.y + 6.6}
-                  fontSize="1.9" fontWeight="500" fill="#626E7C"
-                >
-                  {b.range}
-                </text>
+                <text x={b.x + PAD} y={b.y + PAD + NAME + 0.9 + NUM * 0.82} fontSize={NUM} fontWeight="500" fill="#626E7C">{b.range}</text>
               )}
+              {b.here && (() => {
+                /* 현재 위치 — 점과 글자를 한 줄로, 이름 아래 같은 왼쪽 선 */
+                const cy0 = b.y + PAD + NAME + 0.9 + NUM / 2, dx0 = b.x + PAD + 0.9;
+                return (
+                  <>
+                    <circle cx={dx0} cy={cy0} r="0.9" fill={YOU} />
+                    <circle cx={dx0} cy={cy0} r="1.6" fill="none" stroke={YOU} strokeWidth="0.3" opacity="0.5">
+                      <animate attributeName="r" values="1.1;2.2;1.1" dur="1.8s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.8s" repeatCount="indefinite" />
+                    </circle>
+                    <text x={dx0 + 1.6} y={cy0 + NUM * 0.34} fontSize={NUM} fontWeight="700" fill={YOU}>{t(lang, "youAreHere")}</text>
+                  </>
+                );
+              })()}
             </g>
           );
         })}
