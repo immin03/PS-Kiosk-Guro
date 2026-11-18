@@ -39,7 +39,7 @@ export function Section({ title, count, right, children, gap = GAP }) {
       {(title || right) && (
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, minHeight: 30 }}>
           {title && <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: INK, lineHeight: 1.45 }}>
-            {title}{count != null && <span style={{ marginLeft: 6, fontSize: 13, fontWeight: 400, color: MUTED }}>{count}</span>}
+            {title}{count != null && <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 400, color: MUTED }}>{count}</span>}
           </h2>}
           {right && <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>{right}</div>}
         </div>
