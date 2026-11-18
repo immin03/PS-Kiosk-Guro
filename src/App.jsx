@@ -17,7 +17,7 @@ import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { usage, installUsage } from "./usage.js";
 import { GUIDE_PAGES, CONCERNS } from "./guide.js";
-import { EMOJI as CAT_EMOJI, key as catKey } from "./categories.js";
+import { EMOJI as CAT_EMOJI, key as catKey, emojiOf } from "./categories.js";
 import { UI_CSS, Section, Row, Rows, Thumb, Tile, Chip, ChipRow, Btn, Seg, Badge, Dot, GAP, PAD, INK, MUTED, MINT } from "./ui.jsx";
 
 /* 건강 고민 칩 그림 — 카테고리 카드처럼 이모지 한 글자 */
@@ -293,7 +293,7 @@ function ProductCard({ p, onLocate, showCat, hideRack }) {
   return (
     <div style={{ height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box", borderBottom:"1px solid #EFF1F3" }}>
       <Row height={PRODUCT_ROW_HEIGHT - 1} onClick={() => onLocate?.(p)} chevron={false}
-        lead={<Thumb emoji={CAT_EMOJI[catKey(p.cat || "")] || "🛍️"} img={p.img} />}
+        lead={<Thumb emoji={emojiOf(catKey(p.cat || "")) || "🛍️"} img={p.img} />}
         title={p.name} sub={(p.brand || "") + (showCat && p.cat ? " · " + p.cat : "")} trail={hideRack ? null : p.rack} />
     </div>
   );
