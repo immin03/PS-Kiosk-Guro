@@ -16,7 +16,13 @@
     "title": "수능 응원 이벤트",
     "sub": "",
     "link": "https://www.phamasquare.com/event.html",
-    "image": null
+    "image": "2611-suneung-1.jpg",
+    "images": [
+      "2611-suneung-1.jpg",
+      "2611-suneung-2.jpg",
+      "2611-suneung-3.jpg"
+    ],
+    "imageHasText": true
   },
   {
     "id": "pr-2611-하남기획전",
@@ -28,7 +34,17 @@
     "title": "11월 하남점 기획전",
     "sub": "환절기, 건강부터 보습까지",
     "link": "https://www.phamasquare.com/event.html",
-    "image": null
+    "image": "2611-winter-0.jpg",
+    "images": [
+      "2611-winter-0.jpg",
+      "2611-winter-1.jpg",
+      "2611-winter-2.jpg",
+      "2611-winter-3.jpg",
+      "2611-winter-4.jpg",
+      "2611-winter-5.jpg",
+      "2611-winter-6.jpg"
+    ],
+    "imageHasText": true
   },
   {
     "id": "pr-2611-파마스클럽멤버십",
@@ -40,7 +56,9 @@
     "title": "파마스 클럽 멤버십",
     "sub": "",
     "link": "https://www.phamasquare.com/event.html",
-    "image": null
+    "image": null,
+    "images": [],
+    "imageHasText": false
   },
   {
     "id": "pr-2611-타포린",
@@ -52,7 +70,9 @@
     "title": "타포린백 런칭",
     "sub": "동네를 민트로",
     "link": "https://www.phamasquare.com/event.html",
-    "image": null
+    "image": null,
+    "images": [],
+    "imageHasText": false
   },
   {
     "id": "pr-2611-하남룰렛",
@@ -64,7 +84,15 @@
     "title": "돌려돌려! 파마 럭키룰렛",
     "sub": "하남점 단독",
     "link": "https://www.phamasquare.com/event.html",
-    "image": null
+    "image": "2611-roulette-0.jpg",
+    "images": [
+      "2611-roulette-0.jpg",
+      "2611-roulette-1.jpg",
+      "2611-roulette-2.jpg",
+      "2611-roulette-3.jpg",
+      "2611-roulette-4.jpg"
+    ],
+    "imageHasText": true
   },
   {
     "id": "pr-2612-연말",
@@ -76,7 +104,9 @@
     "title": "연말 기획전",
     "sub": "",
     "link": "https://www.phamasquare.com/event.html",
-    "image": null
+    "image": null,
+    "images": [],
+    "imageHasText": false
   }
 ];
   

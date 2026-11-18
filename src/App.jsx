@@ -12,7 +12,7 @@ import VirtualProductList from "./VirtualProductList.jsx";
 import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
 import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
-import PromoBanner from "./PromoBanner.jsx";
+import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { usage, installUsage } from "./usage.js";
@@ -476,7 +476,7 @@ export default function KioskApp() {
   /* ── HOME ── 부품 한 벌(ui.jsx)만 씀. 묶음 사이 여백 GAP 한 값 */
   const renderHome = () => (
     <div style={{ padding:`16px ${PAD}px 24px` }}>
-      <PromoBanner bleed={PAD}/>
+      <PromoBanner bleed={PAD} onPress={(p) => navTo("promo", { promo: p })}/>
 
       <div style={{ marginBottom:GAP, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
@@ -798,6 +798,7 @@ export default function KioskApp() {
       case "map": return renderMap();
       case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.survey} lang={lang} nonce={cur.nonce || 0} />;
       case "location": return renderLocation();
+      case "promo": return <div style={{ padding: `20px ${PAD}px 32px` }}><PromoSlides promo={cur.promo} /></div>;
       default: return renderHome();
     }
   };
@@ -864,7 +865,7 @@ export default function KioskApp() {
         바탕색은 body 가 깔아 주므로 짧은 화면에서도 흰 자리가 생기지 않습니다. */}
     <div style={{ maxWidth:SHELL_MAX, margin:"0 auto", background:C.bgF,
       fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:64 }}>
-      <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}
+      <TopBar title={cur.page === "promo" ? (cur.promo?.title || "") : PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}
         badge={cur.page==="catDetail" ? String(cur.cat?.racks || "").split(",")[0].trim() : undefined}
         sub={cur.page==="catDetail" ? (CAT_SIGN[cur.cat?.name] || {}).en : undefined}
         onStart={undefined}

@@ -110,7 +110,12 @@ for (const STORE of Object.keys(STORES)) {
         const [from, to] = span(r.period);
         const [title, sub] = String(r.name).split(/\s+—\s+/);
         return { id: r.id, src: "프칼", status: r.status, from, to: to || null, tag: r.type || "기획전",
-          title, sub: sub || "", link: "https://www.phamasquare.com/event.html", image: r.kioskImage || null };
+          title, sub: sub || "", link: "https://www.phamasquare.com/event.html",
+          /* 장표(2026-11-19 사용자 「대표 한 장만 배너에, 누르면 나머지 장표가 슬라이드」) — kioskImages 첫 장이 배너, 전부가 상세 넘겨 보기.
+             장표는 문구가 박힌 디자인이라 글자를 얹지 않는다(imageHasText) */
+          image: (r.kioskImages && r.kioskImages[0]) || r.kioskImage || null,
+          images: r.kioskImages || (r.kioskImage ? [r.kioskImage] : []),
+          imageHasText: !!(r.kioskImages && r.kioskImages.length) };
       })
       .sort((a, b) => a.from.localeCompare(b.from));
     const running = (pdoc.running || pdoc.promotions || [])

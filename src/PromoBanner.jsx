@@ -60,7 +60,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
       {items.map((p, k) => (
         <div
           key={p.id}
-          onClick={onPress ? () => onPress(p) : undefined}
+          onClick={onPress && p.images && p.images.length ? () => onPress(p) : undefined}
           style={{
             position: "absolute", inset: 0,
             transform: `translateX(calc(${slot(k)} * 100% + ${dx}px))`,
@@ -70,7 +70,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
             backgroundImage: bgOf(p, k),
             backgroundSize: "cover",
             backgroundPosition: "center",
-            cursor: onPress ? "pointer" : "default",
+            cursor: onPress && p.images && p.images.length ? "pointer" : "default",
           }}
         >
           {/* 그림 안에 이미 문구가 박힌 디자인 시안이면 글자를 얹지 않습니다 —
@@ -114,6 +114,52 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
               }}
             />
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* 행사 장표 넘겨 보기 — 홈 배너(대표 한 장)를 누르면 열린다(2026-11-19 사용자).
+   장표는 비율이 제각각(16:9 · 4:5)이라 화면 폭에 맞춰 그대로 보이고, 좌우로 밀거나 아래 점 · 화살표로 넘긴다.
+   장기적으로는 같은 장표로 웹 프로모션 페이지를 만든다 */
+export function PromoSlides({ promo }) {
+  const imgs = (promo && promo.images) || [];
+  const [i, setI] = useState(0);
+  const drag = useRef(null), [dx, setDx] = useState(0);
+  /* 장마다 비율이 달라 상자 높이를 지금 보는 장에 맞춘다(가장 긴 장에 맞추면 16:9 장 아래가 빈다) */
+  const [hs, setHs] = useState({});
+  const n = imgs.length;
+  const go = (d) => setI((x) => Math.min(n - 1, Math.max(0, x + d)));
+  const down = (e) => { drag.current = { x: e.clientX }; };
+  const move = (e) => { if (drag.current) setDx(e.clientX - drag.current.x); };
+  const up = () => { if (!drag.current) return; if (dx < -40) go(1); else if (dx > 40) go(-1); drag.current = null; setDx(0); };
+  if (!n) return null;
+  const btn = { width: 36, height: 36, borderRadius: 999, border: "1px solid #E2E5E8", background: "#FFFFFF", display: "grid", placeItems: "center", cursor: "pointer" };
+  const arrow = (d) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d={d < 0 ? "M10 3.5 5.5 8 10 12.5" : "M6 3.5 10.5 8 6 12.5"} stroke="#2D373D" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  return (
+    <div>
+      <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onPointerLeave={up}
+        style={{ overflow: "hidden", touchAction: "pan-y", userSelect: "none", borderRadius: 12, border: "1px solid #EFF1F3", background: "#F7F7F8",
+          height: hs[i] || "auto", transition: "height .3s" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", transform: `translateX(calc(${-i * 100}% + ${dx}px))`, transition: dx ? "none" : "transform .4s cubic-bezier(.3,.7,.2,1)" }}>
+          {imgs.map((name, k) => (
+            <img key={name} src={slideUrl(name)} alt={`${promo.title} ${k + 1}`} draggable={false}
+              onLoad={(e) => { const h = e.currentTarget.offsetHeight; setHs((o) => ({ ...o, [k]: h })); }}
+              style={{ flex: "0 0 100%", width: "100%", height: "auto", display: "block" }} />
+          ))}
+        </div>
+      </div>
+      {n > 1 && (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
+          <button type="button" aria-label="앞 장" onClick={() => go(-1)} disabled={i === 0} style={{ ...btn, opacity: i === 0 ? 0.4 : 1 }}>{arrow(-1)}</button>
+          <div style={{ display: "flex", gap: 6 }}>
+            {imgs.map((name, m) => (
+              <button key={name} type="button" aria-label={`${m + 1}번째 장`} onClick={() => setI(m)}
+                style={{ width: m === i ? 18 : 6, height: 6, borderRadius: 999, padding: 0, border: "none", cursor: "pointer", transition: "width .3s", background: m === i ? "#01C0A4" : "#E2E5E8" }} />
+            ))}
+          </div>
+          <button type="button" aria-label="다음 장" onClick={() => go(1)} disabled={i === n - 1} style={{ ...btn, opacity: i === n - 1 ? 0.4 : 1 }}>{arrow(1)}</button>
         </div>
       )}
     </div>

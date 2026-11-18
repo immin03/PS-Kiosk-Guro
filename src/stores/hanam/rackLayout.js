@@ -2043,8 +2043,8 @@
     "cat": "포스 주변",
     "zone": "기타",
     "fixture": "RP-DP-600-V1",
-    "qty": 4,
-    "units": 4
+    "qty": 3,
+    "units": 3
   },
   {
     "code": "포스 옆",
