@@ -212,6 +212,8 @@ const SCHEMATIC_HANAM = [
   { id: "b25",    zone: "라이프",   range: "25",           x: 64, y: 38, w: 7,  h: 8 },
   { id: "b23",    zone: "뷰티",     range: "23–24",        x: 72, y: 38, w: 18, h: 8 },
 ];
+/* 좁은 칸에서만 쓰는 짧은 구역 이름(전체 이름은 지도 아래 목록에) */
+const SHORT_ZONE = { 건기식: "건기식", 라이프: "라이프", 브랜드존: "브랜드" };
 const SCHEMATIC = STORE_CONFIG.id === "hanam" ? SCHEMATIC_HANAM : SCHEMATIC_GURO;
 const SCHEMATIC_BOX = { x: 0, y: 0, w: 100, h: 46 };
 
@@ -719,8 +721,18 @@ export default function FloorPlan({
              여러 덩어리로 갈린 구역이 한 칸만 보였다(2026-11-19 사용자 「펫존 전체가 보여야지」) */
           const block = b.zone && zoneBlock(b.zone);
           const name = b.mark ? markLabel(lang, b.mark) : zoneLabel(lang, b.zone) || b.zone;
-          /* 좁은 상자는 이름을 폭에 맞춰 줄이다 깨알이 됐다 — 읽히는 크기 밑이면 이름을 빼고 색 점 · 번호만 둔다(구역 색은 아래 목록이 풀어 준다) */
-          const nameSize = Math.min(color ? 2.6 : 2.1, (b.w - (color ? 6 : 3)) / runWidth(name));
+          /* 좁은 상자: 점을 빼고 그 자리에 이름을 쓴다 — 점보다 작은 한글이라도 낫다(2026-11-19 사용자).
+             넓은 상자는 점 + 이름, 좁으면 점 없이 이름(긴 이름은 짧은 이름으로), 번호도 같은 왼쪽 선에 맞춘다 */
+          const wide = Math.min(color ? 2.6 : 2.1, (b.w - (color ? 6 : 3)) / runWidth(name));
+          const dot = !color || wide >= 1.9;
+          let label = name, nameSize = wide;
+          if (!dot) {
+            const fit = (x) => Math.min(2.4, (b.w - 3.2) / runWidth(x));
+            const short = lang === "ko" && SHORT_ZONE[b.zone];
+            label = short && fit(name) < 1.5 ? short : name;
+            nameSize = fit(label);
+          }
+          const tx = color ? (dot ? b.x + 4.4 : b.x + 1.8) : b.x + b.w / 2;
           return (
             <g
               key={b.id}
@@ -733,16 +745,16 @@ export default function FloorPlan({
                 fill={color || "#FFFFFF"} fillOpacity={color ? 0.12 : 1}
                 stroke={color ? "none" : "#D9DDE1"} strokeWidth={color ? 0 : 0.25} strokeDasharray={color ? undefined : "0.8 0.6"}
               />
-              {color && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
-              {nameSize >= (color ? 1.5 : 1.5) && <text
-                x={color ? b.x + 4.4 : b.x + b.w / 2} y={b.small ? b.y + b.h / 2 + 0.75 : b.y + 3.5}
+              {color && dot && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
+              {<text
+                x={tx} y={b.small ? b.y + b.h / 2 + 0.75 : b.y + 3.5}
                 textAnchor={color ? "start" : "middle"}
                 /* 좁은 상자에서 이름이 밖으로 흘러나오지 않게 폭에 맞춥니다. */
                 fontSize={nameSize}
                 fontWeight={color ? 600 : 500}
                 fill={color ? "#2D373D" : MARK_TEXT}
               >
-                {name}
+                {label}
               </text>}
               {b.here && b.small && (
                 /* 점과 「현재 위치」는 한 줄로 붙여 키오스크 칸 왼쪽에(2026-11-19 사용자 「같이 있어야지」) */
@@ -771,7 +783,7 @@ export default function FloorPlan({
               )}
               {b.range && (
                 <text
-                  x={b.x + 2.6} y={b.y + 6.6}
+                  x={dot ? b.x + 2.6 : b.x + 1.8} y={b.y + 6.6}
                   fontSize="2.1" fontWeight="500" fill="#626E7C"
                 >
                   {b.range}
