@@ -98,9 +98,13 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
           onClick={onPress && p.images && p.images.length ? () => onPress(p) : undefined}
           style={{
             position: "absolute", inset: 0,
-            transform: `translateX(calc(${slot(k)} * 100% + ${dx}px))`,
-            transition: dx ? "none" : "transform .45s cubic-bezier(.3,.7,.2,1)",
-            visibility: Math.abs(slot(k)) > 1 ? "hidden" : "visible",
+            /* 자동 넘김은 밀지 않고 천천히 겹쳐 바꾼다(2026-11-19 사용자 「정신사나워, 세련된 걸로」).
+               손가락으로 밀 때만 따라 움직이고, 놓으면 다시 겹침 전환 */
+            transform: dx ? `translateX(calc(${slot(k)} * 100% + ${dx}px))` : "none",
+            opacity: dx ? 1 : k === i ? 1 : 0,
+            zIndex: k === i ? 1 : 0,
+            transition: dx ? "none" : "opacity .9s ease",
+            visibility: dx && Math.abs(slot(k)) > 1 ? "hidden" : "visible",
             pointerEvents: k === i ? "auto" : "none",
             backgroundImage: bgOf(p, k),
             backgroundSize: "cover",

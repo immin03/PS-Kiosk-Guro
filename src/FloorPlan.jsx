@@ -4,7 +4,7 @@ import { STORE_CONFIG } from "./store.js";
 /* 지점이 숨기라 한 집기는 처음부터 뺀다(하남 기둥 · 바구니 등) */
 const MARKS = STORE_CONFIG.hideMarks ? ALL_MARKS.filter((m) => !STORE_CONFIG.hideMarks.test(m.kind)) : ALL_MARKS;
 import { zoneLabel, markLabel, t } from "./i18n.js";
-import { BRAND, ZONE_COLOR, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
+import { BRAND, ZONE_COLOR, ZONE_TONE, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
 
 /* 매장 지도.
  *
@@ -24,6 +24,8 @@ export const ORIGIN_MARK = STORE_CONFIG.origin;
 const WAYPOINT = /입구|계산|파마베스트|체험존|행사|음료/;
 
 const zc = (zone) => ZONE_COLOR[zone] || FALLBACK;
+const zt = (zone) => ZONE_TONE[zone] || ZONE_TONE["기타"];
+const zf = (zone) => zt(zone).fill, zi = (zone) => zt(zone).ink;
 
 /*
  * 존 블록 — 랙 85개를 덩어리로 묶습니다.
@@ -192,6 +194,7 @@ const SCHEMATIC_HANAM = [
   { id: "pos",    mark: "계산대",                          x: 1,  y: 11, w: 22, h: 10 },
   { id: "kiosk",  mark: "키오스크", here: true, small: true, x: 13.4, y: 24.5, w: 9.6, h: 7 },
   { id: "door",   mark: "입구",                            x: 1,  y: 35, w: 22, h: 10 },
+  { id: "drink",  zone: "식품·음료", range: "음료",       x: 1,  y: 1,  w: 12, h: 8 },   /* 왼쪽 벽 음료 냉장(정본 랙 「음료」) */
   { id: "w1",     zone: "건기식",   range: "1–9",          x: 14, y: 1,  w: 40, h: 8 },
   { id: "w2",     zone: "펫",       range: "10–12",        x: 55, y: 1,  w: 13, h: 8 },
   { id: "w3",     zone: "뷰티",     range: "13",           x: 69, y: 1,  w: 10, h: 8 },
@@ -213,7 +216,7 @@ const SCHEMATIC_HANAM = [
   { id: "b23",    zone: "뷰티",     range: "23–24",        x: 72, y: 38, w: 18, h: 8 },
 ];
 /* 좁은 칸에서만 쓰는 짧은 구역 이름(전체 이름은 지도 아래 목록에) */
-const SHORT_ZONE = { 건기식: "건기식", 라이프: "라이프", 브랜드존: "브랜드" };
+const SHORT_ZONE = { 건기식: "건기식", 라이프: "라이프", 브랜드존: "브랜드", "식품·음료": "식품 · 음료" };
 const SCHEMATIC = STORE_CONFIG.id === "hanam" ? SCHEMATIC_HANAM : SCHEMATIC_GURO;
 const SCHEMATIC_BOX = { x: 0, y: 0, w: 100, h: 46 };
 
@@ -654,11 +657,8 @@ export default function FloorPlan({
                 x={m.c + ix} y={m.r + iy}
                 width={m.w - ix * 2} height={m.h - iy * 2}
                 rx={BAR_RADIUS}
-                fill={color || MARK_FILL}
-                fillOpacity={color ? 0.16 : 1}
-                stroke={color || "none"}
-                strokeOpacity={color ? 0.9 : 0}
-                strokeWidth={color ? 0.12 : 0}
+                fill={color ? zf(m.zone) : MARK_FILL}
+                stroke="none"
               />
               {/* 그림과 글자를 한 덩어리로 묶어 상자 한가운데에 놓습니다.
                   전에는 그림을 왼쪽 끝에 붙이고 글자만 어림잡아 밀어서,
@@ -746,7 +746,7 @@ export default function FloorPlan({
               <rect
                 x={b.x} y={b.y} width={b.w} height={b.h} rx="2"
                 /* 구역은 옅은 색 면만(테두리 없음), 집기(계산대 · 입구 · 체험존)는 점선 칸 — 둘이 한눈에 갈림(2026-11-17 지도 다듬기) */
-                fill={color || "#FFFFFF"} fillOpacity={color ? 0.12 : 1}
+                fill={color ? zf(b.zone) : "#FFFFFF"}
                 stroke={color ? "none" : "#D9DDE1"} strokeWidth={color ? 0 : 0.25} strokeDasharray={color ? undefined : "0.8 0.6"}
               />
               {color && dot && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
@@ -819,11 +819,9 @@ export default function FloorPlan({
               <rect
                 x={r.c + bar.ix} y={r.r + bar.iy}
                 width={r.w - bar.ix * 2} height={r.h - bar.iy * 2} rx={BAR_RADIUS}
-                fill={color}
-                fillOpacity={grouped ? 0.42 : isTarget ? 1 : zoneOn ? 0.34 : dim ? 0.1 : aside ? 0.09 : 0.16}
-                stroke={color}
-                strokeOpacity={isTarget ? 1 : dim ? 0.4 : aside ? 0.45 : 0.9}
-                strokeWidth={isTarget ? 0.3 : 0.12}
+                fill={isTarget ? zi(r.zone) : zoneOn ? color : zf(r.zone)}
+                fillOpacity={dim || aside ? 0.55 : 1}
+                stroke="none"
               />
               {labelled(r) && !isTarget && bar.label && (
                 <g
@@ -844,7 +842,7 @@ export default function FloorPlan({
                         (i - (bar.label.lines.length - 1) / 2) * bar.label.size * 1.12
                       }
                       textAnchor="middle" fontSize={bar.label.size} fontWeight="600"
-                      fill={color} fillOpacity={dim ? 0.55 : aside ? 0.55 : 1}
+                      fill={zi(r.zone)} fillOpacity={dim ? 0.55 : aside ? 0.55 : 1}
                     >
                       {line}
                     </text>
@@ -900,14 +898,14 @@ export default function FloorPlan({
           const above = target.r > 9;
           return (
           <g>
-            <circle cx={cx(target)} cy={cy(target)} r="3.4" fill="none" stroke={zc(target.zone)} strokeWidth="0.6" opacity="0.5">
+            <circle cx={cx(target)} cy={cy(target)} r="3.4" fill="none" stroke={zi(target.zone)} strokeWidth="0.6" opacity="0.5">
               <animate attributeName="r" values="2.6;4.6;2.6" dur="1.4s" repeatCount="indefinite" />
               <animate attributeName="opacity" values="0.55;0.05;0.55" dur="1.4s" repeatCount="indefinite" />
             </circle>
             {/* 위쪽 끝에 붙은 랙은 말풍선을 아래로 내립니다 — 위로 두면 잘립니다 */}
             <text
               x={cx(target)} y={above ? target.r - 4.6 : target.r + target.h + 4.2}
-              textAnchor="middle" fontSize="4.2" fontWeight="800" fill={zc(target.zone)}
+              textAnchor="middle" fontSize="4.2" fontWeight="800" fill={zi(target.zone)}
               stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke"
             >
               {target.code}
