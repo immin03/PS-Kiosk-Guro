@@ -249,8 +249,10 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub, onH
           <StartButton onStart={onStart} lang={lang} />
           {/* 건강 가이드 홈으로(2026-11-18 사용자) — 가이드 탭은 설문부터 열려서 가이드 홈으로 갈 길이 없었다. 뒤로 버튼과 같은 36 칸 */}
           {onHome && (
-            <button type="button" onClick={onHome} aria-label={t(lang,"guideHome")} className="kiosk-iconbtn" style={{ background:"none", border:"none", cursor:"pointer", width:36, height:36, display:"grid", placeItems:"center", borderRadius:8, flexShrink:0 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={INK} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9v10h4.5v-5.5h3V19H18V9"/></svg>
+            <button type="button" onClick={onHome} aria-label={t(lang,"guideHome")} className="kiosk-homebtn" style={{ background:"#FFFFFF", border:"1px solid #E2E5E8", cursor:"pointer", height:32, padding:"0 10px 0 8px", display:"inline-flex", alignItems:"center", gap:4,
+              borderRadius:999, flexShrink:0, fontFamily:"inherit", fontSize:12, fontWeight:600, color:INK, whiteSpace:"nowrap", transition:"border-color .15s" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9v10h4.5v-5.5h3V19H18V9"/></svg>
+              {t(lang,"guideHomeShort")}
             </button>
           )}
           <LangToggle lang={lang} setLang={setLang} />
@@ -838,7 +840,7 @@ export default function KioskApp() {
       .kiosk-search:focus-within{border-color:#01C0A4!important}
       .kiosk-input::placeholder{color:#98A2AE!important}
       @media (hover:hover){.kiosk-search:hover{border-color:#01C0A4!important}}
-      @media (hover:hover){.kiosk-iconbtn:hover{background:#EFF1F3!important}}
+      @media (hover:hover){.kiosk-homebtn:hover{border-color:#01C0A4!important}} .kiosk-homebtn:active{border-color:#01C0A4!important}
       @media (hover:hover){.kiosk-start-btn:hover{background:${C.bgF}!important;color:${C.t1}!important}}
       .kiosk-input::placeholder{color:${BRAND.hint}}
       .kiosk-tag:hover{background:${BRAND.accentTint}!important;border-color:${C.pri}!important}
