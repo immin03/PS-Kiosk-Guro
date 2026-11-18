@@ -239,8 +239,10 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub }) {
         </>
       ) : (
         <>
-          {badge && <Badge>{badge}</Badge>}
-          <span style={{ flex:1, minWidth:0, fontSize:17, fontWeight:600, color:INK, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+          {/* 매대 번호는 랙 상부 사인처럼 「번호 | 이름 영문」(2026-11-18 사용자) — 민트 상자 대신 글자 + 세로 선, 이름은 줄임표 대신 줄바꿈 */}
+          {badge && <span style={{ flexShrink:0, display:"inline-flex", alignItems:"center", fontSize:17, fontWeight:600, color:INK, fontVariantNumeric:"tabular-nums" }}>
+            {badge}<span aria-hidden="true" style={{ width:1, height:15, marginLeft:10, background:"#D9DDE1" }} /></span>}
+          <span style={{ flex:1, minWidth:0, fontSize:17, fontWeight:600, color:INK, lineHeight:1.3, wordBreak:"keep-all" }}>
             {title}{sub && <small style={{ marginLeft:6, fontSize:12, fontWeight:400, color:MUTED }}>{sub}</small>}
           </span>
           <StartButton onStart={onStart} lang={lang} />
