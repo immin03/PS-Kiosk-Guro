@@ -192,24 +192,24 @@ const SCHEMATIC_HANAM = [
   { id: "pos",    mark: "계산대",                          x: 1,  y: 11, w: 22, h: 10 },
   { id: "kiosk",  mark: "키오스크", here: true, small: true, x: 13.4, y: 24.5, w: 9.6, h: 7 },
   { id: "door",   mark: "입구",                            x: 1,  y: 35, w: 22, h: 10 },
-  { id: "w1",     zone: "건기식",   range: "1–9",          x: 14, y: 1,  w: 44, h: 8 },
-  { id: "w2",     zone: "펫",       range: "10–12",        x: 59, y: 1,  w: 14, h: 8 },
-  { id: "w3",     zone: "뷰티",     range: "13",           x: 74, y: 1,  w: 8,  h: 8 },
-  { id: "w4",     zone: "라이프",   range: "14",           x: 83, y: 1,  w: 7,  h: 8 },
+  { id: "w1",     zone: "건기식",   range: "1–9",          x: 14, y: 1,  w: 40, h: 8 },
+  { id: "w2",     zone: "펫",       range: "10–12",        x: 55, y: 1,  w: 13, h: 8 },
+  { id: "w3",     zone: "뷰티",     range: "13",           x: 69, y: 1,  w: 10, h: 8 },
+  { id: "w4",     zone: "라이프",   range: "14",           x: 80, y: 1,  w: 10, h: 8 },
   { id: "r1",     zone: "브랜드존", range: "15–17",        x: 91, y: 1,  w: 8.6,  h: 13 },
   { id: "r2",     zone: "뷰티",     range: "18–20",        x: 91, y: 15, w: 8.6,  h: 12 },
   { id: "r3",     zone: "건기식",   range: "21–22",        x: 91, y: 28, w: 8.6,  h: 9 },
-  { id: "ga",     zone: "건기식",   range: "A–E",          x: 26, y: 11, w: 30, h: 8 },
-  { id: "gf",     zone: "뷰티",     range: "F",            x: 57, y: 11, w: 7,  h: 8 },
-  { id: "gg",     zone: "라이프",   range: "G",            x: 65, y: 11, w: 7,  h: 8 },
+  { id: "ga",     zone: "건기식",   range: "A–E",          x: 26, y: 11, w: 26, h: 8 },
+  { id: "gf",     zone: "뷰티",     range: "F",            x: 53, y: 11, w: 9,  h: 8 },
+  { id: "gg",     zone: "라이프",   range: "G",            x: 63, y: 11, w: 9,  h: 8 },
   { id: "gh",     zone: "브랜드존", range: "H–I",          x: 73, y: 11, w: 17, h: 8 },
-  { id: "evt",    zone: "프로모션", range: "행사",          x: 26, y: 21, w: 12, h: 12 },
-  { id: "m1",     zone: "브랜드존", range: "33–34",        x: 40, y: 21, w: 11, h: 8 },
-  { id: "m2",     zone: "건기식",   range: "31–32",        x: 52, y: 21, w: 11, h: 8 },
-  { id: "m3",     zone: "브랜드존", range: "30",           x: 64, y: 21, w: 7,  h: 8 },
-  { id: "c26",    zone: "뷰티",     range: "26–29",        x: 72, y: 21, w: 8,  h: 16 },
-  { id: "jk",     zone: "브랜드존", range: "J–K",          x: 81, y: 21, w: 9, h: 16 },
-  { id: "b25",    zone: "라이프",   range: "25",           x: 64, y: 38, w: 7,  h: 8 },
+  { id: "evt",    zone: "프로모션", range: "행사",          x: 26, y: 21, w: 11, h: 12 },
+  { id: "m1",     zone: "브랜드존", range: "33–34",        x: 38, y: 21, w: 11, h: 8 },
+  { id: "m2",     zone: "건기식",   range: "31–32",        x: 50, y: 21, w: 11, h: 8 },
+  { id: "m3",     zone: "브랜드존", range: "30",           x: 62, y: 21, w: 9,  h: 8 },
+  { id: "c26",    zone: "뷰티",     range: "26–29",        x: 72, y: 21, w: 9,  h: 16 },
+  { id: "jk",     zone: "브랜드존", range: "J–K",          x: 82, y: 21, w: 8.4, h: 16 },
+  { id: "b25",    zone: "라이프",   range: "25",           x: 62, y: 38, w: 9,  h: 8 },
   { id: "b23",    zone: "뷰티",     range: "23–24",        x: 72, y: 38, w: 18, h: 8 },
 ];
 /* 좁은 칸에서만 쓰는 짧은 구역 이름(전체 이름은 지도 아래 목록에) */
@@ -723,14 +723,18 @@ export default function FloorPlan({
           const name = b.mark ? markLabel(lang, b.mark) : zoneLabel(lang, b.zone) || b.zone;
           /* 좁은 상자: 점을 빼고 그 자리에 이름을 쓴다 — 점보다 작은 한글이라도 낫다(2026-11-19 사용자).
              넓은 상자는 점 + 이름, 좁으면 점 없이 이름(긴 이름은 짧은 이름으로), 번호도 같은 왼쪽 선에 맞춘다 */
-          const wide = Math.min(color ? 2.6 : 2.1, (b.w - (color ? 6 : 3)) / runWidth(name));
-          const dot = !color || wide >= 1.9;
-          let label = name, nameSize = wide;
-          if (!dot) {
-            const fit = (x) => Math.min(2.4, (b.w - 3.2) / runWidth(x));
+          /* 구역 이름은 한 크기(NAME)로 — 구로 손님 지도처럼 칸마다 글자 크기가 달라지지 않게(2026-11-19 사용자 「글자크기 맞추고」).
+             점 + 이름이 들어가면 그대로, 안 되면 점을 빼고(점보다 작은 한글이라도 낫다), 그래도 안 되면 짧은 이름 */
+          const NAME = 2.0;
+          const fitDot = (x) => (b.w - 5.4) / runWidth(x), fitBare = (x) => (b.w - 3.2) / runWidth(x);
+          let dot = true, label = name, nameSize = NAME;
+          if (!color) { dot = false; nameSize = Math.min(NAME, (b.w - 3) / runWidth(name)); }
+          else if (fitDot(name) >= NAME) dot = true;
+          else {
+            dot = false;
             const short = lang === "ko" && SHORT_ZONE[b.zone];
-            label = short && fit(name) < 1.5 ? short : name;
-            nameSize = fit(label);
+            label = fitBare(name) >= NAME || !short ? name : short;
+            nameSize = Math.min(NAME, fitBare(label));
           }
           const tx = color ? (dot ? b.x + 4.4 : b.x + 1.8) : b.x + b.w / 2;
           return (
@@ -784,7 +788,7 @@ export default function FloorPlan({
               {b.range && (
                 <text
                   x={dot ? b.x + 2.6 : b.x + 1.8} y={b.y + 6.6}
-                  fontSize="2.1" fontWeight="500" fill="#626E7C"
+                  fontSize="1.9" fontWeight="500" fill="#626E7C"
                 >
                   {b.range}
                 </text>
