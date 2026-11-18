@@ -22,6 +22,7 @@
       "2611-suneung-2.jpg",
       "2611-suneung-3.jpg"
     ],
+    "video": null,
     "imageHasText": true
   },
   {
@@ -44,6 +45,7 @@
       "2611-winter-5.jpg",
       "2611-winter-6.jpg"
     ],
+    "video": null,
     "imageHasText": true
   },
   {
@@ -64,6 +66,7 @@
       "2611-roulette-3.jpg",
       "2611-roulette-4.jpg"
     ],
+    "video": "2611-roulette-0.mp4",
     "imageHasText": true
   }
 ];

@@ -134,6 +134,7 @@ for (const STORE of Object.keys(STORES)) {
              장표는 문구가 박힌 디자인이라 글자를 얹지 않는다(imageHasText) */
           image: (r.kioskImages && r.kioskImages[0]) || r.kioskImage || null,
           images: r.kioskImages || (r.kioskImage ? [r.kioskImage] : []),
+          video: r.kioskVideo || null,
           imageHasText: !!(r.kioskImages && r.kioskImages.length) };
       })
       /* 이미 끝난 행사는 싣지 않는다(키오스크도 그날 날짜로 한 번 더 거른다) */

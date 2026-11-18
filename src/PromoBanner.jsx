@@ -74,7 +74,8 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
       typeof matchMedia === "function" &&
       matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
-    const t = setTimeout(() => setI((x) => (x + 1) % n), interval);
+    /* 돌아가는 장표는 한 바퀴(7초)를 다 보이고 넘긴다 */
+    const t = setTimeout(() => setI((x) => (x + 1) % n), items[i] && items[i].video ? 8000 : interval);
     return () => clearTimeout(t);
   }, [n, interval, i]);
 
@@ -107,6 +108,11 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
             cursor: onPress && p.images && p.images.length ? "pointer" : "default",
           }}
         >
+          {/* 돌아가는 장표(kioskVideo) — 정지 장표를 포스터로 깔고 소리 없이 되풀이(2026-11-19 룰렛 「돌아가는 파일 활용」) */}
+          {p.video && slideUrl(p.video) && (
+            <video src={slideUrl(p.video)} poster={p.image ? slideUrl(p.image) : undefined} autoPlay muted loop playsInline
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
+          )}
           {/* 그림 안에 이미 문구가 박힌 디자인 시안이면 글자를 얹지 않습니다 —
               겹쳐 읽힙니다. 그 외(매장 사진)에는 문구를 얹어야 합니다. 전에는
               「그림이 있으면 문구가 박힌 것」으로 보아, 맨 매장 사진을 건 슬라이드
@@ -179,9 +185,15 @@ export function PromoSlides({ promo }) {
           height: hs[i] || "auto", transition: "height .3s" }}>
         <div style={{ display: "flex", alignItems: "flex-start", transform: `translateX(calc(${-i * 100}% + ${dx}px))`, transition: dx ? "none" : "transform .4s cubic-bezier(.3,.7,.2,1)" }}>
           {imgs.map((name, k) => (
+            k === 0 && promo.video && slideUrl(promo.video) ? (
+              <video key={name} src={slideUrl(promo.video)} poster={slideUrl(name)} autoPlay muted loop playsInline
+                onLoadedData={(e) => { const h = e.currentTarget.offsetHeight; setHs((o) => ({ ...o, [k]: h })); }}
+                style={{ flex: "0 0 100%", width: "100%", height: "auto", display: "block", pointerEvents: "none" }} />
+            ) : (
             <img key={name} src={slideUrl(name)} alt={`${promo.title} ${k + 1}`} draggable={false}
               onLoad={(e) => { const h = e.currentTarget.offsetHeight; setHs((o) => ({ ...o, [k]: h })); }}
               style={{ flex: "0 0 100%", width: "100%", height: "auto", display: "block" }} />
+            )
           ))}
         </div>
       </div>
