@@ -187,11 +187,11 @@ const SCHEMATIC_GURO = [
 /* 하남 구역 도식(2026-11-17 사용자 「하남 지도 ㄱㄱ」) — PS-OS racks.json 하남 좌표(가로 566 · 세로 253)를 같은 100 × 46 틀로 옮겨 그렸다.
  * 왼쪽은 계산대 · 키오스크 · 입구, 위 벽면 1–14, 오른쪽 벽면 15–22, 아래 벽면 23–25, 가운데 곤돌라 A–K · 30–34 · 행사. 번호는 매장 사인 번호 */
 const SCHEMATIC_HANAM = [
+  /* 사무실은 손님이 찾을 곳이 아니라 뺐고, 키오스크는 실제 크기대로 작은 칸 + 왼쪽 현재 위치 점(2026-11-19 사용자) */
   { id: "pos",    mark: "계산대",                          x: 1,  y: 11, w: 22, h: 10 },
-  { id: "kiosk",  mark: "키오스크", here: true,             x: 1,  y: 24, w: 22, h: 9 },
-  { id: "door",   mark: "입구",                            x: 1,  y: 36, w: 22, h: 9 },
-  { id: "office", mark: "사무실",                          x: 1,  y: 1,  w: 12, h: 8 },
-  { id: "w1",     zone: "건기식",   range: "1–9",          x: 14, y: 1,  w: 44, h: 8 },
+  { id: "kiosk",  mark: "키오스크", here: true, small: true, x: 13.4, y: 24.5, w: 9.6, h: 7 },
+  { id: "door",   mark: "입구",                            x: 1,  y: 35, w: 22, h: 10 },
+  { id: "w1",     zone: "건기식",   range: "1–9",          x: 1,  y: 1,  w: 57, h: 8 },
   { id: "w2",     zone: "펫",       range: "10–12",        x: 59, y: 1,  w: 14, h: 8 },
   { id: "w3",     zone: "뷰티",     range: "13",           x: 74, y: 1,  w: 8,  h: 8 },
   { id: "w4",     zone: "라이프",   range: "14",           x: 83, y: 1,  w: 7,  h: 8 },
@@ -734,7 +734,7 @@ export default function FloorPlan({
               />
               {color && <circle cx={b.x + 2.6} cy={b.y + 2.8} r="0.85" fill={color} />}
               {nameSize >= (color ? 1.5 : 1.5) && <text
-                x={color ? b.x + 4.4 : b.x + b.w / 2} y={b.y + 3.5}
+                x={color ? b.x + 4.4 : b.x + b.w / 2} y={b.small ? b.y + b.h / 2 + 0.75 : b.y + 3.5}
                 textAnchor={color ? "start" : "middle"}
                 /* 좁은 상자에서 이름이 밖으로 흘러나오지 않게 폭에 맞춥니다. */
                 fontSize={nameSize}
@@ -743,7 +743,20 @@ export default function FloorPlan({
               >
                 {name}
               </text>}
-              {b.here && (
+              {b.here && b.small && (
+                /* 점과 「현재 위치」는 한 줄로 붙여 키오스크 칸 왼쪽에(2026-11-19 사용자 「같이 있어야지」) */
+                <>
+                  <circle cx={3.6} cy={b.y + b.h / 2} r="1.1" fill={YOU} />
+                  <circle cx={3.6} cy={b.y + b.h / 2} r="2" fill="none" stroke={YOU} strokeWidth="0.35" opacity="0.5">
+                    <animate attributeName="r" values="1.4;2.8;1.4" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.5;0.05;0.5" dur="1.8s" repeatCount="indefinite" />
+                  </circle>
+                  <text x={5.4} y={b.y + b.h / 2 + 0.68} fontSize="1.9" fontWeight="700" fill={YOU}>
+                    {t(lang, "youAreHere")}
+                  </text>
+                </>
+              )}
+              {b.here && !b.small && (
                 <>
                   <circle cx={b.x + b.w - 3.2} cy={b.y + b.h / 2} r="1.1" fill={YOU} />
                   <circle cx={b.x + b.w - 3.2} cy={b.y + b.h / 2} r="2" fill="none" stroke={YOU} strokeWidth="0.35" opacity="0.5">
