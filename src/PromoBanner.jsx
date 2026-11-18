@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PROMOTIONS } from "./promotions.js";
-import { STORE_PHOTO } from "./storePhoto.js";
+import { STORE_PHOTOS } from "./storePhoto.js";
 
 /* 홈 상단 프로모션 배너.
  *
@@ -14,7 +14,8 @@ import { STORE_PHOTO } from "./storePhoto.js";
    정본에는 파일 이름만 두고, 번들에 실린 주소는 여기서 찾습니다. */
 const SLIDES = import.meta.glob("./promo/*", { eager: true, query: "?url", import: "default" });
 const slideUrl = (name) => SLIDES[`./promo/${name}`];
-const bgOf = (p) => `url(${(p.image && slideUrl(p.image)) || STORE_PHOTO})`;
+/* 이미지 없는 슬라이드는 k 번째 매장 사진(한 장을 모든 슬라이드에 깔지 않는다) */
+const bgOf = (p, k) => `url(${(p.image && slideUrl(p.image)) || STORE_PHOTOS[k % STORE_PHOTOS.length]})`;
 
 export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
   /* 프칼 건은 그날 기간 안에 있는 것만. 하나도 없으면 상시 건(src 상시) — scripts/sync-racks.mjs */
@@ -66,7 +67,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
             transition: dx ? "none" : "transform .45s cubic-bezier(.3,.7,.2,1)",
             visibility: Math.abs(slot(k)) > 1 ? "hidden" : "visible",
             pointerEvents: k === i ? "auto" : "none",
-            backgroundImage: bgOf(p),
+            backgroundImage: bgOf(p, k),
             backgroundSize: "cover",
             backgroundPosition: "center",
             cursor: onPress ? "pointer" : "default",
