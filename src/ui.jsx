@@ -24,6 +24,7 @@ export const UI_CSS = `
 @media (hover:hover){
   .ui-row.is-go:hover::before{opacity:.6}
   .ui-tile:hover,.ui-chip.is-go:hover,.ui-btn2:hover{border-color:${MINT}!important}
+  .ui-chip.is-go:hover{color:${MINT}!important}
   .ui-btn1:hover{filter:brightness(.95)}
   .ui-seg button[aria-pressed="false"]:hover{color:${INK}}
 }
