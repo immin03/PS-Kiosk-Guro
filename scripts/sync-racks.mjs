@@ -101,13 +101,32 @@ for (const STORE of Object.keys(STORES)) {
        구로가 걸린 건(구로 · 하남 · 구로 · 전체) 중 진행 중 · 기획 · 확정인 것만, 기간(period)을 그대로 실어
        키오스크가 그날 날짜로 거릅니다(다시 빌드하지 않아도 끝난 건은 내려가고 시작한 건은 뜸).
        프칼에 걸린 건이 하나도 없을 때만 예전 상시 목록(running)을 씁니다. */
-    const SHOW = ["진행 중", "기획", "확정"];
+    /* 키오스크에는 현황 「확정」 인 행사만(2026-11-19 사용자 「무조건 진행 중인 것만」 → 현황 두 축: 확정 + 기간 안 = 운영 중).
+       기간은 키오스크가 그날 날짜로 거른다. 옛 현황(진행 중 · 완료)은 PS-OS 와 같이 확정으로 접는다.
+       PS-OS 화면에서 고친 현황 · 이름(psos_policy.promoEd)은 PS_SUPABASE_URL · PS_SUPABASE_KEY 가 있을 때 덮는다 */
+    const SHOW = ["확정"];
+    const ST_OLD = { "진행": "확정", "진행 중": "확정", "완료": "확정" };
+    let ed = {};
+    const sbUrl = (process.env.PS_SUPABASE_URL || "").replace(/\/$/, ""), sbKey = process.env.PS_SUPABASE_KEY || "";
+    if (sbUrl && sbKey) {
+      try {
+        const res = await fetch(sbUrl + "/rest/v1/psos_policy?select=value&key=eq.promoEd", { headers: { apikey: sbKey, Authorization: "Bearer " + sbKey } });
+        if (res.ok) { const rows = await res.json(); ed = (rows[0] && rows[0].value) || {}; console.log(`프로모션 화면 고친 값 ${Object.keys(ed).length}건 덮음`); }
+      } catch (e) { console.log("프로모션 고친 값 못 읽음 — 카탈로그만 씀"); }
+    } else console.log("프로모션 고친 값 건너뜀(PS_SUPABASE_URL · PS_SUPABASE_KEY 없음) — 카탈로그만 씀");
+    (pdoc.records || []).forEach((r, i, arr) => {
+      const o = ed[r.id]; if (o && typeof o === "object") arr[i] = r = Object.assign({}, r, o);
+      if (ST_OLD[r.status]) r.status = ST_OLD[r.status];
+    });
     const forStore = (s) => new RegExp(STORES[STORE] + "|전체").test(String(s || ""));
     const span = (p) => String(p || "").split("~").map((v) => v.trim());
     const cal = (pdoc.records || [])
       .filter((r) => SHOW.includes(r.status) && forStore(r.store) && span(r.period)[0])
       .map((r) => {
-        const [from, to] = span(r.period);
+        let [from, to] = span(r.period);
+        /* 연월만 적힌 기간(2026-11)은 그 달 1일 ~ 말일로 — 끝이 비면 키오스크에 끝없이 남았다 */
+        if (/^\d{4}-\d{2}$/.test(from)) { if (!to) to = from + "-31"; from = from + "-01"; }
+        if (to && /^\d{4}-\d{2}$/.test(to)) to = to + "-31";
         const [title, sub] = String(r.name).split(/\s+—\s+/);
         return { id: r.id, src: "프칼", status: r.status, from, to: to || null, tag: r.type || "기획전",
           title, sub: sub || "", link: "https://www.phamasquare.com/event.html",
@@ -117,6 +136,8 @@ for (const STORE of Object.keys(STORES)) {
           images: r.kioskImages || (r.kioskImage ? [r.kioskImage] : []),
           imageHasText: !!(r.kioskImages && r.kioskImages.length) };
       })
+      /* 이미 끝난 행사는 싣지 않는다(키오스크도 그날 날짜로 한 번 더 거른다) */
+      .filter((p) => !p.to || p.to >= new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10))
       .sort((a, b) => a.from.localeCompare(b.from));
     const running = (pdoc.running || pdoc.promotions || [])
       .filter((p) => p.status === "live")

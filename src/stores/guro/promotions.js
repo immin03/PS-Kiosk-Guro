@@ -9,7 +9,7 @@
   {
     "id": "pr-2611-수험생",
     "src": "프칼",
-    "status": "진행 중",
+    "status": "확정",
     "from": "2026-10-08",
     "to": "2026-11-19",
     "tag": "시즌 기획전",
@@ -27,12 +27,12 @@
   {
     "id": "pr-2611-하남기획전",
     "src": "프칼",
-    "status": "진행 중",
+    "status": "확정",
     "from": "2026-10-30",
     "to": "2026-11-29",
     "tag": "시즌 기획전",
-    "title": "11월 하남점 기획전",
-    "sub": "환절기, 건강부터 보습까지",
+    "title": "건강한 겨울을 준비할 시간",
+    "sub": "",
     "link": "https://www.phamasquare.com/event.html",
     "image": "2611-winter-0.jpg",
     "images": [
@@ -45,48 +45,6 @@
       "2611-winter-6.jpg"
     ],
     "imageHasText": true
-  },
-  {
-    "id": "pr-2611-파마스클럽멤버십",
-    "src": "프칼",
-    "status": "기획",
-    "from": "2026-11",
-    "to": null,
-    "tag": "멤버십 전용",
-    "title": "파마스 클럽 멤버십",
-    "sub": "",
-    "link": "https://www.phamasquare.com/event.html",
-    "image": null,
-    "images": [],
-    "imageHasText": false
-  },
-  {
-    "id": "pr-2611-타포린",
-    "src": "프칼",
-    "status": "기획",
-    "from": "2026-11-09",
-    "to": "2026-11-22",
-    "tag": "파일럿",
-    "title": "타포린백 런칭",
-    "sub": "동네를 민트로",
-    "link": "https://www.phamasquare.com/event.html",
-    "image": null,
-    "images": [],
-    "imageHasText": false
-  },
-  {
-    "id": "pr-2612-연말",
-    "src": "프칼",
-    "status": "기획",
-    "from": "2026-12-07",
-    "to": "2027-01-03",
-    "tag": "시즌 기획전",
-    "title": "연말 기획전",
-    "sub": "",
-    "link": "https://www.phamasquare.com/event.html",
-    "image": null,
-    "images": [],
-    "imageHasText": false
   },
   {
     "id": "guro-open",
