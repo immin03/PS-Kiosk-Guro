@@ -140,7 +140,8 @@ export function PromoSlides({ promo }) {
   return (
     <div>
       <div onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onPointerLeave={up}
-        style={{ overflow: "hidden", touchAction: "pan-y", userSelect: "none", borderRadius: 12, border: "1px solid #EFF1F3", background: "#F7F7F8",
+        /* 장표는 화면 폭 끝까지(좌우 여백 · 테두리 · 둥근 모서리 없음) */
+        style={{ overflow: "hidden", touchAction: "pan-y", userSelect: "none", background: "#F7F7F8",
           height: hs[i] || "auto", transition: "height .3s" }}>
         <div style={{ display: "flex", alignItems: "flex-start", transform: `translateX(calc(${-i * 100}% + ${dx}px))`, transition: dx ? "none" : "transform .4s cubic-bezier(.3,.7,.2,1)" }}>
           {imgs.map((name, k) => (
@@ -151,7 +152,7 @@ export function PromoSlides({ promo }) {
         </div>
       </div>
       {n > 1 && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "12px 20px 0" }}>
           <button type="button" aria-label="앞 장" onClick={() => go(-1)} disabled={i === 0} style={{ ...btn, opacity: i === 0 ? 0.4 : 1 }}>{arrow(-1)}</button>
           <div style={{ display: "flex", gap: 6 }}>
             {imgs.map((name, m) => (

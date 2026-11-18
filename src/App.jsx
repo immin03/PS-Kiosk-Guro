@@ -796,9 +796,9 @@ export default function KioskApp() {
       case "brandDetail": return renderBrandDetail();
       case "search": return renderSearch();
       case "map": return renderMap();
-      case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.survey} lang={lang} nonce={cur.nonce || 0} />;
+      case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.home} lang={lang} nonce={cur.nonce || 0} />;
       case "location": return renderLocation();
-      case "promo": return <div style={{ padding: `20px ${PAD}px 32px` }}><PromoSlides promo={cur.promo} /></div>;
+      case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
       default: return renderHome();
     }
   };
@@ -835,6 +835,8 @@ export default function KioskApp() {
       .kiosk-card:active{transform:translateY(0);box-shadow:none!important}
       .kiosk-tag{transition:background 0.15s,border-color 0.15s,transform 0.1s!important}
       html,body{background:${C.bgF}}
+      /* 세로 스크롤 막대 자리 걷기 — 배너 오른쪽에 틈이 생겼다(2026-11-19 사용자 「슬라이드 좌우 여백 없게」). 터치 화면이라 막대가 필요 없다 */
+      html{scrollbar-width:none}html::-webkit-scrollbar{display:none}
       .kiosk-swipe::-webkit-scrollbar{display:none}
       ${UI_CSS}
       .kiosk-chip{transition:border-color .15s,color .15s}
@@ -886,7 +888,8 @@ export default function KioskApp() {
           return (
             <button key={tab.id} onClick={() => {
               setActiveTab(tab.id);
-              setNav([{ page:tab.id, ...(tab.id === "guide" ? { path: GUIDE_PAGES.survey } : {}) }]);
+              /* 건강 가이드 탭은 설문이 아니라 가이드 홈부터(2026-11-19 사용자) */
+              setNav([{ page:tab.id, ...(tab.id === "guide" ? { path: GUIDE_PAGES.home } : {}) }]);
               if(tab.id==="search") setSearchQ("");
             }} className="kiosk-nav-btn" style={{
               flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
