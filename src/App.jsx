@@ -232,7 +232,8 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub }) {
       {isHome ? (
         <>
           <StartButton onStart={onStart} lang={lang} />
-          <div style={{ flex:1, minWidth:0, display:"flex", justifyContent:"center" }}>
+          {/* 로고는 왼쪽 정렬(2026-11-18 사용자 「헤더 로고 좌측 통일」) — 머리 안쪽 16px, 건강 가이드 홈 머리와 같은 자리 */}
+          <div style={{ flex:1, minWidth:0, display:"flex", justifyContent:"flex-start", paddingLeft: onStart ? 0 : 4 }}>
             <img src={LOGO_IMG} alt="PHAMA SQUARE" style={{ height:12, maxWidth:"100%", objectFit:"contain", display:"block" }} />
           </div>
           <LangToggle lang={lang} setLang={setLang} />
