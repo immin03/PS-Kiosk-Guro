@@ -82,6 +82,10 @@ test("직원 기기 · PS-OS 미리보기는 세지 않고, 개발 서버는 모
   assert.equal(visitMode({ search: "", hostname: "kiosk.phamasquare.com", storage }).counted, false, "한 번 열면 남는다");
   assert.equal(visitMode({ search: "?staff=0", hostname: "kiosk.phamasquare.com", storage }).counted, true);
   assert.equal(visitMode({ hostname: "kiosk.phamasquare.com", inFrame: true, referrer: "https://ps-os.vercel.app/" }).counted, false);
+  assert.equal(visitMode({ hostname: "kiosk.phamasquare.com", inFrame: true, referrer: "https://os.phamasquare.com/" }).counted, false, "PS-OS 새 주소 미리보기");
+  assert.equal(visitMode({ hostname: "kiosk.phamasquare.com", cookie: "a=1; ps_staff=1" }).counted, false, "PS-OS 에 로그인한 기기");
+  assert.equal(visitMode({ hostname: "kiosk.phamasquare.com", cookie: "ps_staff=1", search: "?staff=0" }).counted, true, "?staff=0 은 센다");
+  assert.equal(visitMode({ hostname: "kiosk.phamasquare.com", cookie: "x_ps_staff=1" }).counted, true);
   const dev = visitMode({ hostname: "localhost" });
   assert.deepEqual([dev.counted, dev.send], [true, false]);
   assert.equal(visitMode({ hostname: "localhost", search: "?usage=on" }).send, true);

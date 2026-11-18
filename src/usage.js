@@ -9,7 +9,7 @@ import { STORE } from "./store.js";
      그 손님의 모든 기록에 구좌(src)를 붙입니다.
    - 사람을 알아볼 값은 담지 않습니다. 찾은 말은 결과 수와 함께 남깁니다(없는 상품을 찾는 말이 가장 쓸모 있습니다).
    - 매장 단말은 인터넷이 끊길 수 있어, 모은 기록은 기기에 두었다가(최대 1,000건) 연결될 때 30초마다 보냅니다.
-   - 세지 않는 곳: 직원 기기(?staff=1 로 한 번 열면 이 브라우저에 남음, ?staff=0 으로 풂) · PS-OS 안 미리보기 · 개발 서버.
+   - 세지 않는 곳: 직원 기기(?staff=1 로 한 번 열면 이 브라우저에 남음, ?staff=0 으로 풂 · PS-OS 에 로그인한 기기는 공통 쿠키 ps_staff 로 자동) · PS-OS 안 미리보기 · 개발 서버.
      개발 서버(localhost)에서는 보내지 않고 window.__psVisit 에만 모읍니다. 주소에 ?usage=on 을 붙이면 보내고, ?usage=off 면 어디서든 끕니다. */
 
 export const USAGE_IDLE_MS = 90_000;
@@ -126,7 +126,7 @@ export function createUsage({ store = "guro", src = "", url = SUPABASE_URL, key 
 }
 
 /* 직원 기기 · 미리보기 · 개발 서버 가리기 — 주소와 저장소만 보고 정합니다(시험에서 따로 부름) */
-export function visitMode({ search = "", hostname = "", inFrame = false, referrer = "", storage } = {}) {
+export function visitMode({ search = "", hostname = "", inFrame = false, referrer = "", storage, cookie = "" } = {}) {
   const qs = new URLSearchParams(search);
   let staff = false;
   try {
@@ -134,8 +134,11 @@ export function visitMode({ search = "", hostname = "", inFrame = false, referre
     if (s === "1") storage && storage.setItem("ps_staff", "1");
     if (s === "0") storage && storage.removeItem("ps_staff");
     staff = !!storage && storage.getItem("ps_staff") === "1";
+    /* PS-OS 에 로그인한 기기 — PS-OS 가 phamasquare.com 공통 쿠키 ps_staff=1 을 굽는다(2026-11-19). ?staff=0 으로 연 탭은 그대로 센다 */
+    if (s !== "0" && /(^|;\s*)ps_staff=1(;|$)/.test(cookie)) staff = true;
   } catch (e) {}
-  const psosPreview = inFrame && /ps-os|localhost|127\.0\.0\.1/.test(referrer);
+  /* PS-OS 새 주소(os.phamasquare.com, 2026-11-18 이사)도 — 옛 규칙은 ps-os 만 봐서 고객 화면 미리보기가 손님으로 세졌다 */
+  const psosPreview = inFrame && /ps-os|os\.phamasquare\.com|psos\.pages\.dev|localhost|127\.0\.0\.1/.test(referrer);
   const onDev = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(hostname);
   const flag = qs.get("usage");
   const counted = !staff && !psosPreview && flag !== "off";
@@ -148,7 +151,7 @@ export function visitMode({ search = "", hostname = "", inFrame = false, referre
 const hasWin = typeof window !== "undefined" && typeof location !== "undefined";
 export const mode = hasWin
   ? visitMode({ search: location.search, hostname: location.hostname, inFrame: window.top !== window.self,
-      referrer: document.referrer, storage: typeof localStorage !== "undefined" ? localStorage : null })
+      referrer: document.referrer, storage: typeof localStorage !== "undefined" ? localStorage : null, cookie: document.cookie || "" })
   : { counted: false, send: false, staff: false, src: "" };
 export const usage = createUsage({
   store: STORE, /* 지점(src/store.js) — 하남 키오스크도 같은 코드라 지점을 실어 보낸다(2026-11-17) */
