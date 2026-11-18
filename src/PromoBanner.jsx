@@ -1,6 +1,38 @@
 import { useState, useEffect, useRef } from "react";
 import { PROMOTIONS } from "./promotions.js";
 import { STORE_PHOTOS } from "./storePhoto.js";
+import { STORE } from "./store.js";
+
+/* PS-OS 프로모션 화면에서 고친 현황 · 이름 · 기간 · 지점을 열 때 받아 덮는다(2026-11-19 사용자 「공개 통로 열기」).
+   Supabase 함수 psos_promo_feed(PS-OS supabase/psos-promo-feed.sql)가 네 칸만 공개한다. 못 받으면 빌드 때 실린 값 그대로.
+   빌드 때 실린 행사만 덮는다 — 새로 확정된 행사는 장표 그림이 번들에 있어야 해서 키오스크 동기화(scripts/sync-racks.mjs) 뒤에 뜬다 */
+const FEED_URL = "https://jdondfrukwetncyxwrtt.supabase.co/rest/v1/rpc/psos_promo_feed";
+const FEED_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impkb25kZnJ1a3dldG5jeXh3cnR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MjIxNjksImV4cCI6MjEwNjI5ODE2OX0.DJA-Eun7iT403KcJWFv0F6aLkAv5t0N2OZ3cu4AURNo";
+const ST_OLD = { "진행": "확정", "진행 중": "확정", "완료": "확정" };
+const STORE_KO = { guro: "구로", hanam: "하남" };
+let feedP = null;
+const loadFeed = () => feedP || (feedP = (typeof fetch === "function"
+  ? fetch(FEED_URL, { method: "POST", headers: { apikey: FEED_KEY, Authorization: "Bearer " + FEED_KEY, "Content-Type": "application/json" }, body: "{}" })
+      .then((r) => (r.ok ? r.json() : {})).catch(() => ({}))
+  : Promise.resolve({})));
+/* 고친 값 덮기 — 현황이 확정이 아니거나 이 지점이 빠지면 내리고, 이름 · 기간은 바꿔 단다 */
+export function applyFeed(list, feed, store = STORE) {
+  if (!feed || typeof feed !== "object") return list;
+  return list.flatMap((p) => {
+    const o = feed[p.id]; if (!o || p.src !== "프칼") return [p];
+    const st = o.status ? (ST_OLD[o.status] || o.status) : "확정";
+    if (st !== "확정") return [];
+    if (o.store && !new RegExp(STORE_KO[store] + "|전체|전 지점").test(o.store)) return [];
+    const q = { ...p };
+    if (o.name) { const [t, sub] = String(o.name).split(/\s+—\s+/); q.title = t; if (sub != null) q.sub = sub; }
+    if (o.period) {
+      let [from, to] = String(o.period).split("~").map((v) => v.trim());
+      if (/^\d{4}-\d{2}$/.test(from)) { if (!to) to = from + "-31"; from = from + "-01"; }
+      if (from) { q.from = from; q.to = to || null; }
+    }
+    return [q];
+  });
+}
 
 /* 홈 상단 프로모션 배너.
  *
@@ -20,7 +52,9 @@ const bgOf = (p, k) => `url(${(p.image && slideUrl(p.image)) || STORE_PHOTOS[k %
 export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
   /* 프칼 건은 그날 기간 안에 있는 것만. 하나도 없으면 상시 건(src 상시) — scripts/sync-racks.mjs */
   const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-  const live = PROMOTIONS.filter((p) => (!p.from || p.from <= today) && (!p.to || p.to >= today));
+  const [feed, setFeed] = useState(null);
+  useEffect(() => { let on = true; loadFeed().then((f) => { if (on) setFeed(f); }); return () => { on = false; }; }, []);
+  const live = applyFeed(PROMOTIONS, feed).filter((p) => (!p.from || p.from <= today) && (!p.to || p.to >= today));
   const cal = live.filter((p) => p.src === "프칼");
   const items = cal.length ? cal : live.filter((p) => p.src !== "프칼");
   const [i, setI] = useState(0);
