@@ -522,6 +522,9 @@ export default function KioskApp() {
                 <span style={{ display:"block", fontSize:14, fontWeight:600, color:"#2D373D", lineHeight:1.4 }}>{t(lang,k)}</span>
                 <span style={{ display:"block", fontSize:12, color:"#98A2AE", lineHeight:1.4, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{t(lang,sk)}</span>
               </span>
+              {/* 꺾쇠(2026-11-18 사용자 「얘도 > 넣으라고」) — 건강 가이드 더 보기와 같은 꼴, 올리면 오른쪽으로 2 */}
+              <svg className="ui-chev" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ marginLeft:"auto", flexShrink:0, transition:"transform .15s" }}>
+                <path d="M6 3.5 10.5 8 6 12.5" stroke="#98A2AE" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </div>
           ))}
         </div>

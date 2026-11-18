@@ -28,6 +28,7 @@ export const UI_CSS = `
 }
 /* 터치 화면엔 호버가 없어 누를 때도 같은 민트 테두리(2026-11-18 사용자 「호버 디자인이 사라졌다」) */
 .ui-tile:active,.ui-chip.is-go:active,.ui-btn2:active{border-color:${MINT}!important}
+@media (hover:hover){.ui-tile:hover .ui-chev{transform:translateX(2px)}}
 .ui-swipe{scrollbar-width:none}.ui-swipe::-webkit-scrollbar{display:none}
 `;
 
