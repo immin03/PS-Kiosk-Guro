@@ -22,7 +22,7 @@ const usableHeight = () => {
   return Math.max(320, Math.floor(window.innerHeight / z) - TOP_BAR - BOTTOM_NAV);
 };
 
-export default function GuideFrame({ path, lang }) {
+export default function GuideFrame({ path, lang, nonce = 0 }) {
   const [h, setH] = useState(usableHeight);
   const [state, setState] = useState(() => (navigator.onLine === false ? "offline" : "loading"));
   const [tryNo, setTryNo] = useState(0);
@@ -65,7 +65,7 @@ export default function GuideFrame({ path, lang }) {
           fontSize: TYPE["body"], color: BRAND.gray }}>{t(lang, "guideLoading")}</p>
       )}
       <iframe
-        key={`${src}#${tryNo}`}
+        key={`${src}#${tryNo}#${nonce}`}
         src={src}
         title={t(lang, "tabGuide")}
         onLoad={() => setState("ready")}

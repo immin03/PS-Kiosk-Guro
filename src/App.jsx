@@ -220,7 +220,7 @@ function StartButton({ onStart, lang }) {
 }
 
 /* 머리줄 한 꼴 — 높이 56 · 흰 바탕 · 아래 선 하나. 홈은 가운데 로고(키움), 다른 화면은 ← + 제목(카테고리 상세는 매대 번호 + 영문 작게) */
-function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub }) {
+function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub, onHome }) {
   return (
     <div style={{ display:"flex", alignItems:"center", height:56, boxSizing:"border-box", padding:"0 12px 0 " + (isHome ? 12 : 8) + "px", gap:8,
       background:"#FFFFFF", position:"sticky", top:0, zIndex:100, borderBottom:"1px solid #E2E5E8" }}>
@@ -247,6 +247,12 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub }) {
             {title}{sub && <small style={{ marginLeft:6, fontSize:12, fontWeight:400, color:MUTED }}>{sub}</small>}
           </span>
           <StartButton onStart={onStart} lang={lang} />
+          {/* 건강 가이드 홈으로(2026-11-18 사용자) — 가이드 탭은 설문부터 열려서 가이드 홈으로 갈 길이 없었다. 뒤로 버튼과 같은 36 칸 */}
+          {onHome && (
+            <button type="button" onClick={onHome} aria-label={t(lang,"guideHome")} className="kiosk-iconbtn" style={{ background:"none", border:"none", cursor:"pointer", width:36, height:36, display:"grid", placeItems:"center", borderRadius:8, flexShrink:0 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={INK} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9v10h4.5v-5.5h3V19H18V9"/></svg>
+            </button>
+          )}
           <LangToggle lang={lang} setLang={setLang} />
         </>
       )}
@@ -785,7 +791,7 @@ export default function KioskApp() {
       case "brandDetail": return renderBrandDetail();
       case "search": return renderSearch();
       case "map": return renderMap();
-      case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.survey} lang={lang} />;
+      case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.survey} lang={lang} nonce={cur.nonce || 0} />;
       case "location": return renderLocation();
       default: return renderHome();
     }
@@ -832,6 +838,7 @@ export default function KioskApp() {
       .kiosk-search:focus-within{border-color:#01C0A4!important}
       .kiosk-input::placeholder{color:#98A2AE!important}
       @media (hover:hover){.kiosk-search:hover{border-color:#01C0A4!important}}
+      @media (hover:hover){.kiosk-iconbtn:hover{background:#EFF1F3!important}}
       @media (hover:hover){.kiosk-start-btn:hover{background:${C.bgF}!important;color:${C.t1}!important}}
       .kiosk-input::placeholder{color:${BRAND.hint}}
       .kiosk-tag:hover{background:${BRAND.accentTint}!important;border-color:${C.pri}!important}
@@ -855,7 +862,8 @@ export default function KioskApp() {
       <TopBar title={PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}
         badge={cur.page==="catDetail" ? String(cur.cat?.racks || "").split(",")[0].trim() : undefined}
         sub={cur.page==="catDetail" ? (CAT_SIGN[cur.cat?.name] || {}).en : undefined}
-        onStart={undefined}/>
+        onStart={undefined}
+        onHome={cur.page==="guide" ? () => setNav([{ page:"guide", path: GUIDE_PAGES.home, nonce: Date.now() }]) : undefined}/>
       <div>{renderPage()}</div>
 
       {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline(배포본 꼴 그대로). 탭에 건강 가이드만 더함(2026-11-13) */}

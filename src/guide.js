@@ -21,6 +21,7 @@ export const CONCERNS = [
 ];
 
 export const GUIDE_PAGES = {
+  home: "index.html",
   survey: "survey.html",
   dict: "encyclopedia.html",
   topic: (id) => `explore.html?topic=${encodeURIComponent(id)}`,
