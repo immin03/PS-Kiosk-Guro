@@ -7,24 +7,6 @@
    */
   export const PROMOTIONS = [
   {
-    "id": "pr-2611-수험생",
-    "src": "프칼",
-    "status": "확정",
-    "from": "2026-10-08",
-    "to": "2026-11-19",
-    "tag": "시즌 기획전",
-    "title": "수능 응원 이벤트",
-    "sub": "",
-    "link": "https://www.phamasquare.com/event.html",
-    "image": "2611-suneung-1.jpg",
-    "images": [
-      "2611-suneung-feed.jpg"
-    ],
-    "detailVideo": null,
-    "video": null,
-    "imageHasText": true
-  },
-  {
     "id": "pr-2611-하남기획전",
     "src": "프칼",
     "status": "확정",
@@ -34,6 +16,7 @@
     "title": "건강한 겨울을 준비할 시간",
     "sub": "",
     "link": "https://www.phamasquare.com/event.html",
+    "desc": "환절기 건강과 보습 상품을 이벤트존 한자리에 모은 겨울 기획전",
     "image": "2611-winter-0.jpg",
     "images": [
       "2611-winter-feed-1.jpg",
@@ -43,6 +26,27 @@
       "2611-winter-feed-5.jpg",
       "2611-winter-feed-6.jpg",
       "2611-winter-feed-7.jpg"
+    ],
+    "detailVideo": null,
+    "video": null,
+    "imageHasText": true
+  },
+  {
+    "id": "pr-2611-수능2차",
+    "src": "프칼",
+    "status": "확정",
+    "from": "2026-11-19",
+    "to": "2026-11-30",
+    "tag": "시즌 기획전",
+    "title": "수능 끝! 할인 시작!",
+    "sub": "2027학년도 수험생 특별 EVENT",
+    "link": "https://www.phamasquare.com/event.html",
+    "desc": "수험표 인증 시 11/22(일)까지 10% 할인(최대 10,000원), 11/23(월)부터 11/30(월)까지 2만원 이상 구매 시 2,000원 할인",
+    "image": "2611-suneung2-1.jpg",
+    "images": [
+      "2611-suneung2-feed-1.jpg",
+      "2611-suneung2-feed-2.jpg",
+      "2611-suneung2-feed-3.jpg"
     ],
     "detailVideo": null,
     "video": null,

@@ -130,6 +130,8 @@ for (const STORE of Object.keys(STORES)) {
         const [title, sub] = String(r.name).split(/\s+—\s+/);
         return { id: r.id, src: "프칼", status: r.status, from, to: to || null, tag: r.type || "기획전",
           title, sub: sub || "", link: "https://www.phamasquare.com/event.html",
+          /* 이벤트 목록 페이지(?view=events) 카드 아래 설명 — 손님용 한 줄(kioskDesc). 요약(summary)은 안쪽 말이라 쓰지 않는다(2026-11-19) */
+          desc: r.kioskDesc || "",
           /* 장표(2026-11-19 사용자 「대표 한 장만 배너에, 누르면 나머지 장표가 슬라이드」) — kioskImages 첫 장이 배너, 전부가 상세 넘겨 보기.
              장표는 문구가 박힌 디자인이라 글자를 얹지 않는다(imageHasText) */
           image: (r.kioskImages && r.kioskImages[0]) || r.kioskImage || null,

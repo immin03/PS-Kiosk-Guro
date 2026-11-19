@@ -11,7 +11,7 @@ const FEED_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const ST_OLD = { "진행": "확정", "진행 중": "확정", "완료": "확정" };
 const STORE_KO = { guro: "구로", hanam: "하남" };
 let feedP = null;
-const loadFeed = () => feedP || (feedP = (typeof fetch === "function"
+export const loadFeed = () => feedP || (feedP = (typeof fetch === "function"
   ? fetch(FEED_URL, { method: "POST", headers: { apikey: FEED_KEY, Authorization: "Bearer " + FEED_KEY, "Content-Type": "application/json" }, body: "{}" })
       .then((r) => (r.ok ? r.json() : {})).catch(() => ({}))
   : Promise.resolve({})));
@@ -45,18 +45,24 @@ export function applyFeed(list, feed, store = STORE) {
    없으면 매장 사진을 깝니다. 글자가 얹히므로 위에 어둡게 덮습니다.
    정본에는 파일 이름만 두고, 번들에 실린 주소는 여기서 찾습니다. */
 const SLIDES = import.meta.glob("./promo/*", { eager: true, query: "?url", import: "default" });
-const slideUrl = (name) => SLIDES[`./promo/${name}`];
+export const slideUrl = (name) => SLIDES[`./promo/${name}`];
 /* 이미지 없는 슬라이드는 k 번째 매장 사진(한 장을 모든 슬라이드에 깔지 않는다) */
 const bgOf = (p, k) => `url(${(p.image && slideUrl(p.image)) || STORE_PHOTOS[k % STORE_PHOTOS.length]})`;
 
-export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
-  /* 프칼 건은 그날 기간 안에 있는 것만. 하나도 없으면 상시 건(src 상시) — scripts/sync-racks.mjs */
-  const today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
-  const [feed, setFeed] = useState(null);
-  useEffect(() => { let on = true; loadFeed().then((f) => { if (on) setFeed(f); }); return () => { on = false; }; }, []);
+/* 오늘 걸 장 — 프칼 건 중 기간 안의 것, 하나도 없으면 상시 건. 이벤트 목록 페이지(EventsPage)도 같은 목록을 쓴다 */
+export const kstToday = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+export function liveSlides(feed, today = kstToday()) {
   const live = applyFeed(PROMOTIONS, feed).filter((p) => (!p.from || p.from <= today) && (!p.to || p.to >= today));
   const cal = live.filter((p) => p.src === "프칼");
-  const items = cal.length ? cal : live.filter((p) => p.src !== "프칼");
+  return cal.length ? cal : live.filter((p) => p.src !== "프칼");
+}
+
+export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
+  /* 프칼 건은 그날 기간 안에 있는 것만. 하나도 없으면 상시 건(src 상시) — scripts/sync-racks.mjs */
+  const today = kstToday();
+  const [feed, setFeed] = useState(null);
+  useEffect(() => { let on = true; loadFeed().then((f) => { if (on) setFeed(f); }); return () => { on = false; }; }, []);
+  const items = liveSlides(feed, today);
   const [i, setI] = useState(0);
   /* 손가락 · 마우스로 좌우로 밀어 넘긴다(2026-11-17 사용자 「스와이프해서 넘겨 볼 수 있게」).
      40px 넘게 밀면 한 장 넘기고, 민 뒤 손을 떼는 클릭은 배너 누르기로 치지 않는다.
