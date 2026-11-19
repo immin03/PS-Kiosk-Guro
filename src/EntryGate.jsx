@@ -12,13 +12,19 @@ import { t } from "./i18n.js";
 
 export const SITE = "https://www.phamasquare.com";
 export const SITE_EVENT = `${SITE}/event.html`;
+/* 키오스크 안 진행 중 이벤트 목록(2026-11-19) — 지금 지점 주소 그대로 ?view=events. 개발 서버의 ?store= 도 싣는다 */
+export const eventsHref = () => {
+  if (typeof location === "undefined") return SITE_EVENT;
+  const st = new URLSearchParams(location.search).get("store");
+  return location.pathname + "?view=events" + (st ? "&store=" + encodeURIComponent(st) : "");
+};
 
 export default function EntryGate({ lang, setLang, onEnter, logo, LangToggle }) {
   /* 2 × 2. 매장에서 쓰는 둘을 윗줄에, 밖으로 나가는 둘을 아랫줄에 둡니다. */
   const cards = [
     { id: "map", emoji: "🗺️", key: "gateMap", sub: "gateMapSub", tab: "map" },
     { id: "search", emoji: "🔎", key: "gateSearch", sub: "gateSearchSub", tab: "search" },
-    { id: "event", emoji: "🎟️", key: "gateEvent", sub: "gateEventSub", href: SITE_EVENT },
+    { id: "event", emoji: "🎟️", key: "gateEvent", sub: "gateEventSub", href: eventsHref() },
     { id: "site", emoji: "🌐", key: "gateSite", sub: "gateSiteSub", href: SITE },
   ];
 

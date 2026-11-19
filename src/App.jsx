@@ -13,6 +13,7 @@ import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
 import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
+import EventsList from "./EventsPage.jsx";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { usage, installUsage, mode as visit, GUIDE_ORIGIN } from "./usage.js";
@@ -318,7 +319,8 @@ export default function KioskApp() {
   );
   /* ?tab=search · map · guide 로 열면 그 탭에서 시작(2026-11-17) — 건강 가이드 바닥 탭이 키오스크 탭으로 넘어올 때 쓴다 */
   const TAB0 = (() => { const v = new URLSearchParams(window.location.search).get("tab"); return ["home","search","guide","map"].includes(v) ? v : "home"; })();
-  const [nav, setNav] = useState([{ page:TAB0 }]);
+  /* ?view=events 로 열면 진행 중 이벤트 목록부터 — 뒤로 가기는 시작 탭으로(2026-11-19) */
+  const [nav, setNav] = useState(() => new URLSearchParams(window.location.search).get("view") === "events" ? [{ page:TAB0 }, { page:"events" }] : [{ page:TAB0 }]);
   const cur = nav[nav.length - 1];
   const push = useCallback((pg) => setNav(p => [...p, pg]), []);
   const pop = useCallback(() => setNav(p => p.length > 1 ? p.slice(0,-1) : p), []);
@@ -525,8 +527,9 @@ export default function KioskApp() {
         {/* 2단(2026-11-17 사용자) — 두 칸 사이 20, 줄 선 없이 */}
         {/* 버튼 상자 둘(2026-11-17 사용자 「그냥 버튼으로 묶어, 박스로」) — 카테고리 카드와 같은 선 · 모서리, 올리면 테두리 민트 */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-          {[["🎟️","gateEvent","gateEventSub",SITE_EVENT],["🌐","gateSite","gateSiteSub",SITE]].map(([em,k,sk,href]) => (
-            <div key={k} className="ui-tile" role="button" onClick={() => window.location.assign(href)}
+          {/* 이벤트는 키오스크 안 진행 중 이벤트 목록으로(2026-11-19 사용자 「자세히 링크를 이벤트 페이지로」) — 홈페이지 event.html 은 이 지점 행사만 따로 못 보여 줬다 */}
+          {[["🎟️","gateEvent","gateEventSub",null],["🌐","gateSite","gateSiteSub",SITE]].map(([em,k,sk,href]) => (
+            <div key={k} className="ui-tile" role="button" onClick={() => (href ? window.location.assign(href) : navTo("events"))}
               style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
               <span aria-hidden="true" style={{ fontSize:24, lineHeight:1, flexShrink:0 }}>{em}</span>
               <span style={{ minWidth:0 }}>
@@ -796,6 +799,7 @@ export default function KioskApp() {
     map: t(lang,"storeMap"),
     location: t(lang,"locationTitle"),
     guide: t(lang,"tabGuide"),
+    events: t(lang,"eventsTitle"),
   };
 
   const renderPage = () => {
@@ -809,6 +813,7 @@ export default function KioskApp() {
       case "map": return renderMap();
       case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.home} lang={lang} nonce={cur.nonce || 0} />;
       case "location": return renderLocation();
+      case "events": return <EventsList onOpen={(p) => navTo("promo", { promo: p })} emptyText={t(lang,"eventsEmpty")} />;
       case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
       default: return renderHome();
     }

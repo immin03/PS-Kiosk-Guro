@@ -5,6 +5,8 @@ export const LANGS = ["ko", "en", "zh"];
 const STRINGS = {
   "ko": {
     "moreTitle": "더 보기",
+    "eventsTitle": "진행 중 이벤트",
+    "eventsEmpty": "지금 진행 중인 이벤트가 없습니다.",
     "catAll": "전체 카테고리",
     "locTitle": "매대 위치",
     "whoFor": "이런 분께",
@@ -176,6 +178,8 @@ const STRINGS = {
   },
   "en": {
     "moreTitle": "More",
+    "eventsTitle": "Current events",
+    "eventsEmpty": "There are no events running right now.",
     "catAll": "All categories",
     "locTitle": "Shelf location",
     "whoFor": "Good for",
@@ -423,6 +427,8 @@ const STRINGS = {
   },
   "zh": {
     "moreTitle": "更多",
+    "eventsTitle": "进行中的活动",
+    "eventsEmpty": "目前没有进行中的活动。",
     "catAll": "全部分类",
     "locTitle": "货架位置",
     "whoFor": "适合人群",

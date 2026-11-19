@@ -129,7 +129,8 @@ for (const STORE of Object.keys(STORES)) {
         if (to && /^\d{4}-\d{2}$/.test(to)) to = to + "-31";
         const [title, sub] = String(r.name).split(/\s+—\s+/);
         return { id: r.id, src: "프칼", status: r.status, from, to: to || null, tag: r.type || "기획전",
-          title, sub: sub || "", link: "https://www.phamasquare.com/event.html",
+          /* 자세히 = 키오스크 안 진행 중 이벤트 목록(2026-11-19) */
+          title, sub: sub || "", link: `https://kiosk.phamasquare.com/${STORE}/?view=events`,
           /* 이벤트 목록 페이지(?view=events) 카드 아래 설명 — 손님용 한 줄(kioskDesc). 요약(summary)은 안쪽 말이라 쓰지 않는다(2026-11-19) */
           desc: r.kioskDesc || "",
           /* 장표(2026-11-19 사용자 「대표 한 장만 배너에, 누르면 나머지 장표가 슬라이드」) — kioskImages 첫 장이 배너, 전부가 상세 넘겨 보기.
