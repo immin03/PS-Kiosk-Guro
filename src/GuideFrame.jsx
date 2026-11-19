@@ -13,8 +13,8 @@ import { t } from "./i18n.js";
  * 가이드는 인터넷이 있어야 돕니다(설문 저장 · 쿠폰). 매장 WebView 가 끊겨 있으면
  * 하얀 칸만 남지 않게 안내를 띄우고 다시 시도할 수 있게 합니다. */
 
-const TOP_BAR = 49;   /* 머리글 줄 */
-const BOTTOM_NAV = 56; /* 아래 탭 */
+const TOP_BAR = 56;   /* 머리글 줄 — 실측(2026-11-20) */
+const BOTTOM_NAV = 49; /* 아래 탭 — 실측 48.6 */
 
 /* 화면 폭에 맞춰 html 에 zoom 을 걸어 두므로, 남은 높이는 그 배율로 나눠 셉니다. */
 const usableHeight = () => {

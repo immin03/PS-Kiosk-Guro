@@ -388,7 +388,10 @@ export default function KioskApp() {
       return Math.max(1, Math.floor(s * 4) / 4);
     };
     const fit = () => {
-      const s = snap(Math.min(window.innerWidth / DESIGN_W, 2.6));
+      /* 웹 · PC 에서는 2.6배까지만(넓은 모니터에서 거대해지지 않게). DID(?did=)는 화면이 곧 키오스크라 끝까지 —
+         4K 세로 DID(2160px)에서 2.6배로 묶이면 기둥이 가운데 1,600px 만 쓰고 글자가 작아졌다(2026-11-20 DID 검수) */
+      const cap = new URLSearchParams(window.location.search).has("did") ? 8 : 2.6;
+      const s = snap(Math.min(window.innerWidth / DESIGN_W, cap));
       document.documentElement.style.zoom = s > 1 ? String(s) : "";
     };
     fit();
@@ -866,7 +869,9 @@ export default function KioskApp() {
         100vh 는 실제 화면의 2.6배가 되고, 그만큼 빈 자리가 아래로 늘어납니다.
         바탕색은 body 가 깔아 주므로 짧은 화면에서도 흰 자리가 생기지 않습니다. */}
     <div style={{ maxWidth:SHELL_MAX, margin:"0 auto", background:C.bgF,
-      fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1, paddingBottom:64 }}>
+      fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1,
+      /* 건강 가이드 탭은 iframe 이 화면 높이를 다 쓰므로 아래 여백을 두지 않는다 — 두면 바깥 페이지가 15px 더 밀려 머리글이 흔들렸다(2026-11-20 DID 검수) */
+      paddingBottom: cur.page === "guide" ? 0 : 64 }}>
       <TopBar title={cur.page === "promo" ? (cur.promo?.title || "") : PAGE_TITLES[cur.page]} onBack={cur.page!=="home" ? goBack : undefined} isHome={cur.page==="home"} lang={lang} setLang={setLang}
         badge={cur.page==="catDetail" ? String(cur.cat?.racks || "").split(",")[0].trim() : undefined}
         sub={cur.page==="catDetail" ? (CAT_SIGN[cur.cat?.name] || {}).en : undefined}
