@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import PromoBanner from "./PromoBanner.jsx";
 import { BRAND } from "./theme.js";
 import { resolveBaseRelativeUrl } from "./baseRelativeUrl.js";
@@ -15,7 +15,17 @@ export const SHELL_FRAME_W = 0.62;
 export default function Shell75() {
   const u = new URL(window.location.href);
   u.searchParams.set("inner", "1");
-  const frame = useRef(null);
+  const frame = useRef(null), box = useRef(null);
+  /* 판 안 키오스크는 늘 설계 폭(DW)으로 그리고 판 크기에 맞춰 통째로 줄인다 — 판이 좁은 화면(미리보기 · 작은 창)에서
+     키오스크가 판 폭 그대로 그려져 칸이 눌리고 「홈페이지」 가 두 줄로 꺾였다(2026-11-19 사용자). 실제 75"(1080 폭)에서는 약 1.5배로 키워 보인다 */
+  const DW = 450;
+  const [bx, setBx] = useState({ w: 0, h: 0 });
+  useEffect(() => {
+    const el = box.current; if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setBx({ w: el.clientWidth, h: el.clientHeight })); ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const sc = bx.w ? bx.w / DW : 1;
   /* 위 장표를 누르면 판 안 키오스크가 진행 중 이벤트로 — 안쪽 홈에는 같은 배너를 두지 않는다(App: inner) */
   const openEvents = () => { const e = new URL(u); e.searchParams.set("view", "events"); if (frame.current) frame.current.src = e.toString(); };
   return (
@@ -29,8 +39,11 @@ export default function Shell75() {
       </div>
       <div style={{ flex: 1 }} />
       <div style={{ width: `${SHELL_FRAME_W * 100}vw`, height: `${SHELL_FRAME_W * 100}vh`, marginBottom: "3vh", flexShrink: 0, borderRadius: "2.6vw", overflow: "hidden",
-        background: "#FFFFFF", boxShadow: "0 0 0 1px rgba(16,24,30,.06), 0 2vh 5vh rgba(16,24,30,.16)" }}>
-        <iframe ref={frame} src={u.toString()} title="파마스퀘어 키오스크" allow="clipboard-write" style={{ width: "100%", height: "100%", border: 0, display: "block" }} />
+        background: "#FFFFFF", boxShadow: "0 0 0 1px rgba(16,24,30,.06), 0 2vh 5vh rgba(16,24,30,.16)" }} ref={box}>
+        {bx.w > 0 && (
+          <iframe ref={frame} src={u.toString()} title="파마스퀘어 키오스크" allow="clipboard-write"
+            style={{ width: DW, height: Math.round(bx.h / sc), border: 0, display: "block", transform: `scale(${sc})`, transformOrigin: "0 0" }} />
+        )}
       </div>
     </div>
   );
