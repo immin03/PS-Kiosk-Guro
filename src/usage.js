@@ -7,6 +7,9 @@ import { STORE } from "./store.js";
      화면이 저절로 처음으로 돌아가는 것(유휴 초기화)은 손님이 아니라서 세지 않습니다.
    - DID · 인쇄물 QR 로 폰에서 열면 주소에 ?src=<마칼 품목 코드> 가 붙어 옵니다. 그때는 터치를 기다리지 않고 바로 손님 한 명(view target=scan)으로 세고,
      그 손님의 모든 기록에 구좌(src)를 붙입니다.
+   - 매장에 붙박인 기기(DID · 입구 키오스크 · 아이패드)는 주소에 ?did=<마칼 품목 코드> 를 붙여 띄웁니다(2026-11-19 사용자 「디바이스마다 어디서 눌렀는지」).
+     QR 과 달리 손님은 터치로 열고, 그 기기의 모든 손님 기록에 같은 코드를 구좌(src)로 붙입니다 — 손님이 바뀌어도 지우지 않습니다.
+     건강 가이드 탭(다른 주소의 iframe)에도 기기 코드와 손님 값(sid)을 넘기고, 가이드 안에서 만지는 것도 손이 닿은 것으로 받습니다(ps-guide-activity).
    - 사람을 알아볼 값은 담지 않습니다. 찾은 말은 결과 수와 함께 남깁니다(없는 상품을 찾는 말이 가장 쓸모 있습니다).
    - 매장 단말은 인터넷이 끊길 수 있어, 모은 기록은 기기에 두었다가(최대 1,000건) 연결될 때 30초마다 보냅니다.
    - 세지 않는 곳: 직원 기기(?staff=1 로 한 번 열면 이 브라우저에 남음, ?staff=0 으로 풂 · PS-OS 에 로그인한 기기는 공통 쿠키 ps_staff 로 자동) · PS-OS 안 미리보기 · 개발 서버.
@@ -17,6 +20,8 @@ const FLUSH_MS = 30_000;
 const QUEUE_KEY = "ps_usage_q";
 const QUEUE_MAX = 1000;
 const BATCH = 300;
+/* 건강 가이드 주소 — 이 주소에서 온 「만졌다」 알림만 받는다 */
+export const GUIDE_ORIGIN = /^https:\/\/(health\.phamasquare\.com|ps-aihealthguide\.netlify\.app|[a-z0-9-]+--ps-aihealthguide\.netlify\.app)$|^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 export const SRC_RE = /^[A-Z0-9][A-Z0-9-]{2,39}(\.[0-9]{1,2})?$/;
 
 /* 공개용(anon) 키입니다 — 브라우저에 실려도 되는 값이고, 이 키로는 기록 쓰기 함수만 부를 수 있습니다. */
@@ -29,9 +34,11 @@ const clip = (s, n) => String(s == null ? "" : s).replace(/\s+/g, " ").trim().sl
 export const screenOf = (page) => (page === "map" || page === "location" ? "store-map" : "kiosk");
 export const pageId = (page) => (String(page || "").replace(/[^0-9A-Za-z-]/g, "").slice(0, 40) || "home");
 
-export function createUsage({ store = "guro", src = "", url = SUPABASE_URL, key = SUPABASE_ANON, storage, fetchFn, now = () => Date.now(), enabled = true, sink } = {}) {
-  src = SRC_RE.test(src || "") ? src : "";
-  const st = { sid: "", sesStart: 0, lastAct: 0, page: "", pageStart: 0, off: 0, busy: false, q: [], src };
+export function createUsage({ store = "guro", src = "", device = "", url = SUPABASE_URL, key = SUPABASE_ANON, storage, fetchFn, now = () => Date.now(), enabled = true, sink } = {}) {
+  device = SRC_RE.test(device || "") ? device : "";
+  /* 붙박인 기기면 QR 구좌는 보지 않는다 — 그 화면에서 연 손님은 모두 그 기기 손님 */
+  src = !device && SRC_RE.test(src || "") ? src : "";
+  const st = { sid: "", sesStart: 0, lastAct: 0, page: "", pageStart: 0, off: 0, busy: false, q: [], src, device };
   try { st.q = JSON.parse((storage && storage.getItem(QUEUE_KEY)) || "[]") || []; } catch (e) { st.q = []; }
 
   const save = () => { try { storage && storage.setItem(QUEUE_KEY, JSON.stringify(st.q)); } catch (e) {} };
@@ -39,7 +46,7 @@ export function createUsage({ store = "guro", src = "", url = SUPABASE_URL, key 
     if (!enabled || !st.sid) return;
     const p = pageId(page);
     const row = Object.assign({ at: new Date(now()).toISOString(), sid: st.sid, screen: screenOf(p), page: p, kind }, extra);
-    if (st.src) row.src = st.src;
+    if (st.src || st.device) row.src = st.src || st.device;
     st.q.push(row);
     if (sink) sink(row);
     if (st.q.length > QUEUE_MAX) st.q.splice(0, st.q.length - QUEUE_MAX);
@@ -126,7 +133,7 @@ export function createUsage({ store = "guro", src = "", url = SUPABASE_URL, key 
 }
 
 /* 직원 기기 · 미리보기 · 개발 서버 가리기 — 주소와 저장소만 보고 정합니다(시험에서 따로 부름) */
-export function visitMode({ search = "", hostname = "", inFrame = false, referrer = "", ancestors = [], storage, cookie = "" } = {}) {
+export function visitMode({ search = "", hostname = "", inFrame = false, referrer = "", ancestors = [], storage, session, cookie = "" } = {}) {
   const qs = new URLSearchParams(search);
   let staff = false;
   try {
@@ -146,16 +153,24 @@ export function visitMode({ search = "", hostname = "", inFrame = false, referre
   const counted = !staff && !psosPreview && flag !== "off";
   const send = counted && (flag === "on" || !onDev);
   const raw = (qs.get("src") || "").toUpperCase();
-  return { counted, send, staff, src: SRC_RE.test(raw) ? raw : "" };
+  /* 기기 코드는 이 탭에 기억한다 — 가이드의 「매장에서 위치 찾기」 처럼 주소를 새로 열며 ?did 가 빠져도 같은 기기. 기기를 다시 켜면 처음 주소에서 다시 받는다 */
+  let did = (qs.get("did") || "").toUpperCase();
+  try {
+    if (SRC_RE.test(did)) session && session.setItem("ps_did", did);
+    else did = (session && session.getItem("ps_did")) || "";
+  } catch (e) {}
+  return { counted, send, staff, src: SRC_RE.test(raw) ? raw : "", device: SRC_RE.test(did) ? did : "" };
 }
 
 /* 앱에서 쓰는 한 벌 — 화면 이벤트를 듣는다. 세는 기기지만 보내지 않는 곳(개발 서버)은 window.__psVisit 에만 쌓는다 */
 const hasWin = typeof window !== "undefined" && typeof location !== "undefined";
 export const mode = hasWin
   ? visitMode({ search: location.search, hostname: location.hostname, inFrame: window.top !== window.self,
-      referrer: document.referrer, ancestors: (location.ancestorOrigins && Array.from(location.ancestorOrigins)) || [], storage: typeof localStorage !== "undefined" ? localStorage : null, cookie: document.cookie || "" })
-  : { counted: false, send: false, staff: false, src: "" };
+      referrer: document.referrer, ancestors: (location.ancestorOrigins && Array.from(location.ancestorOrigins)) || [], storage: typeof localStorage !== "undefined" ? localStorage : null,
+      session: (() => { try { return sessionStorage; } catch (e) { return null; } })(), cookie: document.cookie || "" })
+  : { counted: false, send: false, staff: false, src: "", device: "" };
 export const usage = createUsage({
+  device: mode.device,
   store: STORE, /* 지점(src/store.js) — 하남 키오스크도 같은 코드라 지점을 실어 보낸다(2026-11-17) */
   src: mode.src,
   storage: mode.send && typeof localStorage !== "undefined" ? localStorage : null,
@@ -175,14 +190,22 @@ export function installUsage(u = usage) {
     u.click(name, e.clientX / Math.max(1, window.innerWidth), e.clientY / Math.max(1, window.innerHeight));
   };
   const onHide = () => { if (document.hidden) u.flush(); };
+  /* 건강 가이드(iframe) 안에서 만짐 — 바깥 창에는 터치가 안 온다. 손님으로 받고, 그 손님 값(sid)을 돌려줘 가이드 기록을 같은 손님으로 묶는다 */
+  const onMsg = (e) => {
+    if (!e.data || e.data.type !== "ps-guide-activity" || !GUIDE_ORIGIN.test(e.origin || "")) return;
+    u.touch();
+    try { e.source && e.source.postMessage({ type: "ps-visit", sid: u.state.sid, src: u.state.src || u.state.device || "" }, e.origin); } catch (err) {}
+  };
   window.addEventListener("pointerdown", onDown, { capture: true, passive: true });
   window.addEventListener("keydown", onDown, { capture: true, passive: true });
   window.addEventListener("click", onClick, true);
   document.addEventListener("visibilitychange", onHide);
+  window.addEventListener("message", onMsg);
   u.arrive();
   const iv = setInterval(() => u.tick(), FLUSH_MS);
   return () => {
     window.removeEventListener("pointerdown", onDown, true); window.removeEventListener("keydown", onDown, true);
     window.removeEventListener("click", onClick, true); document.removeEventListener("visibilitychange", onHide); clearInterval(iv);
+    window.removeEventListener("message", onMsg);
   };
 }

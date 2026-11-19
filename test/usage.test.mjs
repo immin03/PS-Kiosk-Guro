@@ -120,3 +120,24 @@ test("함수가 없으면(404) 버리고 30분 쉽니다", async () => {
   await u.flush();
   assert.equal(sent.length, 2);
 });
+
+test("붙박인 기기(?did)는 터치로 손님을 열고, 손님이 바뀌어도 모든 기록에 기기 코드", () => {
+  let t = Date.parse("2026-11-19T03:00:00Z");
+  const u = createUsage({ device: "DD-DID-ENT-75T-V2", src: "PD-DID65-SLD-V1", now: () => t });
+  u.arrive();
+  assert.equal(u.state.q.length, 0, "켜지기만 해서는 손님이 아니다");
+  u.view("home"); u.touch(); t += 5_000; u.view("search");
+  t += USAGE_IDLE_MS + 1_000; u.touch(); u.view("guide");
+  const sids = new Set(u.state.q.map((e) => e.sid));
+  assert.equal(sids.size, 2, "손님 둘");
+  assert.ok(u.state.q.every((e) => e.src === "DD-DID-ENT-75T-V2"), "QR 구좌 대신 기기 코드, 둘째 손님에게도");
+  assert.equal(u.state.q[0].target, "touch");
+});
+
+test("기기 코드는 주소 ?did 에서, 빠진 주소로 다시 열려도 그 탭에 남는다", () => {
+  const mem = {}; const session = { getItem: (k) => mem[k] || null, setItem: (k, v) => { mem[k] = v; } };
+  assert.equal(visitMode({ search: "?did=dd-ksk-ent-v1", session }).device, "DD-KSK-ENT-V1");
+  assert.equal(visitMode({ search: "?locate=비타민", session }).device, "DD-KSK-ENT-V1");
+  assert.equal(visitMode({ search: "?did=<x>" }).device, "");
+  assert.equal(visitMode({ search: "" }).device, "");
+});

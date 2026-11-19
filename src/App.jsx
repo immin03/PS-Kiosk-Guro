@@ -15,7 +15,7 @@ import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
-import { usage, installUsage } from "./usage.js";
+import { usage, installUsage, mode as visit, GUIDE_ORIGIN } from "./usage.js";
 import { GUIDE_PAGES, CONCERNS } from "./guide.js";
 import { EMOJI as CAT_EMOJI, key as catKey, emojiOf } from "./categories.js";
 import { UI_CSS, Section, Row, Rows, Thumb, Tile, Chip, ChipRow, Btn, Seg, Badge, Dot, GAP, PAD, INK, MUTED, MINT } from "./ui.jsx";
@@ -390,7 +390,7 @@ export default function KioskApp() {
     const fit = () => {
       /* 웹 · PC 에서는 2.6배까지만(넓은 모니터에서 거대해지지 않게). DID(?did=)는 화면이 곧 키오스크라 끝까지 —
          4K 세로 DID(2160px)에서 2.6배로 묶이면 기둥이 가운데 1,600px 만 쓰고 글자가 작아졌다(2026-11-20 DID 검수) */
-      const cap = new URLSearchParams(window.location.search).has("did") ? 8 : 2.6;
+      const cap = new URLSearchParams(window.location.search).has("did") || visit.device ? 8 : 2.6;
       const s = snap(Math.min(window.innerWidth / DESIGN_W, cap));
       document.documentElement.style.zoom = s > 1 ? String(s) : "";
     };
@@ -406,24 +406,32 @@ export default function KioskApp() {
   /* 매장에 놓인 공용 단말입니다. 손님이 떠난 자리에 앞사람이 보던 화면이
      남아 있으면 다음 손님은 그 화면부터 시작하게 됩니다.
      한동안 아무도 만지지 않으면 처음으로 되돌립니다. 언어도 함께 돌립니다. */
+  const touchedGuide = useRef(false);
   useEffect(() => {
     if (IDLE_RESET_MS <= 0) return;
     let timer;
-    const atHome = () => nav.length === 1 && nav[0].page === "home" && !searchQ;
+    /* 처음 = 연 탭(?tab=) — 건강 가이드로 띄운 아이패드는 가이드로 돌아간다(2026-11-19) */
+    /* 가이드는 iframe 안에서 옮겨 다녀 바깥에서 못 본다 — 만진 적이 있으면 새로 띄운다(nonce) */
+    const atHome = () => nav.length === 1 && nav[0].page === TAB0 && !searchQ && !(TAB0 === "guide" && touchedGuide.current);
     const reset = () => {
       if (atHome()) return;
-      setNav([{ page: "home" }]);
-      setActiveTab("home");
+      touchedGuide.current = false;
+      setNav([TAB0 === "guide" ? { page: TAB0, nonce: Date.now() } : { page: TAB0 }]);
+      setActiveTab(TAB0);
       setSearchQ("");
       setLang(DEFAULT_LANG);
       window.scrollTo({ top: 0 });
     };
-    const arm = () => { clearTimeout(timer); timer = setTimeout(reset, cur.page === "guide" ? 300_000 : IDLE_RESET_MS); };
+    const arm = (e) => { if (e) touchedGuide.current = true; clearTimeout(timer); timer = setTimeout(reset, cur.page === "guide" ? 300_000 : IDLE_RESET_MS); };
     const events = ["pointerdown", "keydown", "wheel", "touchstart"];
     events.forEach((e) => window.addEventListener(e, arm, { passive: true }));
-    arm();
+    /* 건강 가이드(iframe) 안에서 만지는 것은 바깥 창에 안 온다 — 가이드가 알려 주는 것으로 다시 잰다. 설문 도중 처음으로 튕기던 것 */
+    const onGuide = (e) => { if (e.data && e.data.type === "ps-guide-activity" && GUIDE_ORIGIN.test(e.origin || "")) arm(e); };
+    window.addEventListener("message", onGuide);
+    arm(null);
     return () => {
       clearTimeout(timer);
+      window.removeEventListener("message", onGuide);
       events.forEach((e) => window.removeEventListener(e, arm));
     };
   }, [nav, searchQ]);

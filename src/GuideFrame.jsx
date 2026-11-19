@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { guideUrl } from "./guide.js";
 import { BRAND, RADIUS } from "./theme.js";
 
@@ -40,7 +40,8 @@ export default function GuideFrame({ path, lang, nonce = 0 }) {
     return () => clearTimeout(id);
   }, [state, tryNo]);
 
-  const src = guideUrl(path, lang);
+  /* 주소는 띄울 때 한 번만 — 손님 값(sid)이 바뀌었다고 쓰는 도중 다시 띄우지 않는다 */
+  const src = useMemo(() => guideUrl(path, lang), [path, lang, nonce, tryNo]);
 
   /* 「여는 중」 문구는 0.4초 넘게 걸릴 때만(2026-11-18 사용자 「번쩍임 확인」) — 빨리 열려도 매번 문구가 한 번 번쩍 지나갔다 */
   const [slow, setSlow] = useState(false);
