@@ -24,7 +24,8 @@ export function eventPeriod(p) {
 export default function EventsList({ onOpen, emptyText }) {
   const [feed, setFeed] = useState(null);
   useEffect(() => { let on = true; loadFeed().then((f) => { if (on) setFeed(f); }); return () => { on = false; }; }, []);
-  const items = liveSlides(feed, kstToday());
+  /* 최신순 — 늦게 시작한 행사가 위(2026-11-19 사용자). 홈 배너 순서는 그대로 둔다 */
+  const items = liveSlides(feed, kstToday()).slice().sort((a, b) => String(b.from || "").localeCompare(String(a.from || "")));
 
   return (
     <div style={{ padding: `16px ${PAD}px 40px`, wordBreak: "keep-all" }}>
