@@ -14,6 +14,7 @@ import {
 import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import EventsList from "./EventsPage.jsx";
+import SiteFrame from "./SiteFrame.jsx";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { usage, installUsage, mode as visit, GUIDE_ORIGIN } from "./usage.js";
@@ -489,7 +490,8 @@ export default function KioskApp() {
   /* ── HOME ── 부품 한 벌(ui.jsx)만 씀. 묶음 사이 여백 GAP 한 값 */
   const renderHome = () => (
     <div style={{ padding:`16px ${PAD}px 24px` }}>
-      <PromoBanner bleed={PAD} onPress={(p) => navTo("promo", { promo: p })}/>
+      {/* 75" 판 안쪽(&inner=1)은 위 장표를 바깥 판이 띄우므로 홈 배너를 두지 않는다(Shell75) */}
+      {!new URLSearchParams(window.location.search).has("inner") && <PromoBanner bleed={PAD} onPress={(p) => navTo("promo", { promo: p })}/>}
 
       <div style={{ marginBottom:GAP, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
@@ -528,8 +530,9 @@ export default function KioskApp() {
         {/* 버튼 상자 둘(2026-11-17 사용자 「그냥 버튼으로 묶어, 박스로」) — 카테고리 카드와 같은 선 · 모서리, 올리면 테두리 민트 */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
           {/* 이벤트는 키오스크 안 진행 중 이벤트 목록으로(2026-11-19 사용자 「자세히 링크를 이벤트 페이지로」) — 홈페이지 event.html 은 이 지점 행사만 따로 못 보여 줬다 */}
-          {[["🎟️","gateEvent","gateEventSub",null],["🌐","gateSite","gateSiteSub",SITE]].map(([em,k,sk,href]) => (
-            <div key={k} className="ui-tile" role="button" onClick={() => (href ? window.location.assign(href) : navTo("events"))}
+          {/* 홈페이지도 키오스크 안에서(site) — 통째로 넘어가면 매장 기기가 돌아올 길이 없었다(2026-11-19) */}
+          {[["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
+            <div key={k} className="ui-tile" role="button" onClick={() => navTo(pg)}
               style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
               <span aria-hidden="true" style={{ fontSize:24, lineHeight:1, flexShrink:0 }}>{em}</span>
               <span style={{ minWidth:0 }}>
@@ -800,6 +803,7 @@ export default function KioskApp() {
     location: t(lang,"locationTitle"),
     guide: t(lang,"tabGuide"),
     events: t(lang,"eventsTitle"),
+    site: t(lang,"gateSite"),
   };
 
   const renderPage = () => {
@@ -813,6 +817,7 @@ export default function KioskApp() {
       case "map": return renderMap();
       case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.home} lang={lang} nonce={cur.nonce || 0} />;
       case "location": return renderLocation();
+      case "site": return <SiteFrame src={SITE} title={t(lang,"gateSite")} />;
       case "events": return <EventsList onOpen={(p) => navTo("promo", { promo: p })} emptyText={t(lang,"eventsEmpty")} />;
       case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
       default: return renderHome();
