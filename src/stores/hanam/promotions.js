@@ -17,6 +17,7 @@
     "sub": "",
     "link": "https://kiosk.phamasquare.com/hanam/?view=events",
     "desc": "환절기 건강과 보습 상품을 이벤트존 한자리에 모은 겨울 기획전",
+    "view": null,
     "image": "2611-winter-0.jpg",
     "images": [
       "2611-winter-feed-1.jpg",
@@ -42,6 +43,7 @@
     "sub": "하남점 단독",
     "link": "https://kiosk.phamasquare.com/hanam/?view=events",
     "desc": "하남점에서 3만원 이상 구매한 영수증 1건마다 룰렛 1회, 꽝 없이 사은품 증정",
+    "view": null,
     "image": "2611-roulette-0.jpg",
     "images": [
       "2611-roulette-feed.jpg",
@@ -65,11 +67,32 @@
     "sub": "2027학년도 수험생 특별 EVENT",
     "link": "https://kiosk.phamasquare.com/hanam/?view=events",
     "desc": "수험표 인증 시 11/22(일)까지 10% 할인(최대 10,000원), 11/23(월)부터 11/30(월)까지 2만원 이상 구매 시 2,000원 할인",
+    "view": null,
     "image": "2611-suneung2-1.jpg",
     "images": [
       "2611-suneung2-feed-1.jpg",
       "2611-suneung2-feed-2.jpg",
       "2611-suneung2-feed-3.jpg"
+    ],
+    "detailVideo": null,
+    "video": null,
+    "imageHasText": true
+  },
+  {
+    "id": "pr-2611-하남월드",
+    "src": "프칼",
+    "status": "확정",
+    "from": "2026-11-22",
+    "to": null,
+    "tag": "3D 매장",
+    "title": "파마스퀘어 월드",
+    "sub": "하남점 3D 매장 오픈",
+    "link": "https://kiosk.phamasquare.com/hanam/?view=events",
+    "desc": "파미랑 하남점 3D 매장을 걷고, 숨은 보물도 찾아요",
+    "view": "world",
+    "image": "2612-world-0.jpg",
+    "images": [
+      "2612-world-0.jpg"
     ],
     "detailVideo": null,
     "video": null,
