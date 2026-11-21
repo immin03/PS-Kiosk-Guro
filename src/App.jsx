@@ -15,6 +15,10 @@ import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
+import { STORE } from "./store.js";
+import worldBanner from "./promo/2612-world-0.jpg?url";
+/* 파마스퀘어 월드(하남 3D 매장 · guide.phamasquare.com) — 키오스크 안 틀로 연다. 하남만(2026-11-22 사용자) */
+const WORLD = "https://guide.phamasquare.com/world/hanam/3d";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { usage, installUsage, mode as visit, GUIDE_ORIGIN } from "./usage.js";
@@ -321,7 +325,7 @@ export default function KioskApp() {
   /* ?tab=search · map · guide 로 열면 그 탭에서 시작(2026-11-17) — 건강 가이드 바닥 탭이 키오스크 탭으로 넘어올 때 쓴다 */
   const TAB0 = (() => { const v = new URLSearchParams(window.location.search).get("tab"); return ["home","search","guide","map"].includes(v) ? v : "home"; })();
   /* ?view=events 로 열면 진행 중 이벤트 목록부터 — 뒤로 가기는 시작 탭으로(2026-11-19) */
-  const [nav, setNav] = useState(() => new URLSearchParams(window.location.search).get("view") === "events" ? [{ page:TAB0 }, { page:"events" }] : [{ page:TAB0 }]);
+  const [nav, setNav] = useState(() => { const v = new URLSearchParams(window.location.search).get("view"); return v === "events" || (v === "world" && STORE === "hanam") ? [{ page:TAB0 }, { page:v }] : [{ page:TAB0 }]; });
   const cur = nav[nav.length - 1];
   const push = useCallback((pg) => setNav(p => [...p, pg]), []);
   const pop = useCallback(() => setNav(p => p.length > 1 ? p.slice(0,-1) : p), []);
@@ -491,7 +495,7 @@ export default function KioskApp() {
   const renderHome = () => (
     <div style={{ padding:`16px ${PAD}px 24px` }}>
       {/* 75" 판 안쪽(&inner=1)은 위 장표를 바깥 판이 띄우므로 홈 배너를 두지 않는다(Shell75) */}
-      {!new URLSearchParams(window.location.search).has("inner") && <PromoBanner bleed={PAD} onPress={(p) => navTo("promo", { promo: p })}/>}
+      {!new URLSearchParams(window.location.search).has("inner") && <PromoBanner bleed={PAD} onPress={(p) => (p.view === "world" && STORE === "hanam") ? navTo("world") : navTo("promo", { promo: p })}/>}
 
       <div style={{ marginBottom:GAP, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
@@ -719,6 +723,13 @@ export default function KioskApp() {
     <div style={{ padding:`16px ${PAD}px 24px` }}>
       <FloorPlan lang={lang} heading={t(lang,"storeFloor")} onRackClick={(rack) => { const ty = ZONE_TYPE[rack.zone]; if (ty) navTo("catList", { catType: ty }); }}/>
       {zoneRows()}
+      {/* 지도 아래 — 파마스퀘어 월드(3D 매장) 홍보 배너, 누르면 키오스크 안에서 3D 매장(하남만) */}
+      {STORE === "hanam" && (
+        <button type="button" onClick={() => navTo("world")} aria-label="파마스퀘어 월드 — 3D 매장 입장"
+          style={{ display:"block", width:"100%", marginTop:24, padding:0, border:0, borderRadius:12, overflow:"hidden", background:"transparent", cursor:"pointer" }}>
+          <img src={worldBanner} alt="" style={{ display:"block", width:"100%", aspectRatio:"16 / 9", objectFit:"cover" }} />
+        </button>
+      )}
     </div>
   );
 
@@ -818,6 +829,7 @@ export default function KioskApp() {
       case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.home} lang={lang} nonce={cur.nonce || 0} />;
       case "location": return renderLocation();
       case "site": return <SiteFrame src={SITE} title={t(lang,"gateSite")} />;
+      case "world": return <SiteFrame src={WORLD} title="PHAMA SQUARE WORLD" />;
       case "events": return <EventsList onOpen={(p) => navTo("promo", { promo: p })} emptyText={t(lang,"eventsEmpty")} />;
       case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
       default: return renderHome();

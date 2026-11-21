@@ -133,6 +133,8 @@ for (const STORE of Object.keys(STORES)) {
           title, sub: sub || "", link: `https://kiosk.phamasquare.com/${STORE}/?view=events`,
           /* 이벤트 목록 페이지(?view=events) 카드 아래 설명 — 손님용 한 줄(kioskDesc). 요약(summary)은 안쪽 말이라 쓰지 않는다(2026-11-19) */
           desc: r.kioskDesc || "",
+          /* 누르면 갈 키오스크 안 화면(kioskView) — world = 파마스퀘어 월드(3D 매장). 없으면 장표 상세(2026-11-22) */
+          view: r.kioskView || null,
           /* 장표(2026-11-19 사용자 「대표 한 장만 배너에, 누르면 나머지 장표가 슬라이드」) — kioskImages 첫 장이 배너, 전부가 상세 넘겨 보기.
              장표는 문구가 박힌 디자인이라 글자를 얹지 않는다(imageHasText) */
           image: (r.kioskImages && r.kioskImages[0]) || r.kioskImage || null,
