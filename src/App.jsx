@@ -20,7 +20,9 @@ import { STORE } from "./store.js";
 import worldBanner from "./promo/2612-world-0.jpg?url";
 import WorldCta from "./WorldCta.jsx";
 /* 파마스퀘어 월드(하남 3D 매장 · guide.phamasquare.com) — 키오스크 안 틀로 연다. 하남만(2026-11-22 사용자) */
-const WORLD = "https://guide.phamasquare.com/world/hanam/3d";
+/* 파마스퀘어 월드(3D 매장) — 하남 · 구로가 같은 3D 틀(PS-OS tools/build-world.py), 지점 주소만 다르다(2026-11-22 구로 추가) */
+export const WORLD_STORES = ["hanam", "guro"];
+const WORLD = "https://guide.phamasquare.com/world/" + STORE + "/3d";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { usage, installUsage, mode as visit, GUIDE_ORIGIN } from "./usage.js";
@@ -278,7 +280,8 @@ const toShell = (m) => { try { window.parent.postMessage({ psShell: true, ...m }
 if (INNER) {
   window.addEventListener("message", (e) => {
     if (e.origin !== window.location.origin) return;
-    const m = e.data; if (!m || m.psKbd !== "key" || !kbd.cur) return;
+    const m = e.data; if (m && m.psNav === "back") { if (window.__psBack) window.__psBack(); return; }   /* 75" 판의 3D 전체 화면에서 「처음으로」 → 월드 칸 닫기 */
+    if (!m || m.psKbd !== "key" || !kbd.cur) return;
     const v = kbd.cur.value;
     const nv = m.k === "back" ? backKey(v) : typeKey(v, m.k);
     kbd.cur.value = nv; kbd.cur.onChange(nv);
@@ -347,12 +350,13 @@ export default function KioskApp() {
   /* ?tab=search · map · guide 로 열면 그 탭에서 시작(2026-11-17) — 건강 가이드 바닥 탭이 키오스크 탭으로 넘어올 때 쓴다 */
   const TAB0 = (() => { const v = new URLSearchParams(window.location.search).get("tab"); return ["home","search","guide","map"].includes(v) ? v : "home"; })();
   /* ?view=events 로 열면 진행 중 이벤트 목록부터 — 뒤로 가기는 시작 탭으로(2026-11-19) */
-  const [nav, setNav] = useState(() => { const v = new URLSearchParams(window.location.search).get("view"); return v === "events" || (v === "world" && STORE === "hanam") ? [{ page:TAB0 }, { page:v }] : [{ page:TAB0 }]; });
+  const [nav, setNav] = useState(() => { const v = new URLSearchParams(window.location.search).get("view"); return v === "events" || (v === "world" && WORLD_STORES.includes(STORE)) ? [{ page:TAB0 }, { page:v }] : [{ page:TAB0 }]; });
   const cur = nav[nav.length - 1];
   /* 75" 판: 지금 화면을 바깥에 알린다(매장 지도면 판이 가로로 넓어진다) */
   useEffect(() => { if (INNER) toShell({ page: cur.page }); }, [cur.page]);
   const push = useCallback((pg) => setNav(p => [...p, pg]), []);
   const pop = useCallback(() => setNav(p => p.length > 1 ? p.slice(0,-1) : p), []);
+  useEffect(() => { window.__psBack = pop; }, [pop]);
   const [activeTab, setActiveTab] = useState(TAB0);
   const [searchQ, setSearchQ] = useState("");
   const [brandQ, setBrandQ] = useState("");
@@ -565,7 +569,7 @@ export default function KioskApp() {
           {/* 이벤트는 키오스크 안 진행 중 이벤트 목록으로(2026-11-19 사용자 「자세히 링크를 이벤트 페이지로」) — 홈페이지 event.html 은 이 지점 행사만 따로 못 보여 줬다 */}
           {/* 홈페이지도 키오스크 안에서(site) — 통째로 넘어가면 매장 기기가 돌아올 길이 없었다(2026-11-19) */}
           {/* 하남은 파마스퀘어 월드(3D) 칸을 맨 위 한 줄로 — 아래 탭 「홈」으로 나와도 다시 들어갈 길(2026-11-22 사용자 「다시 메타버스로 돌아갈 수가 없어」) */}
-          {[...(STORE === "hanam" ? [["🧸","gateWorld","gateWorldSub","world"]] : []), ["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
+          {[...(WORLD_STORES.includes(STORE) ? [["🧸","gateWorld","gateWorldSub","world"]] : []), ["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
             <div key={k} className="ui-tile" role="button" onClick={() => navTo(pg)}
               style={{ gridColumn: pg === "world" ? "1 / -1" : undefined, display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
               <span aria-hidden="true" style={{ fontSize:24, lineHeight:1, flexShrink:0 }}>{em}</span>
