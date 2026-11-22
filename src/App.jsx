@@ -17,6 +17,7 @@ import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
 import { STORE } from "./store.js";
 import worldBanner from "./promo/2612-world-0.jpg?url";
+import WorldCta from "./WorldCta.jsx";
 /* 파마스퀘어 월드(하남 3D 매장 · guide.phamasquare.com) — 키오스크 안 틀로 연다. 하남만(2026-11-22 사용자) */
 const WORLD = "https://guide.phamasquare.com/world/hanam/3d";
 import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
@@ -725,9 +726,10 @@ export default function KioskApp() {
       {zoneRows()}
       {/* 지도 아래 — 파마스퀘어 월드(3D 매장) 홍보 배너, 누르면 키오스크 안에서 3D 매장(하남만) */}
       {STORE === "hanam" && (
-        <button type="button" onClick={() => navTo("world")} aria-label="파마스퀘어 월드 — 3D 매장 입장"
-          style={{ display:"block", width:"100%", marginTop:24, padding:0, border:0, borderRadius:12, overflow:"hidden", background:"transparent", cursor:"pointer" }}>
+        <button type="button" className="world-hit" onClick={() => navTo("world")} aria-label="파마스퀘어 월드 — 3D 매장 입장"
+          style={{ position:"relative", display:"block", width:"100%", marginTop:24, padding:0, border:0, borderRadius:12, overflow:"hidden", background:"transparent", cursor:"pointer" }}>
           <img src={worldBanner} alt="" style={{ display:"block", width:"100%", aspectRatio:"16 / 9", objectFit:"cover" }} />
+          <WorldCta />
         </button>
       )}
     </div>

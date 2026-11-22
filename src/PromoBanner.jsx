@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { PROMOTIONS } from "./promotions.js";
 import { STORE_PHOTOS } from "./storePhoto.js";
 import { STORE } from "./store.js";
+import WorldCta from "./WorldCta.jsx";
 
 /* PS-OS 프로모션 화면에서 고친 현황 · 이름 · 기간 · 지점을 열 때 받아 덮는다(2026-11-19 사용자 「공개 통로 열기」).
    Supabase 함수 psos_promo_feed(PS-OS supabase/psos-promo-feed.sql)가 네 칸만 공개한다. 못 받으면 빌드 때 실린 값 그대로.
@@ -102,6 +103,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
         <div
           key={p.id}
           onClick={onPress && p.images && p.images.length ? () => onPress(p) : undefined}
+          className={p.view === "world" ? "world-hit" : undefined}
           style={{
             position: "absolute", inset: 0,
             /* 자동 넘김은 밀지 않고 천천히 겹쳐 바꾼다(2026-11-19 사용자 「정신사나워, 세련된 걸로」).
@@ -128,6 +130,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
               「그림이 있으면 문구가 박힌 것」으로 보아, 맨 매장 사진을 건 슬라이드
               두 장이 제목도 설명도 없는 빈 사진으로 떠 있었습니다.
               정본에 imageHasText 를 적은 슬라이드만 글자를 숨깁니다. */}
+          {p.view === "world" && <WorldCta />}
           {!p.imageHasText && (
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,40,38,.30) 0%,rgba(0,40,38,.74) 100%)" }} />
           )}
