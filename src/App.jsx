@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { typeKey, backKey } from "./hangul.js";
+import { useState, useCallback, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 
 import {
   HEALTH_CATS, BEAUTY_CATS, PET_CATS, TOP_CATS, ZONES_MAP,
@@ -269,7 +270,26 @@ function TopBar({ title, onBack, isHome, lang, setLang, onStart, badge, sub, onH
   );
 }
 
+/* 75" 입구 판 안쪽(&inner=1) — OS 자판 대신 바깥 판의 화면 자판(Shell75)이 올라온다(2026-11-22).
+ * 검색 칸을 누르면 바깥에 알리고, 바깥이 보내는 글자를 한글 조합으로 붙인다. */
+const INNER = new URLSearchParams(window.location.search).has("inner");
+const kbd = { cur: null };
+const toShell = (m) => { try { window.parent.postMessage({ psShell: true, ...m }, window.location.origin); } catch (e) {} };
+if (INNER) {
+  window.addEventListener("message", (e) => {
+    if (e.origin !== window.location.origin) return;
+    const m = e.data; if (!m || m.psKbd !== "key" || !kbd.cur) return;
+    const v = kbd.cur.value;
+    const nv = m.k === "back" ? backKey(v) : typeKey(v, m.k);
+    kbd.cur.value = nv; kbd.cur.onChange(nv);
+  });
+  document.addEventListener("pointerdown", (e) => { if (!(e.target.closest && e.target.closest(".kiosk-search"))) toShell({ kbd: "close" }); }, true);
+}
+
 function SearchBar({ value, onChange, placeholder, onFocus }) {
+  const openKbd = () => { if (!INNER) return; kbd.cur = { value, onChange }; toShell({ kbd: "open" }); };
+  useEffect(() => { if (INNER && kbd.cur && kbd.cur.onChange === onChange) kbd.cur.value = value; });
+  useEffect(() => () => { if (INNER) toShell({ kbd: "close" }); }, []);
   return (
     /* 샘플 홈 검색칸 꼴(2026-11-13): 그림자 없음 · 회색 돋보기 · 올리거나 누르면 테두리 민트 */
     <div className="kiosk-search" style={{
@@ -278,7 +298,8 @@ function SearchBar({ value, onChange, placeholder, onFocus }) {
     }}>
       <span style={{ flexShrink:0, display:"flex" }}><Icon name="search" size={18} color="#98A2AE" /></span>
       <input type="text" placeholder={placeholder || "Search"}
-        value={value} onChange={e => onChange(e.target.value)} onFocus={onFocus}
+        value={value} onChange={e => onChange(e.target.value)} onFocus={() => { onFocus?.(); openKbd(); }} onClick={openKbd}
+        readOnly={INNER} inputMode={INNER ? "none" : undefined}
         className="kiosk-input"
         style={{ border:"none", outline:"none", flex:1, minWidth:0, fontSize:15, fontFamily:"inherit", background:"transparent", color:"#2D373D" }} />
       {value && (
@@ -328,6 +349,8 @@ export default function KioskApp() {
   /* ?view=events 로 열면 진행 중 이벤트 목록부터 — 뒤로 가기는 시작 탭으로(2026-11-19) */
   const [nav, setNav] = useState(() => { const v = new URLSearchParams(window.location.search).get("view"); return v === "events" || (v === "world" && STORE === "hanam") ? [{ page:TAB0 }, { page:v }] : [{ page:TAB0 }]; });
   const cur = nav[nav.length - 1];
+  /* 75" 판: 지금 화면을 바깥에 알린다(매장 지도면 판이 가로로 넓어진다) */
+  useEffect(() => { if (INNER) toShell({ page: cur.page }); }, [cur.page]);
   const push = useCallback((pg) => setNav(p => [...p, pg]), []);
   const pop = useCallback(() => setNav(p => p.length > 1 ? p.slice(0,-1) : p), []);
   const [activeTab, setActiveTab] = useState(TAB0);
@@ -408,6 +431,12 @@ export default function KioskApp() {
   }, []);
 
   const navTo = (page, data) => push({ page, ...data });
+  /* 새 페이지로 들어가면 늘 맨 위에서 시작 — 스크롤을 내린 채 눌러도 다음 페이지가 중간에 열리지 않게(2026-11-22 사용자) */
+  const prevNavLen = useRef(nav.length);
+  useLayoutEffect(() => {
+    if (nav.length > prevNavLen.current) window.scrollTo({ top: 0, behavior: "instant" });
+    prevNavLen.current = nav.length;
+  }, [nav]);
   const tabTo = (tab) => { setActiveTab(tab); setNav([{ page:tab }]); };
   const goBack = () => { if (nav.length > 1) pop(); else if (activeTab !== "home") tabTo("home"); };
 
@@ -495,8 +524,7 @@ export default function KioskApp() {
   /* ── HOME ── 부품 한 벌(ui.jsx)만 씀. 묶음 사이 여백 GAP 한 값 */
   const renderHome = () => (
     <div style={{ padding:`16px ${PAD}px 24px` }}>
-      {/* 75" 판 안쪽(&inner=1)은 위 장표를 바깥 판이 띄우므로 홈 배너를 두지 않는다(Shell75) */}
-      {!new URLSearchParams(window.location.search).has("inner") && <PromoBanner bleed={PAD} onPress={(p) => (p.view === "world" && STORE === "hanam") ? navTo("world") : navTo("promo", { promo: p })}/>}
+      <PromoBanner bleed={PAD} onPress={(p) => (p.view === "world" && STORE === "hanam") ? navTo("world") : navTo("promo", { promo: p })}/>
 
       <div style={{ marginBottom:GAP, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
