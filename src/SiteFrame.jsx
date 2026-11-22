@@ -18,7 +18,7 @@ export default function SiteFrame({ src, title }) {
   }, []);
   return (
     <div style={{ height: h, background: BRAND.bg }}>
-      <iframe src={src} title={title} style={{ width: "100%", height: "100%", border: 0, display: "block" }} />
+      <iframe src={src} title={title} allow="camera; fullscreen; clipboard-write" style={{ width: "100%", height: "100%", border: 0, display: "block" }} />
     </div>
   );
 }

@@ -34,7 +34,7 @@ export default function Shell75() {
     const on = (e) => {
       if (e.origin !== window.location.origin) return;
       const m = e.data; if (!m || !m.psShell) return;
-      if (m.page !== undefined) { setWide(m.page === "map"); setPage(m.page); }
+      if (m.page !== undefined) { setWide(m.page === "map" || m.page === "world"); setPage(m.page); }
       if (m.kbd === "open") setKb(true);
       if (m.kbd === "close") setKb(false);
     };
