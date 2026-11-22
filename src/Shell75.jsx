@@ -13,9 +13,9 @@ const QR = resolveBaseRelativeUrl(import.meta.env.BASE_URL, `assets/qr-kiosk-${S
 const LOGO = resolveBaseRelativeUrl(import.meta.env.BASE_URL, "assets/logo-wordmark.png");
 export const SHELL_FRAME_W = 0.58;   /* 판 폭 = 화면 폭의 58% */
 const FRAME_H = 0.48;                /* 판 높이 = 화면 높이의 48%(약 79cm) */
-/* 판 위 = 화면 높이의 30%. 실제 설치(입구 벽 매립, 화면 아래끝 바닥에서 ≈67cm — 입면도 EL-B103: 파사드 벽 3000, DID 중심이 바닥 1500, 화면 유효 1652)에서 판이 바닥 ≈ 103 ~ 182cm —
-   키 160cm 손님이 가장 자주 누르는 맨 아래 탭(홈 버튼)이 103cm(손 닿는 높이)에 오고, 높은 윗부분은 배너(보기만)(2026-11-22) */
-const FRAME_TOP = 0.30;
+/* 판 위 = 화면 높이의 28.5%. 실제 설치(입구 벽 매립, 화면 아래끝 바닥에서 ≈67cm — 입면도 EL-B103: 파사드 벽 3000, DID 중심이 바닥 1500, 화면 유효 1652)에서 판이 바닥 ≈ 106 ~ 185cm —
+   키 160cm 손님이 가장 자주 누르는 맨 아래 탭(홈 버튼)이 106cm(손 닿는 높이)에 오고, 높은 윗부분은 배너(보기만)(2026-11-22) */
+const FRAME_TOP = 0.285;
 const DW = 450;                      /* 판 안 키오스크 설계 폭 */
 /* 매장 지도 화면은 판이 가로로 넓어진다(판 한가운데를 기준으로 상하좌우 부드럽게) — 도면이 커져 구역 이름이 읽힌다 */
 const WIDE_W = 0.90, WIDE_H = 0.44;
@@ -68,7 +68,7 @@ export default function Shell75() {
       <style>{"@keyframes ps-qr-float { 0%, 24%, 100% { transform: translate(-50%, 0); } 6% { transform: translate(-50%, -1.1cqh); } 12% { transform: translate(-50%, 0.25cqh); } 18% { transform: translate(-50%, -0.6cqh); } }"}</style>
       {/* 9:16 무대 — 가로 · 세로를 한 단위(무대 크기)로 잡아, 창 비율이 달라도(미리보기) 간격이 어긋나지 않는다. 실제 75"(9:16)에서는 화면 전체 */}
       <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "min(100vw, 56.25vh)", height: "min(100vh, 177.78vw)", containerType: "size" }}>
-      <div style={{ position: "absolute", top: "12cqh", left: 0, right: 0, textAlign: "center" }}>
+      <div style={{ position: "absolute", top: "10.5cqh", left: 0, right: 0, textAlign: "center" }}>
         <img src={LOGO} alt="PHAMA SQUARE" style={{ height: "2cqh", display: "block", margin: "0 auto", filter: "brightness(0) invert(1)" }} />
         <div style={{ marginTop: "2.6cqh", fontSize: "5.4cqw", fontWeight: 600, color: "#FFFFFF", letterSpacing: "-0.02em" }}>파마스퀘어 {STORE_CONFIG.name}</div>
         <div style={{ marginTop: "1.2cqh", fontSize: "2.5cqw", fontWeight: 300, color: "#FFFFFF", whiteSpace: "nowrap" }}>
