@@ -70,6 +70,13 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
   const drag = useRef(null), [dx, setDx] = useState(0), swiped = useRef(false);
   const n = items.length;
   const go = (d) => setI((x) => (x + d + n) % n);
+  /* 75" 바깥 판의 좌우 꺾쇠(Shell75)가 보내는 넘김 */
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("inner")) return;
+    const on = (e) => { if (e.origin === window.location.origin && e.data && e.data.psBanner && n > 1) go(e.data.psBanner); };
+    window.addEventListener("message", on);
+    return () => window.removeEventListener("message", on);
+  }, [n]);
   const down = (e) => { if (n < 2) return; drag.current = { x: e.clientX, id: e.pointerId }; swiped.current = false; };
   const move = (e) => { if (!drag.current) return; const d = e.clientX - drag.current.x; if (Math.abs(d) > 6) swiped.current = true; setDx(d); };
   const up = () => { if (!drag.current) return; if (dx < -40) go(1); else if (dx > 40) go(-1); drag.current = null; setDx(0); };
@@ -148,6 +155,17 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
           </div>
           )}
         </div>
+      ))}
+
+      {/* 좌우 넘김 — 꺾쇠만(배경 · 테 없음). 눌리는 칸은 넉넉하게, 그림 위에서도 읽히게 옅은 그림자(2026-11-22 사용자) */}
+      {n > 1 && [[-1, "이전 혜택 보기", "M14.5 5 7.5 12l7 7", { left: 0 }], [1, "다음 혜택 보기", "M9.5 5l7 7-7 7", { right: 0 }]].map(([d, label, path, side]) => (
+        <button key={d} type="button" aria-label={label}
+          onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); go(d); }}
+          style={{ position: "absolute", top: 0, bottom: 0, width: 44, padding: 0, border: 0, background: "none", cursor: "pointer", zIndex: 10,
+            display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", WebkitTapHighlightColor: "transparent", ...side }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+            style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,.45))" }}><path d={path} /></svg>
+        </button>
       ))}
 
       {n > 1 && (
