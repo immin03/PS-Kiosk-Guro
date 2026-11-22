@@ -10,6 +10,7 @@ import { resolveBaseRelativeUrl } from "./baseRelativeUrl.js";
  * 행사 배너는 판 안 홈의 슬라이드 배너 그대로(바깥에 따로 두지 않는다).
  * 키오스크는 같은 주소에 &inner=1 — 방문 기록 · 기기 코드(?did)는 안쪽 키오스크가 센다. 바깥 판은 기록을 쌓지 않는다 */
 const QR = resolveBaseRelativeUrl(import.meta.env.BASE_URL, `assets/qr-kiosk-${STORE_CONFIG.id}.svg`);
+const WORLD_ORIGIN = "https://guide.phamasquare.com";
 const LOGO = resolveBaseRelativeUrl(import.meta.env.BASE_URL, "assets/logo-wordmark.png");
 export const SHELL_FRAME_W = 0.58;   /* 판 폭 = 화면 폭의 58% */
 const FRAME_H = 0.48;                /* 판 높이 = 화면 높이의 48%(약 79cm) */
@@ -28,13 +29,17 @@ export default function Shell75() {
   const [wide, setWide] = useState(false);
   const [page, setPage] = useState("home");
   const [kb, setKb] = useState(false);
+  /* 파마스퀘어 월드는 75" 화면 전체로 — 3D 쪽 ?screen=75 배치(누르는 것은 손 닿는 띠, 2026-11-22 사용자 「75인치는 메타버스 전체화면」).
+     3D 의 「처음으로」 · 90초 무입력이 {w3d: "close"} 를 보내면 닫고 안쪽 키오스크도 한 칸 뒤로 */
+  const [world, setWorld] = useState(false);
   const [bx, setBx] = useState({ w: 0, h: 0 });
   /* 안쪽 키오스크가 알려 주는 것 — 지금 화면(map 이면 판을 넓힘) · 검색 칸을 눌렀는지(화면 자판 열기 · 닫기) */
   useEffect(() => {
     const on = (e) => {
+      if (e.origin === WORLD_ORIGIN && e.data && e.data.w3d === "close") { setWorld(false); try { frame.current && frame.current.contentWindow.postMessage({ psNav: "back" }, window.location.origin); } catch (er) {} return; }
       if (e.origin !== window.location.origin) return;
       const m = e.data; if (!m || !m.psShell) return;
-      if (m.page !== undefined) { setWide(m.page === "map" || m.page === "world"); setPage(m.page); }
+      if (m.page !== undefined) { setWide(m.page === "map" || m.page === "world"); setPage(m.page); setWorld(m.page === "world"); }
       if (m.kbd === "open") setKb(true);
       if (m.kbd === "close") setKb(false);
     };
@@ -112,6 +117,8 @@ export default function Shell75() {
         </button>
       ))}
       {kb && <ScreenKeyboard onKey={sendKey} onDone={() => setKb(false)} top={(FRAME_TOP + FRAME_H) * 100 + 1.4} />}
+      {world && <iframe src={`${WORLD_ORIGIN}/world/${STORE_CONFIG.id}/3d?screen=75`} title="PHAMA SQUARE WORLD" allow="camera; fullscreen"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, zIndex: 50, background: "#F7FAFA" }} />}
       </div>
     </div>
   );
