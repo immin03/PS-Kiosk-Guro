@@ -80,7 +80,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
   }, [n]);
   const down = (e) => { if (n < 2) return; drag.current = { x: e.clientX, id: e.pointerId }; swiped.current = false; };
   const move = (e) => { if (!drag.current) return; const d = e.clientX - drag.current.x; if (Math.abs(d) > 6) swiped.current = true; setDx(d); };
-  const up = () => { if (!drag.current) return; if (dx < -40) go(1); else if (dx > 40) go(-1); drag.current = null; setDx(0); };
+  const up = (e) => { if (!drag.current) return; const d = e && e.type !== "pointercancel" && e.clientX != null ? e.clientX - drag.current.x : dx; if (d < -40) go(1); else if (d > 40) go(-1); drag.current = null; setDx(0); };
 
   useEffect(() => {
     if (n < 2) return;
@@ -160,16 +160,7 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
         </div>
       ))}
 
-      {/* 좌우 넘김 — 꺾쇠만(배경 · 테 없음). 눌리는 칸은 넉넉하게, 그림 위에서도 읽히게 옅은 그림자(2026-11-22 사용자) */}
-      {n > 1 && [[-1, "이전 혜택 보기", "M14.5 5 7.5 12l7 7", { left: 0 }], [1, "다음 혜택 보기", "M9.5 5l7 7-7 7", { right: 0 }]].map(([d, label, path, side]) => (
-        <button key={d} type="button" aria-label={label}
-          onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); go(d); }}
-          style={{ position: "absolute", top: 0, bottom: 0, width: 44, padding: 0, border: 0, background: "none", cursor: "pointer", zIndex: 10,
-            display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", WebkitTapHighlightColor: "transparent", ...side }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
-            style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,.45))" }}><path d={path} /></svg>
-        </button>
-      ))}
+      {/* 배너 안 좌우 꺾쇠는 뺐다(2026-11-22 사용자 「보기 싫다 빼자」) — 넘김은 손 밀기 · 아래 점 · 자동 넘김 */}
 
       {n > 1 && (
         <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6, zIndex: 10 }}>
@@ -204,7 +195,8 @@ export function PromoSlides({ promo }) {
   const go = (d) => setI((x) => Math.min(n - 1, Math.max(0, x + d)));
   const down = (e) => { drag.current = { x: e.clientX }; };
   const move = (e) => { if (drag.current) setDx(e.clientX - drag.current.x); };
-  const up = () => { if (!drag.current) return; if (dx < -40) go(1); else if (dx > 40) go(-1); drag.current = null; setDx(0); };
+  /* 넘김 판정은 손을 뗀 자리로 직접 잰다 — 화면 상태(dx)는 빠르게 밀면 아직 안 바뀌어 한 번에 안 넘어갔다(2026-11-22 사용자 「두 번 터치해야 넘어가짐」) */
+  const up = (e) => { if (!drag.current) return; const d = e && e.type !== "pointercancel" && e.clientX != null ? e.clientX - drag.current.x : dx; if (d < -40) go(1); else if (d > 40) go(-1); drag.current = null; setDx(0); };
   if (!n) return null;
   const btn = { width: 36, height: 36, borderRadius: 999, border: "1px solid #E2E5E8", background: "#FFFFFF", display: "grid", placeItems: "center", cursor: "pointer" };
   const arrow = (d) => <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d={d < 0 ? "M10 3.5 5.5 8 10 12.5" : "M6 3.5 10.5 8 6 12.5"} stroke="#2D373D" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
