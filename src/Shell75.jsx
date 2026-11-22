@@ -13,9 +13,9 @@ const QR = resolveBaseRelativeUrl(import.meta.env.BASE_URL, `assets/qr-kiosk-${S
 const LOGO = resolveBaseRelativeUrl(import.meta.env.BASE_URL, "assets/logo-wordmark.png");
 export const SHELL_FRAME_W = 0.58;   /* 판 폭 = 화면 폭의 58% */
 const FRAME_H = 0.48;                /* 판 높이 = 화면 높이의 48%(약 79cm) */
-/* 판 위 = 화면 높이의 33%. 실제 설치(입구 벽 매립, 화면 아래끝 바닥에서 ≈67cm — 입면도 EL-B103: 파사드 벽 3000, DID 중심이 바닥 1500, 화면 유효 1652)에서 판이 바닥 ≈ 98 ~ 177cm —
-   키 160cm 손님이 가장 자주 누르는 맨 아래 탭(홈 버튼)이 98cm(손 닿는 높이)에 오고, 높은 윗부분은 배너(보기만)(2026-11-22) */
-const FRAME_TOP = 0.33;
+/* 판 위 = 화면 높이의 27%. 실제 설치(입구 벽 매립, 화면 아래끝 바닥에서 ≈67cm — 입면도 EL-B103: 파사드 벽 3000, DID 중심이 바닥 1500, 화면 유효 1652)에서 판이 바닥 ≈ 108 ~ 187cm —
+   키 160cm 손님이 가장 자주 누르는 맨 아래 탭(홈 버튼)이 108cm(손 닿는 높이)에 오고, 높은 윗부분은 배너(보기만)(2026-11-22) */
+const FRAME_TOP = 0.27;
 const DW = 450;                      /* 판 안 키오스크 설계 폭 */
 /* 매장 지도 화면은 판이 가로로 넓어진다(판 한가운데를 기준으로 상하좌우 부드럽게) — 도면이 커져 구역 이름이 읽힌다 */
 const WIDE_W = 0.90, WIDE_H = 0.44;
