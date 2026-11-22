@@ -160,8 +160,6 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
         </div>
       ))}
 
-      {/* 배너 안 좌우 꺾쇠는 뺐다(2026-11-22 사용자 「보기 싫다 빼자」) — 넘김은 손 밀기 · 아래 점 · 자동 넘김 */}
-
       {n > 1 && (
         <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6, zIndex: 10 }}>
           {items.map((p, m) => (
