@@ -18,7 +18,19 @@ const MARK_TEXT = "#626E7C";
 
 /* 손님이 출발하는 자리. 키오스크가 놓인 곳이며 지도의 집기 이름과 같아야 합니다. */
 /* 지도 시작 자리(현재 위치) — 지점 설정(src/store.js)에서. 구로 엘리베이터 입구 · 하남 입구 */
-export const ORIGIN_MARK = STORE_CONFIG.origin;
+/* 붙박인 기기(?did=<품목 · 구좌 코드>)면 그 기기 자리가 현재 위치 — PS-OS racks.json marks 의 track(방문 분석 구좌 코드)이나 fixture 와 같은 집기.
+   구로 입구 75″ · 파마베스트 50″ · 체험존 43″ 둘(2026-11-22 사용자 「위치별 DID 에 맞춰 현위치」). 주소에서 빠지면 이 탭에 기억한 코드(ps_did) */
+const DID_NOW = (() => { let d = ""; try { d = new URLSearchParams(window.location.search).get("did") || sessionStorage.getItem("ps_did") || ""; } catch (e) {} return d; })();
+const DID_MARK = DID_NOW ? (ALL_MARKS.find((m) => m.track === DID_NOW) || ALL_MARKS.find((m) => m.fixture === DID_NOW)) : null;
+export const ORIGIN_MARK = DID_MARK ? DID_MARK.kind : STORE_CONFIG.origin;
+const ORIGIN_OBJ = DID_MARK || ALL_MARKS.find((m) => m.kind === STORE_CONFIG.origin) || null;
+/* 구역 도식(구로 손그림)에서 「현재 위치」 를 찍을 칸 — 기기 코드 앞부분으로. 없으면 칸에 적힌 here */
+const DID_BLOCK = { "DD-DID-ENT-75T": "elev", "DD-DID-PB-50T": "best", "DD-DID-BEA-43T": "exp", "DD-KSK-ENT": "kiosk" };
+const HERE_ID = DID_MARK ? (Object.entries(DID_BLOCK).find(([k]) => (DID_MARK.track || DID_MARK.fixture || "").startsWith(k)) || [])[1] : null;
+const isHere = (b) => (HERE_ID ? b.id === HERE_ID : !!b.here);
+/* 현재 위치 아래 이름 — DID 집기 이름(「43″ DID 1」)은 손님 말이 아니라 자리 이름으로 */
+const DID_NAME = { elev: "입구", best: "파마베스트", exp: "체험존", kiosk: "키오스크" };
+export const ORIGIN_NAME = (lang) => (HERE_ID && DID_NAME[HERE_ID] && lang === "ko" ? DID_NAME[HERE_ID] : markLabel(lang, ORIGIN_MARK));
 
 /* 길 안내에 이름을 댈 만한 집기. 앤드1~4 같은 내부 용어는 제외합니다. */
 const WAYPOINT = /입구|계산|파마베스트|체험존|행사|음료/;
@@ -369,7 +381,7 @@ function findRoute(originMark, target) {
  * 대신 손님이 실제로 지나치는 지점을 알려줍니다. */
 export function routeSteps(rackCode) {
   const target = RACK_BY_CODE[rackCode];
-  const origin = MARKS.find((m) => m.kind === ORIGIN_MARK);
+  const origin = ORIGIN_OBJ;
   if (!target) return null;
   const route = findRoute(origin, target);
   const passed = [];
@@ -429,7 +441,7 @@ export default function FloorPlan({
      통째로 줄어 매대가 테두리에 닿지 않습니다. */
   const pad = 2;
   const target = highlightRack ? RACK_BY_CODE[highlightRack] : null;
-  const origin = useMemo(() => MARKS.find((m) => m.kind === ORIGIN_MARK), []);
+  const origin = ORIGIN_OBJ;
   const route = useMemo(
     () => (showPath && target ? findRoute(origin, target) : null),
     [showPath, target, origin]
@@ -740,7 +752,7 @@ export default function FloorPlan({
               {b.range && (
                 <text x={b.x + PAD} y={b.y + PAD + NAME + 0.9 + NUM * 0.82} fontSize={NUM} fontWeight="500" fill="#626E7C">{b.range}</text>
               )}
-              {b.here && (() => {
+              {isHere(b) && (() => {
                 /* 현재 위치 — 점과 글자를 한 줄로, 이름 아래 같은 왼쪽 선 */
                 const cy0 = b.y + PAD + NAME + 0.9 + NUM / 2, dx0 = b.x + PAD + 0.9;
                 return (
@@ -849,7 +861,7 @@ export default function FloorPlan({
               fontSize="2.1" fontWeight="600" fill={MARK_TEXT}
               stroke="#FFFFFF" strokeWidth="0.8" paintOrder="stroke"
             >
-              {markLabel(lang, ORIGIN_MARK)}
+              {ORIGIN_NAME(lang)}
             </text>
           </g>
         )}
