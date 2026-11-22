@@ -68,10 +68,10 @@ export default function Shell75() {
       <style>{"@keyframes ps-qr-float { 0%, 24%, 100% { transform: translate(-50%, 0); } 6% { transform: translate(-50%, -1.1cqh); } 12% { transform: translate(-50%, 0.25cqh); } 18% { transform: translate(-50%, -0.6cqh); } }"}</style>
       {/* 9:16 무대 — 가로 · 세로를 한 단위(무대 크기)로 잡아, 창 비율이 달라도(미리보기) 간격이 어긋나지 않는다. 실제 75"(9:16)에서는 화면 전체 */}
       <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "min(100vw, 56.25vh)", height: "min(100vh, 177.78vw)", containerType: "size" }}>
-      <div style={{ position: "absolute", top: "19cqh", left: 0, right: 0, textAlign: "center" }}>
-        <img src={LOGO} alt="PHAMA SQUARE" style={{ height: "1.8cqh", display: "block", margin: "0 auto", filter: "brightness(0) invert(1)" }} />
-        <div style={{ marginTop: "2.6cqh", fontSize: "4.8cqw", fontWeight: 600, color: "#FFFFFF", letterSpacing: "-0.02em" }}>파마스퀘어 {STORE_CONFIG.name}</div>
-        <div style={{ marginTop: "1cqh", fontSize: "2.3cqw", fontWeight: 300, color: "#FFFFFF", whiteSpace: "nowrap" }}>
+      <div style={{ position: "absolute", top: "12cqh", left: 0, right: 0, textAlign: "center" }}>
+        <img src={LOGO} alt="PHAMA SQUARE" style={{ height: "2cqh", display: "block", margin: "0 auto", filter: "brightness(0) invert(1)" }} />
+        <div style={{ marginTop: "2.6cqh", fontSize: "5.4cqw", fontWeight: 600, color: "#FFFFFF", letterSpacing: "-0.02em" }}>파마스퀘어 {STORE_CONFIG.name}</div>
+        <div style={{ marginTop: "1.2cqh", fontSize: "2.5cqw", fontWeight: 300, color: "#FFFFFF", whiteSpace: "nowrap" }}>
           화면을 터치해 상품 검색과 이벤트, 매장 지도를 만나 보세요
         </div>
       </div>
