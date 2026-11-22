@@ -160,17 +160,6 @@ export default function PromoBanner({ onPress, interval = 5000, bleed = 0 }) {
         </div>
       ))}
 
-      {/* 좌우 넘김 — 꺾쇠만(배경 · 테 없음). 눌리는 칸은 넉넉하게, 그림 위에서도 읽히게 옅은 그림자(2026-11-22 사용자) */}
-      {n > 1 && [[-1, "이전 혜택 보기", "M14.5 5 7.5 12l7 7", { left: 0 }], [1, "다음 혜택 보기", "M9.5 5l7 7-7 7", { right: 0 }]].map(([d, label, path, side]) => (
-        <button key={d} type="button" aria-label={label}
-          onPointerDown={(e) => e.stopPropagation()} onClick={(e) => { e.stopPropagation(); go(d); }}
-          style={{ position: "absolute", top: 0, bottom: 0, width: 44, padding: 0, border: 0, background: "none", cursor: "pointer", zIndex: 10,
-            display: "flex", alignItems: "center", justifyContent: "center", color: "#FFFFFF", WebkitTapHighlightColor: "transparent", ...side }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
-            style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,.45))" }}><path d={path} /></svg>
-        </button>
-      ))}
-
       {n > 1 && (
         <div style={{ position: "absolute", bottom: 12, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6, zIndex: 10 }}>
           {items.map((p, m) => (
