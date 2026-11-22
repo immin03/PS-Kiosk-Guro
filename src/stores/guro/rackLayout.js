@@ -52,9 +52,66 @@
     "kind": "체험존",
     "c": 128,
     "r": 79,
-    "w": 16,
+    "w": 34,
     "h": 6,
-    "fixture": "CT-BSN-450-500-V1-G"
+    "note": "뷰티 아일랜드 C1 ~ C5 아래부터 오른쪽 벽 D 열 앞까지(평면도 점선 칸)"
+  },
+  {
+    "kind": "세면대",
+    "c": 148,
+    "r": 79,
+    "w": 6,
+    "h": 5,
+    "fixture": "CT-BSN-450-500-V1-G",
+    "note": "체험존 양면 세면대 — 가운데 기둥에 DID 43\" 둘"
+  },
+  {
+    "kind": "43\" DID 1",
+    "c": 149,
+    "r": 79,
+    "w": 4,
+    "h": 1,
+    "fixture": "DD-DID-BEA-43T-V2",
+    "track": "DD-DID-BEA-43T-V2.1",
+    "note": "세면대 기둥 위 면 — 계단 입구에서 보면 좌측. 평면도(ELSS FL-000) 자리 · 방문 분석 구좌 코드는 track(catalog/did-screens.json 과 같음)"
+  },
+  {
+    "kind": "43\" DID 2",
+    "c": 148,
+    "r": 79,
+    "w": 1,
+    "h": 4,
+    "fixture": "DD-DID-BEA-43T-V2",
+    "track": "DD-DID-BEA-43T-V2.2",
+    "note": "세면대 기둥 왼쪽 면 — 계단 입구 정면. 평면도(ELSS FL-000) 자리 · 방문 분석 구좌 코드는 track(catalog/did-screens.json 과 같음)"
+  },
+  {
+    "kind": "DID 벽",
+    "c": 38,
+    "r": 55,
+    "w": 6,
+    "h": 6,
+    "note": "파마베스트 왼쪽 끝 사선 벽 기둥 — 왼쪽 면 75\" · 오른쪽 면 50\"(AI 건강 측정하기)"
+  },
+  {
+    "kind": "75\" DID",
+    "c": 38,
+    "r": 55,
+    "w": 1,
+    "h": 6,
+    "fixture": "DD-DID-ENT-75T-V2",
+    "track": "DD-DID-ENT-75T-V2",
+    "note": "기둥 왼쪽 사선 면 — 입구 · 엘리베이터 쪽 파사드. 평면도(ELSS FL-000) 자리 · 방문 분석 구좌 코드는 track(catalog/did-screens.json 과 같음)"
+  },
+  {
+    "kind": "50\" DID",
+    "c": 43,
+    "r": 57,
+    "w": 1,
+    "h": 3,
+    "fixture": "DD-DID-PB-50T-V2",
+    "track": "DD-DID-PB-50T-V2",
+    "note": "기둥 오른쪽 면 — AI 건강 측정하기(파마베스트 왼쪽 끝). 평면도(ELSS FL-000) 자리 · 방문 분석 구좌 코드는 track(catalog/did-screens.json 과 같음)"
   },
   {
     "kind": "앤드1",

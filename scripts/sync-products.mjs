@@ -91,7 +91,9 @@ for (const [rack, r] of Object.entries(store.racks)) {
     const cat = r.cat || "";
     if (it.bc) placed.add(it.bc);
     products.push({ name, brand, cat, rack, zone: rack.replace(/[0-9].*$/, ""), en: "", benefit: `${cat} · 섹션 ${rack}`,
-      spec: "", sale: 0, bc: it.bc || "", price: m?.p ?? it.p ?? 0 });
+      spec: "", sale: 0, bc: it.bc || "", price: m?.p ?? it.p ?? 0,
+      /* 상품 원장 사진 — scripts/sync-thumbs.py 가 만든 public/thumbs/<바코드>.webp 가 있으면(2026-11-22) */
+      ...(it.bc && existsSync(resolve(HERE, "..", "public", "thumbs", it.bc + ".webp")) ? { img: "./thumbs/" + it.bc + ".webp" } : {}) });
     if (brand && !seenBrand.has(brand)) { seenBrand.add(brand); brands.push(brand); }
   }
 }

@@ -11,7 +11,7 @@ import { filterProducts, productKey, PRODUCT_ROW_HEIGHT } from "./catalogPerform
 import VirtualProductList from "./VirtualProductList.jsx";
 import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
-import FloorPlan, { routeSteps } from "./FloorPlan.jsx";
+import FloorPlan, { routeSteps, ORIGIN_NAME } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
@@ -24,7 +24,7 @@ import EntryGate, { SITE, SITE_EVENT } from "./EntryGate.jsx";
 import GuideFrame from "./GuideFrame.jsx";
 import { usage, installUsage, mode as visit, GUIDE_ORIGIN } from "./usage.js";
 import { GUIDE_PAGES, CONCERNS } from "./guide.js";
-import { EMOJI as CAT_EMOJI, key as catKey, emojiOf } from "./categories.js";
+import { EMOJI as CAT_EMOJI, key as catKey, emojiOf, productEmoji } from "./categories.js";
 import { UI_CSS, Section, Row, Rows, Thumb, Tile, Chip, ChipRow, Btn, Seg, Badge, Dot, GAP, PAD, INK, MUTED, MINT } from "./ui.jsx";
 
 /* 건강 고민 칩 그림 — 카테고리 카드처럼 이모지 한 글자 */
@@ -300,7 +300,7 @@ function ProductCard({ p, onLocate, showCat, hideRack }) {
   return (
     <div style={{ height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box", borderBottom:"1px solid #EFF1F3" }}>
       <Row height={PRODUCT_ROW_HEIGHT - 1} onClick={() => onLocate?.(p)} chevron={false}
-        lead={<Thumb emoji={emojiOf(catKey(p.cat || "")) || "🛍️"} img={p.img} />}
+        lead={<Thumb emoji={productEmoji(p)} img={p.img} />}
         title={p.name} sub={(p.brand || "") + (showCat && p.cat ? " · " + p.cat : "")} trail={hideRack ? null : p.rack} />
     </div>
   );
@@ -756,7 +756,7 @@ export default function KioskApp() {
        축척 도면이 아니라 근거가 없었고, 같은 존이면 전부 같은 문구가 나왔습니다. */
     const steps = [];
     const redDot = t(lang, "step.redDot");
-    steps.push({ n:1, t: t(lang, "step.start"), sub: guide?.origin ? markLabel(lang, guide.origin) + " · " + redDot : redDot });
+    steps.push({ n:1, t: t(lang, "step.start"), sub: guide?.origin ? ORIGIN_NAME(lang) + " · " + redDot : redDot });
     (guide?.passed || []).forEach((mark) => {
       steps.push({ n: steps.length + 1, t: t(lang, "step.pass", { mark: markLabel(lang, mark) }), sub: t(lang, "step.passSub") });
     });
@@ -796,9 +796,19 @@ export default function KioskApp() {
         <div style={{ marginBottom:GAP }}><Btn onClick={pop}>{t(lang,"seeOther")}</Btn></div>
         {related.length>0 && (
           <Section title={t(lang,"relatedAlso")} gap={0}>
-            {related.slice(0,4).map((r,i) => (
-              <ProductCard key={i} p={r} onLocate={() => { window.scrollTo({ top:0, behavior:"instant" }); setNav(prev => [...prev.slice(0,-1), { page:"location", product:r }]); }} />
-            ))}
+            {/* 좌우로 넘기는 카드 줄(2026-11-22 사용자 「좌우 스와이프 슬라이드로」) — 판 끝까지 밀고, 사진 없으면 상품 종류 이모지 */}
+            <div className="kiosk-swipe" style={{ display:"flex", gap:10, overflowX:"auto", scrollSnapType:"x mandatory", scrollPadding:`0 ${PAD}px`,
+              margin:`0 -${PAD}px`, padding:`2px ${PAD}px 6px`, scrollbarWidth:"none", WebkitOverflowScrolling:"touch" }}>
+              {related.slice(0,10).map((r,i) => (
+                <button key={i} type="button" onClick={() => { window.scrollTo({ top:0, behavior:"instant" }); setNav(prev => [...prev.slice(0,-1), { page:"location", product:r }]); }}
+                  style={{ flex:"none", width:148, scrollSnapAlign:"start", padding:0, border:0, background:"transparent", textAlign:"left", cursor:"pointer", fontFamily:"inherit" }}>
+                  <Thumb size={148} emoji={productEmoji(r)} img={r.img} />
+                  <p style={{ margin:"8px 0 0", fontSize:12, color:"#98A2AE", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{r.brand}{r.rack ? " · " + r.rack : ""}</p>
+                  <p style={{ margin:"2px 0 0", fontSize:14, fontWeight:600, color:INK, lineHeight:1.35, wordBreak:"keep-all",
+                    display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>{r.name}</p>
+                </button>
+              ))}
+            </div>
           </Section>
         )}
       </div>
