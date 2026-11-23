@@ -569,7 +569,7 @@ export default function KioskApp() {
           {/* 이벤트는 키오스크 안 진행 중 이벤트 목록으로(2026-11-19 사용자 「자세히 링크를 이벤트 페이지로」) — 홈페이지 event.html 은 이 지점 행사만 따로 못 보여 줬다 */}
           {/* 홈페이지도 키오스크 안에서(site) — 통째로 넘어가면 매장 기기가 돌아올 길이 없었다(2026-11-19) */}
           {/* 하남은 파마스퀘어 월드(3D) 칸을 맨 위 한 줄로 — 아래 탭 「홈」으로 나와도 다시 들어갈 길(2026-11-22 사용자 「다시 메타버스로 돌아갈 수가 없어」) */}
-          {[...(WORLD_STORES.includes(STORE) ? [["🧸","gateWorld","gateWorldSub","world"]] : []), ["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
+          {[...(WORLD_STORES.includes(STORE) ? [["🌏","gateWorld","gateWorldSub","world"]] : []), ["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
             <div key={k} className="ui-tile" role="button" onClick={() => navTo(pg)}
               style={{ gridColumn: pg === "world" ? "1 / -1" : undefined, display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
               <span aria-hidden="true" style={{ fontSize:24, lineHeight:1, flexShrink:0 }}>{em}</span>
