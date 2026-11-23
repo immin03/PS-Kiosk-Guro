@@ -99,8 +99,9 @@ export default function Shell75() {
         <img src={QR} alt="휴대폰으로 보기 QR" style={{ height: "7.6cqh", width: "7.6cqh", display: "block" }} />
         <div style={{ width: 1, alignSelf: "stretch", background: "#E2E5E8" }} />
         <div style={{ whiteSpace: "nowrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "1cqw", fontSize: "2.9cqw", fontWeight: 600, color: BRAND.ink, letterSpacing: "-0.01em" }}>
-            <svg viewBox="0 0 24 24" width="1.15em" height="1.15em" fill="none" stroke={BRAND.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M11 18.5h2"/></svg>
+          <div style={{ display: "flex", alignItems: "center", gap: ".6cqw", fontSize: "2.9cqw", fontWeight: 600, color: BRAND.ink, letterSpacing: "-0.01em" }}>
+            {/* 아이콘 좌우 빈 칸을 잘라(viewBox 6~18) 폰 왼쪽 끝이 아래 안내 문구 왼쪽 끝과 맞는다(2026-11-23 사용자 「아이콘이랑 글자 여백 좁혀서 좌측으로」) */}
+            <svg viewBox="6 1.5 12 21" width=".66em" height="1.15em" fill="none" stroke={BRAND.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4"/><path d="M11 18.5h2"/></svg>
             내 휴대폰으로 보기
           </div>
           <div style={{ marginTop: ".7cqh", fontSize: "2cqw", fontWeight: 500, color: BRAND.ink }}>카메라로 QR을 찍어 주세요</div>
