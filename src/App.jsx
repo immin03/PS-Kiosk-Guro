@@ -463,16 +463,20 @@ export default function KioskApp() {
       setLang(DEFAULT_LANG);
       window.scrollTo({ top: 0 });
     };
-    const arm = (e) => { if (e) touchedGuide.current = true; clearTimeout(timer); timer = setTimeout(reset, cur.page === "guide" ? 300_000 : IDLE_RESET_MS); };
+    const arm = (e) => { if (e) touchedGuide.current = true; clearTimeout(timer); timer = setTimeout(reset, cur.page === "guide" || cur.page === "world" ? 300_000 : IDLE_RESET_MS); };
     const events = ["pointerdown", "keydown", "wheel", "touchstart"];
     events.forEach((e) => window.addEventListener(e, arm, { passive: true }));
     /* 건강 가이드(iframe) 안에서 만지는 것은 바깥 창에 안 온다 — 가이드가 알려 주는 것으로 다시 잰다. 설문 도중 처음으로 튕기던 것 */
     const onGuide = (e) => { if (e.data && e.data.type === "ps-guide-activity" && GUIDE_ORIGIN.test(e.origin || "")) arm(e); };
+    /* 파마스퀘어 월드(iframe, guide.phamasquare.com) 안에서 만지는 것도 — 걷는 도중 90초 뒤 홈으로 튕기던 것(2026-11-25 사용자 「자꾸 키오스크로 돌아가」) */
+    const onWorld = (e) => { if (e.data && e.data.type === "ps-world-activity" && /^https:\/\/guide\.phamasquare\.com$/.test(e.origin || "")) arm(null); };
+    window.addEventListener("message", onWorld);
     window.addEventListener("message", onGuide);
     arm(null);
     return () => {
       clearTimeout(timer);
       window.removeEventListener("message", onGuide);
+      window.removeEventListener("message", onWorld);
       events.forEach((e) => window.removeEventListener(e, arm));
     };
   }, [nav, searchQ]);
