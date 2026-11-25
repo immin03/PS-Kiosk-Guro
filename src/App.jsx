@@ -943,7 +943,7 @@ export default function KioskApp() {
         화면 폭에 맞춘 zoom 이 걸려 있어서 vh 를 쓰면 안 됩니다 — zoom 2.6 에서
         100vh 는 실제 화면의 2.6배가 되고, 그만큼 빈 자리가 아래로 늘어납니다.
         바탕색은 body 가 깔아 주므로 짧은 화면에서도 흰 자리가 생기지 않습니다. */}
-    <div style={{ /* 파마스퀘어 월드(3D)는 넓은 화면에서도 폭을 다 쓴다(2026-11-22 사용자 「이런데도 풀로」) */ maxWidth:cur.page==="world" ? "100%" : SHELL_MAX, margin:"0 auto", background:C.bgF,
+    <div style={{ /* 파마스퀘어 월드(3D)는 넓은 화면에서도 폭을 다 쓴다(2026-11-22 사용자 「이런데도 풀로」). 건강 가이드도 같다 — 640 상한이 걸리면 iframe 본문이 가운데 좁은 기둥이 된다(2026-11-25 구로 키오스크 사진) */ maxWidth:(cur.page==="world"||cur.page==="guide") ? "100%" : SHELL_MAX, margin:"0 auto", background:C.bgF,
       fontFamily:"Pretendard,'Pretendard Variable',-apple-system,'Noto Sans KR','Noto Sans SC',sans-serif", color:C.t1,
       /* 건강 가이드 탭은 iframe 이 화면 높이를 다 쓰므로 아래 여백을 두지 않는다 — 두면 바깥 페이지가 15px 더 밀려 머리글이 흔들렸다(2026-11-20 DID 검수) */
       paddingBottom: cur.page === "guide" ? 0 : 64 }}>
@@ -956,7 +956,7 @@ export default function KioskApp() {
 
       {/* 바텀 내비 — 아이콘 없이 텍스트만, 활성 탭 민트 underline(배포본 꼴 그대로). 탭에 건강 가이드만 더함(2026-11-13) */}
       <div style={{ position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
-        width:"100%", maxWidth:cur.page==="world" ? "100%" : SHELL_MAX, background:C.wh,
+        width:"100%", maxWidth:(cur.page==="world"||cur.page==="guide") ? "100%" : SHELL_MAX, background:C.wh,
         borderTop:`1px solid ${C.bd}`, display:"flex", zIndex:100 }}>
         {/* 고른 탭 위의 민트 선 하나가 옆으로 미끄러져 옮겨 감(2026-11-13) */}
         {(() => { const idx = tabs.findIndex((x) => x.id === activeTab); return idx < 0 ? null : (
