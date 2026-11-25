@@ -860,6 +860,7 @@ export default function KioskApp() {
     guide: t(lang,"tabGuide"),
     events: t(lang,"eventsTitle"),
     site: t(lang,"gateSite"),
+    world: t(lang,"gateWorld"),   /* 월드 화면 머리 제목(2026-11-25 사용자 「메인 헤더에 파마스퀘어 월드」) */
   };
 
   const renderPage = () => {
