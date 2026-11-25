@@ -14,6 +14,7 @@ import {
   detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
 import FloorPlan, { routeSteps, ORIGIN_NAME } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
+import BungeoGame from "./bungeo/BungeoGame.jsx";
 import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
 import { STORE } from "./store.js";
@@ -529,6 +530,11 @@ export default function KioskApp() {
   const renderHome = () => (
     <div style={{ padding:`16px ${PAD}px 24px` }}>
       <PromoBanner bleed={PAD} onPress={(p) => (p.view === "world" && STORE === "hanam") ? navTo("world") : navTo("promo", { promo: p })}/>
+      <button type="button" onClick={() => navTo("bungeo")} aria-label="얼굴빵 스탬프 게임 시작"
+        style={{ width:"100%", marginTop:12, padding:"14px 16px", borderRadius:12, border:"1px solid #E2E5E8", background:"#FFFFFF", textAlign:"left", cursor:"pointer", fontSize:15, color:"#2D373D" }}>
+        <b style={{ fontWeight:600 }}>얼굴빵 스탬프 게임</b>
+        <span style={{ display:"block", fontSize:13, color:"#626E7C", marginTop:4 }}>60초 한 판 · 손님 주문을 건네면 스탬프</span>
+      </button>
 
       <div style={{ marginBottom:GAP, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
@@ -860,6 +866,7 @@ export default function KioskApp() {
     guide: t(lang,"tabGuide"),
     events: t(lang,"eventsTitle"),
     site: t(lang,"gateSite"),
+    bungeo: "얼굴빵 스탬프",
     world: t(lang,"gateWorld"),   /* 월드 화면 머리 제목(2026-11-25 사용자 「메인 헤더에 파마스퀘어 월드」) */
   };
 
@@ -878,6 +885,7 @@ export default function KioskApp() {
       case "world": return <SiteFrame src={WORLD} title="PHAMA SQUARE WORLD" />;
       case "events": return <EventsList onOpen={(p) => navTo("promo", { promo: p })} emptyText={t(lang,"eventsEmpty")} />;
       case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
+      case "bungeo": return <BungeoGame onExit={goBack} />;
       default: return renderHome();
     }
   };
