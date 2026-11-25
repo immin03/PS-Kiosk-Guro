@@ -27,7 +27,7 @@ function headPath(ctx, grow = 0) {
   }
 }
 
-export function drawFace(canvas) {
+export function drawFace(canvas, { rot = Math.PI * 0.75, edge = true } = {}) {
   canvas.width = S; canvas.height = S;
   const ctx = canvas.getContext("2d");
   /* 빵 바탕 — 가운데 밝고 가장자리 진한 구움색 */
@@ -39,7 +39,7 @@ export function drawFace(canvas) {
 
   ctx.save();
   ctx.translate(S / 2, S / 2);
-  ctx.rotate(Math.PI * 0.75);
+  ctx.rotate(rot);
   ctx.translate(0, -0.02 * K);
 
   /* 틀에 눌린 홈(진한 테두리) → 볼록한 얼굴 */
@@ -87,7 +87,7 @@ export function drawFace(canvas) {
     ctx.restore();
   }
   ctx.restore();
-  ctx.strokeStyle = "#C98743"; ctx.lineWidth = 6; ctx.strokeRect(3, 3, S - 6, S - 6);
+  if (edge) { ctx.strokeStyle = "#C98743"; ctx.lineWidth = 6; ctx.strokeRect(3, 3, S - 6, S - 6); }
   return canvas;
 }
 

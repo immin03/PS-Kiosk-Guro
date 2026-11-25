@@ -15,6 +15,7 @@ import {
 import FloorPlan, { routeSteps, ORIGIN_NAME } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import PamiTopGame from "./pamitop/PamiTopGame.jsx";
+import PamiBreadGame from "./pamibread/PamiBreadGame.jsx";
 import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
 import { STORE } from "./store.js";
@@ -530,6 +531,11 @@ export default function KioskApp() {
   const renderHome = () => (
     <div style={{ padding:`16px ${PAD}px 24px` }}>
       <PromoBanner bleed={PAD} onPress={(p) => (p.view === "world" && STORE === "hanam") ? navTo("world") : navTo("promo", { promo: p })}/>
+      <button type="button" onClick={() => navTo("pamibread")} aria-label="파미빵 타이쿤 시작"
+        style={{ width:"100%", marginTop:12, padding:"14px 16px", borderRadius:12, border:"1px solid #E2E5E8", background:"#FFFFFF", textAlign:"left", cursor:"pointer", fontSize:15, color:"#2D373D" }}>
+        <b style={{ fontWeight:600 }}>파미빵 타이쿤</b>
+        <span style={{ display:"block", fontSize:13, color:"#626E7C", marginTop:4 }}>60초 동안 파미빵을 구워 팔면 스탬프</span>
+      </button>
       <button type="button" onClick={() => navTo("pamitop")} aria-label="파미탑 시작"
         style={{ width:"100%", marginTop:12, padding:"14px 16px", borderRadius:12, border:"1px solid #E2E5E8", background:"#FFFFFF", textAlign:"left", cursor:"pointer", fontSize:15, color:"#2D373D" }}>
         <b style={{ fontWeight:600 }}>파미탑</b>
@@ -867,6 +873,7 @@ export default function KioskApp() {
     events: t(lang,"eventsTitle"),
     site: t(lang,"gateSite"),
     pamitop: "파미탑",
+    pamibread: "파미빵 타이쿤",
     world: t(lang,"gateWorld"),   /* 월드 화면 머리 제목(2026-11-25 사용자 「메인 헤더에 파마스퀘어 월드」) */
   };
 
@@ -886,6 +893,7 @@ export default function KioskApp() {
       case "events": return <EventsList onOpen={(p) => navTo("promo", { promo: p })} emptyText={t(lang,"eventsEmpty")} />;
       case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
       case "pamitop": return <PamiTopGame onExit={goBack} />;
+      case "pamibread": return <PamiBreadGame onExit={goBack} />;
       default: return renderHome();
     }
   };
