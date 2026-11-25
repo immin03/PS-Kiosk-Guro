@@ -1,4 +1,4 @@
-/* 파미빵 타이쿤 — 쌓기 엔진.
+/* 파미탑 — 쌓기 엔진.
  * 원작: Stack by Konrad Linkowski (https://github.com/KonradLinkowski/Stack), MIT License — 전문은 LICENSE-stack.txt.
  * 바꾼 것: 상자 색 → 파미 얼굴을 구운 빵(윗면 그림이 자리에 고정돼 잘리면 얼굴도 같이 잘림), 잘린 조각은 떨어짐,
  * 퍼펙트 연속이면 다시 넓어짐, 눈, 그림자, 터치(pointerdown), 컨테이너 크기에 맞춤, 시작 · 끝 콜백. */

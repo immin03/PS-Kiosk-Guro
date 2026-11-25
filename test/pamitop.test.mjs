@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cutTile, grow, stampsFor, speedFor, FULL, STAMP_MAX } from "../src/pamibread/cut.js";
+import { cutTile, grow, stampsFor, speedFor, FULL, STAMP_MAX } from "../src/pamitop/cut.js";
 
 const base = { cx: 0, cz: 0, sx: FULL, sz: FULL };
 
