@@ -16,7 +16,7 @@ import FloorPlan, { routeSteps, ORIGIN_NAME } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import PamiTopGame from "./pamitop/PamiTopGame.jsx";
 import PamiBreadGame from "./pamibread/PamiBreadGame.jsx";
-import Arcade from "./Arcade.jsx";
+import Arcade from "./arcade/Arcade.jsx";
 import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
 import { STORE } from "./store.js";
@@ -571,11 +571,12 @@ export default function KioskApp() {
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
           {/* 이벤트는 키오스크 안 진행 중 이벤트 목록으로(2026-11-19 사용자 「자세히 링크를 이벤트 페이지로」) — 홈페이지 event.html 은 이 지점 행사만 따로 못 보여 줬다 */}
           {/* 홈페이지도 키오스크 안에서(site) — 통째로 넘어가면 매장 기기가 돌아올 길이 없었다(2026-11-19) */}
-          {/* 게임 둘(파미빵 타이쿤 · 파미탑)은 아케이드 한 칸으로 묶어 한 줄(2026-11-26 사용자 「아케이드로 하나로 묶어 더보기에」) */}
+          {/* 게임 둘(파미빵 타이쿤 · 파미탑)은 아케이드 한 칸으로 묶음(2026-11-26 사용자 「아케이드로 하나로 묶어 더보기에」) */}
+          {/* 월드 · 아케이드도 2단 좌우로(2026-11-26 사용자 「좌우 정렬해야지」) — 월드가 없는 지점만 아케이드를 한 줄로 */}
           {/* 하남은 파마스퀘어 월드(3D) 칸을 맨 위 한 줄로 — 아래 탭 「홈」으로 나와도 다시 들어갈 길(2026-11-22 사용자 「다시 메타버스로 돌아갈 수가 없어」) */}
           {[...(WORLD_STORES.includes(STORE) ? [["🌏","gateWorld","gateWorldSub","world"]] : []), ["🕹️","gateArcade","gateArcadeSub","arcade"], ["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
             <div key={k} className="ui-tile" role="button" onClick={() => navTo(pg)}
-              style={{ gridColumn: (pg === "world" || pg === "arcade") ? "1 / -1" : undefined, display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
+              style={{ gridColumn: (pg === "arcade" && !WORLD_STORES.includes(STORE)) ? "1 / -1" : undefined, display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
               <span aria-hidden="true" style={{ fontSize:24, lineHeight:1, flexShrink:0 }}>{em}</span>
               <span style={{ minWidth:0 }}>
                 <span style={{ display:"block", fontSize:14, fontWeight:600, color:"#2D373D", lineHeight:1.4 }}>{t(lang,k)}</span>
