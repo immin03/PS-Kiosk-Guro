@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
+import { loadLedgers, buildPage, makeCopier } from "./promo-page.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 /* 지점별로 따로 만든다(2026-11-17 하남 키오스크) — src/stores/<지점>/rackLayout.js · promotions.js.
@@ -24,6 +25,8 @@ const SOURCE =
   process.env.PS_OS_RACKS ||
   resolve(os.homedir(), "Projects", "ps-os", "catalog", "racks.json");
 const SOURCE_PROMO = resolve(dirname(SOURCE), "promotions.json");
+/* 상세 페이지 사진 — PS-OS 미디어(catalog/assets 는 git 밖, 2026-11-20)는 본 폴더에만 있다. 워크트리에서 돌려도 여기서 찾는다 */
+const MEDIA = process.env.PS_OS_MEDIA || resolve(os.homedir(), "Projects", "ps-os");
 
 if (!existsSync(SOURCE)) {
   /* 조용히 넘어가면 배치가 어긋나도 아무도 모릅니다. 실제로 손님을 네 칸 떨어진
@@ -97,6 +100,8 @@ for (const STORE of Object.keys(STORES)) {
   let promoBody = null;
   if (existsSync(SOURCE_PROMO)) {
     const pdoc = JSON.parse(readFileSync(SOURCE_PROMO, "utf8"));
+    const LEDGERS = loadLedgers(dirname(SOURCE));
+    const COPY = makeCopier(MEDIA, resolve(HERE, "..", "src", "promo"));
     /* 슬라이드 = 프로모션 캘린더(프칼, records) — 2026-11-13 사용자 「여기 들어가는 슬라이드는 프칼이랑 연동」.
        구로가 걸린 건(구로 · 하남 · 구로 · 전체) 중 진행 중 · 기획 · 확정인 것만, 기간(period)을 그대로 실어
        키오스크가 그날 날짜로 거릅니다(다시 빌드하지 않아도 끝난 건은 내려가고 시작한 건은 뜸).
@@ -131,6 +136,7 @@ for (const STORE of Object.keys(STORES)) {
         return { id: r.id, src: "프칼", status: r.status, from, to: to || null, tag: r.type || "기획전",
           /* 자세히 = 키오스크 안 진행 중 이벤트 목록(2026-11-19) */
           title, sub: sub || "", link: `https://kiosk.phamasquare.com/${STORE}/?view=events`,
+          stores: String(r.store || "").split(/\s*·\s*/).filter(Boolean).map((x) => x === "전체" ? x : x + "점"),
           /* 이벤트 목록 페이지(?view=events) 카드 아래 설명 — 손님용 한 줄(kioskDesc). 요약(summary)은 안쪽 말이라 쓰지 않는다(2026-11-19) */
           desc: r.kioskDesc || "",
           /* 누르면 갈 키오스크 안 화면(kioskView) — world = 파마스퀘어 월드(3D 매장). 없으면 장표 상세(2026-11-22) */
@@ -142,7 +148,9 @@ for (const STORE of Object.keys(STORES)) {
           images: r.kioskDetail || r.kioskImages || (r.kioskImage ? [r.kioskImage] : []),
           detailVideo: r.kioskDetailVideo || null,
           video: r.kioskVideo || null,
-          imageHasText: !!(r.kioskImages && r.kioskImages.length) };
+          imageHasText: !!(r.kioskImages && r.kioskImages.length),
+          /* 상세 페이지(2026-11-27 사용자 여섯 구간) — 기록 page 칸 + 혜택 카탈로그. 없으면 장표 넘겨 보기 */
+          page: buildPage(r, LEDGERS, COPY) };
       })
       /* 이미 끝난 행사는 싣지 않는다(키오스크도 그날 날짜로 한 번 더 거른다) */
       .filter((p) => !p.to || p.to >= new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10))

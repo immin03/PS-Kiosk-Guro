@@ -11,9 +11,10 @@ import { resolveBaseRelativeUrl } from "./baseRelativeUrl.js";
 import { filterProducts, productKey, PRODUCT_ROW_HEIGHT } from "./catalogPerformance.js";
 import VirtualProductList from "./VirtualProductList.jsx";
 import {
-  detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel } from "./i18n.js";
+  detectLang, persistLang, t, catLabel, zoneLabel, topCatLabel, topCatSub, markLabel, dispName } from "./i18n.js";
 import FloorPlan, { routeSteps, ORIGIN_NAME } from "./FloorPlan.jsx";
-import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
+import PromoBanner from "./PromoBanner.jsx";
+import PromoDetail from "./PromoDetail.jsx";
 import PamiTopGame from "./pamitop/PamiTopGame.jsx";
 import PamiBreadGame from "./pamibread/PamiBreadGame.jsx";
 import Arcade from "./arcade/Arcade.jsx";
@@ -328,7 +329,7 @@ function ProductCard({ p, onLocate, showCat, hideRack }) {
     <div style={{ height:PRODUCT_ROW_HEIGHT, boxSizing:"border-box", borderBottom:"1px solid #EFF1F3" }}>
       <Row height={PRODUCT_ROW_HEIGHT - 1} onClick={() => onLocate?.(p)} chevron={false}
         lead={<Thumb emoji={productEmoji(p)} img={p.img} />}
-        title={p.name} sub={(p.brand || "") + (showCat && p.cat ? " · " + p.cat : "")} trail={hideRack ? null : p.rack} />
+        title={p.name} sub={(p.brand || "") + (showCat && p.cat ? " · " + dispName(p.cat) : "")} trail={hideRack ? null : p.rack} />
     </div>
   );
 }
@@ -810,7 +811,7 @@ export default function KioskApp() {
     });
     /* 상세 항목은 값이 실제로 있는 것만 남깁니다. 지금 데이터에서 en·spec 은
        1,606개 전부 비어 있고 benefit 은 "{카테고리} · 섹션 {랙}" 이라 위치의 사본입니다. */
-    const derivedBenefit = `${p.cat} · 섹션 ${p.rack}`;
+    const derivedBenefit = `${dispName(p.cat)} · 섹션 ${p.rack}`;
     const detailRows = [
       { label: t(lang,"labelEn"), value: (p.en || "").trim() },
       { label: t(lang,"labelBenefit"), value: (p.benefit || "").trim() === derivedBenefit ? "" : (p.benefit || "").trim() },
@@ -890,7 +891,7 @@ export default function KioskApp() {
       case "site": return <SiteFrame src={SITE} title={t(lang,"gateSite")} />;
       case "world": return <SiteFrame src={WORLD} title="PHAMA SQUARE WORLD" />;
       case "events": return <EventsList onOpen={(p) => navTo("promo", { promo: p })} emptyText={t(lang,"eventsEmpty")} />;
-      case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
+      case "promo": return <PromoDetail promo={cur.promo} lang={lang} onMap={() => tabTo("map")} />;
       case "pamitop": return <PamiTopGame onExit={goBack} />;
       case "pamibread": return <PamiBreadGame onExit={goBack} />;
       case "arcade": return <Arcade onOpen={(pg) => navTo(pg)} />;

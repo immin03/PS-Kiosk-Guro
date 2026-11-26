@@ -3,7 +3,7 @@ import { GRID, MARKS as ALL_MARKS, RACKS, RACK_BY_CODE } from "./rackLayout.js";
 import { STORE_CONFIG } from "./store.js";
 /* 지점이 숨기라 한 집기는 처음부터 뺀다(하남 기둥 · 바구니 등) */
 const MARKS = STORE_CONFIG.hideMarks ? ALL_MARKS.filter((m) => !STORE_CONFIG.hideMarks.test(m.kind)) : ALL_MARKS;
-import { zoneLabel, markLabel, t } from "./i18n.js";
+import { zoneLabel, markLabel, t, dispName } from "./i18n.js";
 import { BRAND, ZONE_COLOR, ZONE_TONE, ZONE_FALLBACK as FALLBACK, YOU_HERE as YOU } from "./theme.js";
 
 /* 매장 지도.
@@ -259,7 +259,7 @@ const BAR = (() => {
     const iy = upright ? BAR_LONG : BAR_SHORT;
     const boxW = (upright ? r.h : r.w) - (upright ? iy : ix) * 2 - 0.3;
     const boxH = (upright ? r.w : r.h) - (upright ? ix : iy) * 2;
-    return { code: r.code, upright, ix, iy, label: r.cat ? fitLabel(r.cat, boxW, boxH) : null };
+    return { code: r.code, upright, ix, iy, label: r.cat ? fitLabel(dispName(r.cat), boxW, boxH) : null };
   });
 
   /* 글자 크기는 한 값입니다. 칸마다 제 이름에 맞춰 키우면 「식품」만 크고
@@ -431,6 +431,7 @@ export default function FloorPlan({
   heading,              // 머리글 줄 왼쪽에 적을 말. 없으면 버튼만 놓입니다.
   onRackClick,
   minWidth,
+  focus,                // 프로모션 상세(2026-11-27) — { mark: "계산대" } · { zone: "프로모션" } 그 칸만 민트로, 버튼 · 누르기 없음
 }) {
   /* 지도는 언제나 화면 폭에 맞춥니다. 가로로 밀어야 보이는 지도는 손님이
      자기가 무엇을 놓쳤는지 알 수 없습니다. */
@@ -603,7 +604,7 @@ export default function FloorPlan({
     <div style={{ position: "relative" }}>
       {/* 머리글 줄. 버튼은 지도 안이 아니라 제목 오른쪽 끝에 둡니다 —
           지도 위에 얹으면 매대를 가리고, 아래에 두면 자리를 또 먹습니다. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12, paddingLeft: 0 }}>
+      {!focus && <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12, paddingLeft: 0 }}>
         {heading && (
           /* 소제목은 화면 어디서나 한 값입니다 — 「카테고리 바로가기」와
              나란히 놓이는데 두께가 달라 층이 다르게 읽혔습니다. */
@@ -628,7 +629,7 @@ export default function FloorPlan({
           <button type="button" aria-label="지도 축소" className="kiosk-map-btn" style={btn} onClick={() => zoomBy(1 / 1.4)}>{ico(<path d="M5 12h14"/>)}</button>
           <button type="button" aria-label="지도 확대" className="kiosk-map-btn" style={btn} onClick={() => zoomBy(1.4)}>{ico(<><path d="M12 5v14"/><path d="M5 12h14"/></>)}</button>
         </div>
-      </div>
+      </div>}
 
       {/* 지도는 카드 안쪽을 다 씁니다. 안쪽 여백을 두면 그만큼 잘립니다. */}
       <div style={{ background: BRAND.surface, border: `1px solid ${BRAND.border}`,
@@ -740,17 +741,20 @@ export default function FloorPlan({
           const short = lang === "ko" && b.zone && SHORT_ZONE[b.zone];
           const label = runWidth(full) * NAME <= room || !short ? full : short;
           const size = Math.min(NAME, room / runWidth(label));
-          const fill = b.zone ? zf(b.zone) : "#FFFFFF";
+          /* 상세 페이지가 가리키는 칸 — 집기는 이름(mark), 구역은 구역(zone, 집기 아닌 칸만) */
+          const lit = focus && ((focus.mark && b.mark === focus.mark) || (focus.zone && !b.mark && b.zone === focus.zone));
+          const fill = lit ? "#01C0A4" : b.zone ? zf(b.zone) : "#FFFFFF";
+          const go = !focus && block;
           return (
-            <g key={b.id} onClick={block ? () => zoomToBlock(block) : undefined} style={block ? { cursor: "pointer" } : undefined}>
+            <g key={b.id} onClick={go ? () => zoomToBlock(block) : undefined} style={go ? { cursor: "pointer" } : undefined}>
               <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="1.6"
                 fill={fill}
-                stroke={b.zone ? "none" : "#D9DDE1"} strokeWidth={b.zone ? 0 : 0.22}
-                strokeDasharray={b.zone ? undefined : "0.8 0.6"} />
+                stroke={b.zone || lit ? "none" : "#D9DDE1"} strokeWidth={b.zone || lit ? 0 : 0.22}
+                strokeDasharray={b.zone || lit ? undefined : "0.8 0.6"} />
               <text x={b.x + PAD} y={b.y + PAD + size * 0.82} fontSize={size}
-                fontWeight={b.zone ? 600 : 500} fill={b.zone ? "#2D373D" : MARK_TEXT}>{label}</text>
+                fontWeight={b.zone || lit ? 600 : 500} fill={lit ? "#FFFFFF" : b.zone ? "#2D373D" : MARK_TEXT}>{label}</text>
               {b.range && (
-                <text x={b.x + PAD} y={b.y + PAD + NAME + 0.9 + NUM * 0.82} fontSize={NUM} fontWeight="500" fill="#626E7C">{b.range}</text>
+                <text x={b.x + PAD} y={b.y + PAD + NAME + 0.9 + NUM * 0.82} fontSize={NUM} fontWeight="500" fill={lit ? "#FFFFFF" : "#626E7C"}>{b.range}</text>
               )}
               {isHere(b) && (() => {
                 /* 현재 위치 — 점과 글자를 한 줄로, 이름 아래 같은 왼쪽 선 */
