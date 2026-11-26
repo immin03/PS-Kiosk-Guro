@@ -3,6 +3,7 @@ import { INK, SUB, LINE, SOFT, MINT } from "../ui.jsx";
 import { createGame, setFilling, serve, trayCount, stampsFor, comboMult, FILLINGS, STAMP_MAX, STAMP_WON, TRAY_MAX, ROUND, HEARTS, HEAT_AT, BURN_COST, COMBO_1 } from "./tycoon.js";
 import pamiHi from "../pamitop/pami-hi.webp";
 import Guest from "./Guest.jsx";
+import ScoreSave from "../arcade/ScoreSave.jsx";
 
 /* 파미빵 타이쿤 — 60초 동안 파미 얼굴 틀에 빵을 구워 손님에게 파는 게임. 3D 굽기판(three.js)은 이 화면을 열 때만 받아 온다.
  * 매출 5,000원마다 스탬프 하나(최대 5). 스탬프는 직원이 봉투 겉에 찍는다 — 키오스크는 개수만 보여 준다. 규칙은 docs/arcade-rules.md */
@@ -222,6 +223,7 @@ export default function PamiBreadGame({ onExit }) {
             <div className="pt-stamps" aria-label={`스탬프 ${stamps}개`}>
               {Array.from({ length: STAMP_MAX }, (_, i) => <i key={i} className={i < stamps ? "on" : ""} />)}
             </div>
+            <ScoreSave game="tycoon" score={g.money} detail={{ sold: g.sold, perfect: g.perfectSold, combo: g.bestCombo }} />
             <p>{stamps > 0 ? "이 화면을 직원에게 보여 주세요. 봉투 겉에 스탬프를 찍어 드려요." : `매출 ${won(STAMP_WON)}부터 스탬프를 받을 수 있어요. 한 번 더 해 볼까요?`}</p>
             <div className="pt-btns">
               <button type="button" className="pt-btn" onClick={onExit}>나가기</button>

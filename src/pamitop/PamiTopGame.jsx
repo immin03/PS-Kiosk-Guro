@@ -3,6 +3,7 @@ import { INK, SUB, LINE, SOFT, MINT } from "../ui.jsx";
 import { stampsFor, STAMP_MAX, STAMP_EVERY, SHIELD_AFTER, SPEED_EVERY, RANDOM_DIR_AT } from "./cut.js";
 import pamiHi from "./pami-hi.webp";
 import pamiPeek from "./pami-peek.webp";
+import ScoreSave from "../arcade/ScoreSave.jsx";
 
 /* 파미탑 — 화면을 눌러 하얀 파미 얼굴을 높이 쌓는 한 판 게임. 3D 엔진(three.js)은 이 화면을 열 때만 받아 온다.
  * 5층마다 스탬프 하나(최대 5). 스탬프는 직원이 봉투 겉에 찍는다 — 키오스크는 개수만 보여 준다.
@@ -126,6 +127,7 @@ export default function PamiTopGame({ onExit }) {
             <div className="pb-stamps" aria-label={`스탬프 ${stamps}개`}>
               {Array.from({ length: STAMP_MAX }, (_, i) => <i key={i} className={i < stamps ? "on" : ""} />)}
             </div>
+            <ScoreSave game="pamitop" score={points} detail={{ floors: score }} />
             <p>{stamps > 0 ? "이 화면을 직원에게 보여 주세요. 봉투 겉에 스탬프를 찍어 드려요." : `${STAMP_EVERY}층부터 스탬프를 받을 수 있어요. 한 번 더 해 볼까요?`}</p>
             <div className="pb-btns">
               <button type="button" className="pb-btn" onClick={onExit}>나가기</button>
