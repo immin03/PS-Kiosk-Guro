@@ -47,3 +47,13 @@ test("speedFor: 오를수록 빨라지고 상한이 있음", () => {
   assert.ok(speedFor(10) > speedFor(1));
   assert.equal(speedFor(500), 260);
 });
+
+import { towerHead, clipRect, area } from "../src/pamitop/pamiShape.js";
+test("파미 칼선 — 첫 층 안에 들어오고, 반을 자르면 넓이도 줄어든다", () => {
+  const head = towerHead(Math.PI * 0.75);
+  assert.ok(head.every(([x, z]) => Math.abs(x) <= 52 && Math.abs(z) <= 52));
+  const full = area(clipRect(head, -50, 50, -50, 50));
+  const half = area(clipRect(head, 0, 50, -50, 50));
+  assert.ok(full > 4000 && half > full * 0.3 && half < full * 0.7);
+  assert.equal(clipRect(head, 60, 90, -50, 50).length, 0);
+});

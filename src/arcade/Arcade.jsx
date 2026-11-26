@@ -6,7 +6,7 @@ import pamitopCover from "./pamitop.webp";
  * 표지 아래 짙은 띠에 이름 · 설명, 오른쪽 「플레이」(글씨가 표지를 가리지 않게). 카드 전체를 눌러도 시작. 게임은 한국어 전용이라 문구도 한국어만. */
 const GAMES = [
   { page: "pamibread", cover: tycoonCover, title: "파미빵 타이쿤", sub: "60초 동안 파미빵을 구워 팔아요", tag: "3개 팔 때마다 스탬프" },
-  { page: "pamitop", cover: pamitopCover, title: "파미탑", sub: "파미빵을 딱 맞춰 높이 쌓아요", tag: "5층마다 스탬프" },
+  { page: "pamitop", cover: pamitopCover, title: "파미탑", sub: "파미를 딱 맞춰 높이 쌓아요", tag: "5층마다 스탬프" },
 ];
 
 const CSS = `

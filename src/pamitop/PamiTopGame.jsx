@@ -4,7 +4,7 @@ import { stampsFor, STAMP_MAX, STAMP_EVERY } from "./cut.js";
 import pamiHi from "./pami-hi.webp";
 import pamiPeek from "./pami-peek.webp";
 
-/* 파미탑 — 화면을 눌러 파미빵을 높이 쌓는 한 판 게임. 3D 엔진(three.js)은 이 화면을 열 때만 받아 온다.
+/* 파미탑 — 화면을 눌러 하얀 파미 얼굴을 높이 쌓는 한 판 게임. 3D 엔진(three.js)은 이 화면을 열 때만 받아 온다.
  * 5층마다 스탬프 하나(최대 5). 스탬프는 직원이 봉투 겉에 찍는다 — 키오스크는 개수만 보여 준다. */
 const CSS = `
 .pb-stage{position:relative;min-height:440px;overflow:hidden;background:linear-gradient(180deg,#0B2C31 0%,#124A4E 55%,#1C5F5F 100%)}
@@ -89,7 +89,7 @@ export default function PamiTopGame({ onExit }) {
           <div className="pb-card">
             <img className="pb-pami" src={pamiHi} alt="" />
             <h2>파미탑</h2>
-            <p>움직이는 파미빵이 아래 빵과 겹칠 때 화면을 누르세요.<br />어긋난 만큼 잘려요. {STAMP_EVERY}층마다 스탬프 하나!</p>
+            <p>움직이는 파미가 아래 파미와 겹칠 때 화면을 누르세요.<br />어긋난 만큼 잘려요. {STAMP_EVERY}층마다 스탬프 하나!</p>
             <div className="pb-btns"><button type="button" className="pb-btn main" onClick={start}>시작하기</button></div>
           </div>
         )}

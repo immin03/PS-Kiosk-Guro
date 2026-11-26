@@ -1,4 +1,4 @@
-/* 파미빵 쌓기 — 자르기 규칙(화면 없음). 원작: KonradLinkowski/Stack (MIT, LICENSE-stack.txt) 의 cutBox 를 순수 함수로 옮김.
+/* 파미탑 — 자르기 규칙(화면 없음). 원작: KonradLinkowski/Stack (MIT, LICENSE-stack.txt) 의 cutBox 를 순수 함수로 옮김.
  * prev: 아래 층 { cx, cz, sx, sz }, cur: 움직이던 층의 가운데 { cx, cz } (크기는 아래 층과 같음).
  * 한 층은 한 축으로만 움직이므로 잘린 조각도 한 축에서만 나온다. */
 export const FULL = 100;      // 첫 층 한 변

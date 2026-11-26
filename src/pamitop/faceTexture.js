@@ -27,15 +27,15 @@ function headPath(ctx, grow = 0) {
   }
 }
 
-export function drawFace(canvas, { rot = Math.PI * 0.75, edge = true } = {}) {
+export function drawFace(canvas, { rot = Math.PI * 0.75, edge = true, white = false } = {}) {
+  /* white: 파미탑 — 빵이 아니라 하얀 파미 얼굴 그대로(2026-11-26 사용자 「파미 얼굴은 하얗게」) */
   canvas.width = S; canvas.height = S;
   const ctx = canvas.getContext("2d");
   /* 빵 바탕 — 가운데 밝고 가장자리 진한 구움색 */
   const bg = ctx.createRadialGradient(S / 2, S / 2, S * 0.1, S / 2, S / 2, S * 0.72);
   bg.addColorStop(0, "#F3C77F"); bg.addColorStop(0.7, "#E2A65A"); bg.addColorStop(1, "#C98743");
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, S, S);
-  speckle(ctx, 900, "#8A4F1E", 3);
-  speckle(ctx, 500, "#FFF1CF", 2.5);
+  ctx.fillStyle = white ? "#FFFFFF" : bg; ctx.fillRect(0, 0, S, S);
+  if (!white) { speckle(ctx, 900, "#8A4F1E", 3); speckle(ctx, 500, "#FFF1CF", 2.5); }
 
   ctx.save();
   ctx.translate(S / 2, S / 2);
@@ -43,13 +43,14 @@ export function drawFace(canvas, { rot = Math.PI * 0.75, edge = true } = {}) {
   ctx.translate(0, -0.02 * K);
 
   /* 틀에 눌린 홈(진한 테두리) → 볼록한 얼굴 */
-  headPath(ctx, 0.022); ctx.fillStyle = "#A8662B"; ctx.fill();
-  ctx.save(); ctx.shadowColor = "rgba(90,45,10,0.45)"; ctx.shadowBlur = 26; ctx.shadowOffsetY = 10;
+  if (!white) { headPath(ctx, 0.022); ctx.fillStyle = "#A8662B"; ctx.fill(); }
+  ctx.save(); if (!white) { ctx.shadowColor = "rgba(90,45,10,0.45)"; ctx.shadowBlur = 26; ctx.shadowOffsetY = 10; }
   headPath(ctx); const fg = ctx.createRadialGradient(-0.08 * K, -0.12 * K, 0.02 * K, 0, 0, 0.5 * K);
-  fg.addColorStop(0, "#FAD99A"); fg.addColorStop(0.65, "#EDB86C"); fg.addColorStop(1, "#D9984D");
+  if (white) { fg.addColorStop(0, "#FFFFFF"); fg.addColorStop(0.7, "#FBFCFC"); fg.addColorStop(1, "#E4EBEB"); }
+  else { fg.addColorStop(0, "#FAD99A"); fg.addColorStop(0.65, "#EDB86C"); fg.addColorStop(1, "#D9984D"); }
   ctx.fillStyle = fg; ctx.fill(); ctx.restore();
   /* 귀 안쪽 이음매 */
-  ctx.strokeStyle = "rgba(150,85,30,0.55)"; ctx.lineWidth = 0.012 * K;
+  ctx.strokeStyle = white ? "rgba(150,170,175,0.45)" : "rgba(150,85,30,0.55)"; ctx.lineWidth = 0.012 * K;
   for (const k of [-1, 1]) { const [x, y] = P(k * 0.27, 0.235); ctx.beginPath(); ctx.arc(x, y, 0.07 * K, Math.PI * (k < 0 ? 0.9 : 0.1) - 0.9, Math.PI * (k < 0 ? 0.9 : 0.1) + 0.9); ctx.stroke(); }
 
   /* 볼 — 민트 아이싱 */
@@ -64,14 +65,14 @@ export function drawFace(canvas, { rot = Math.PI * 0.75, edge = true } = {}) {
   /* 눈 — 진하게 구운 타원 + 반짝 */
   for (const k of [-1, 1]) {
     const [x, y] = P(k * 0.112, -0.03);
-    ctx.fillStyle = "#3B200D";
+    ctx.fillStyle = white ? "#1E2A30" : "#3B200D";
     ctx.beginPath(); ctx.ellipse(x, y, 0.039 * 0.84 * K, 0.039 * 1.15 * K, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#FFF6E2";
     ctx.beginPath(); ctx.arc(x + 0.01 * K, y - 0.018 * K, 0.0105 * K, 0, Math.PI * 2); ctx.fill();
   }
   /* ω 입 */
   const mouth = [[-0.066, -0.088], [-0.052, -0.106], [-0.03, -0.11], [-0.009, -0.099], [0, -0.09], [0.009, -0.099], [0.03, -0.11], [0.052, -0.106], [0.066, -0.088]].map(([x, y]) => P(x, y));
-  ctx.strokeStyle = "#3B200D"; ctx.lineWidth = 0.016 * K; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.strokeStyle = white ? "#1E2A30" : "#3B200D"; ctx.lineWidth = 0.016 * K; ctx.lineCap = "round"; ctx.lineJoin = "round";
   ctx.beginPath(); ctx.moveTo(...mouth[0]);
   for (let i = 1; i < mouth.length - 1; i++) { const [x1, y1] = mouth[i], [x2, y2] = mouth[i + 1]; ctx.quadraticCurveTo(x1, y1, (x1 + x2) / 2, (y1 + y2) / 2); }
   ctx.lineTo(...mouth[mouth.length - 1]); ctx.stroke();
@@ -81,7 +82,7 @@ export function drawFace(canvas, { rot = Math.PI * 0.75, edge = true } = {}) {
     const [x, y] = P(0.2, 0.15);
     ctx.save(); ctx.translate(x, y); ctx.rotate(Math.atan2(-1.1, 1));
     const L = 0.1 * K, R = 0.043 * K;
-    ctx.shadowColor = "rgba(90,45,10,0.35)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+    ctx.shadowColor = white ? "rgba(40,70,75,0.25)" : "rgba(90,45,10,0.35)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
     ctx.fillStyle = "#1DBFB0"; ctx.beginPath(); ctx.moveTo(0, -R); ctx.lineTo(-L / 2, -R); ctx.arc(-L / 2, 0, R, -Math.PI / 2, Math.PI / 2, true); ctx.lineTo(0, R); ctx.closePath(); ctx.fill();
     ctx.fillStyle = "#FFFFFF"; ctx.beginPath(); ctx.moveTo(0, -R); ctx.lineTo(L / 2, -R); ctx.arc(L / 2, 0, R, -Math.PI / 2, Math.PI / 2); ctx.lineTo(0, R); ctx.closePath(); ctx.fill();
     ctx.restore();

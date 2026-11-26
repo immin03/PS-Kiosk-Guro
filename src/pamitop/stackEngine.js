@@ -1,20 +1,23 @@
 /* 파미탑 — 쌓기 엔진.
  * 원작: Stack by Konrad Linkowski (https://github.com/KonradLinkowski/Stack), MIT License — 전문은 LICENSE-stack.txt.
- * 바꾼 것: 상자 색 → 파미 얼굴을 구운 빵(윗면 그림이 자리에 고정돼 잘리면 얼굴도 같이 잘림), 잘린 조각은 떨어짐,
+ * 바꾼 것: 네모 상자 → 하얀 파미 얼굴 도무송(머리 윤곽 칼선, 2026-11-26 사용자 「스퀘어가 아니라 도무송」 「파미 얼굴은 하얗게」).
+ *   층마다 칼선 다각형을 사각 범위로 잘라 만들고, 얼굴 그림은 그 층에 붙어 함께 움직인다(어긋난 만큼 얼굴도 잘림). 잘린 조각은 떨어짐,
  * 퍼펙트 연속이면 다시 넓어짐, 눈, 그림자, 터치(pointerdown), 컨테이너 크기에 맞춤, 시작 · 끝 콜백. */
 import * as THREE from "three";
 import { cutTile, grow, speedFor, FULL } from "./cut.js";
-import { drawFace, drawSide } from "./faceTexture.js";
+import { drawFace } from "./faceTexture.js";
+import { towerHead, clipRect } from "./pamiShape.js";
 
 const H = 16;                 // 한 층 두께
 const RANGE = 110;            // 움직이는 폭
-const SHADES = [["#C47A33", "#FBE6BC"], ["#B96F2B", "#F8E0B0"], ["#CC8540", "#FCEAC6"], ["#BF7631", "#F9E3B6"]];
+const SIDES = [0xf4f7f7, 0xe3eeed, 0xf4f7f7, 0xd8efeb];   // 옆면 — 하양과 옅은 민트를 번갈아(층이 보이게)
+const ROT = Math.PI * 0.75;   // 얼굴 위쪽이 화면 위로 — 그림과 칼선이 같은 값
 const OFFSET = new THREE.Vector3(-300, 290, -300);
 
-/* 윗면 그림을 세계 자리에 고정 — 층이 어디 있든 그 자리의 얼굴 조각이 보인다 */
-function placeTop(tex, t) {
-  tex.repeat.set(t.sx / FULL, t.sz / FULL);
-  tex.offset.set((t.cx - t.sx / 2 + FULL / 2) / FULL, 1 - (t.cz + t.sz / 2 + FULL / 2) / FULL);
+/* 층 윗면 그림 맞춤 — 칼선 점(층 가운데 기준) → 얼굴 그림. ox, oz 는 이 층 얼굴이 원래 자리에서 밀린 만큼 */
+function fitTop(tex, t) {
+  tex.repeat.set(1 / FULL, -1 / FULL);
+  tex.offset.set((t.cx - (t.ox || 0) + FULL / 2) / FULL, 1 - (t.cz - (t.oz || 0) + FULL / 2) / FULL);
 }
 
 export class PamiStack {
@@ -47,26 +50,23 @@ export class PamiStack {
     this.sun = sun; this.scene.add(sun); this.scene.add(sun.target);
 
     /* 윗면 그림은 한 장, 층마다 자리만 다르게 잘라 씀 */
-    this.faceTex = new THREE.CanvasTexture(drawFace(document.createElement("canvas")));
+    this.faceTex = new THREE.CanvasTexture(drawFace(document.createElement("canvas"), { rot: ROT, edge: false, white: true }));
     this.faceTex.colorSpace = THREE.SRGBColorSpace;
     this.faceTex.anisotropy = 4;
-    this.sideMats = SHADES.map(([a, b]) => {
-      const t = new THREE.CanvasTexture(drawSide(document.createElement("canvas"), a, b));
-      t.colorSpace = THREE.SRGBColorSpace;
-      return new THREE.MeshStandardMaterial({ map: t, roughness: 0.78 });
-    });
+    this.head = towerHead(ROT);
+    this.sideMats = SIDES.map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.55 }));
 
     /* 받침 — 첫 층 아래 긴 빵 기둥 */
-    this.base = this.makeTile({ cx: 0, cz: 0, sx: FULL, sz: FULL }, 0, 400);
+    this.base = this.makeTile({ cx: 0, cz: 0, sx: FULL, sz: FULL, ox: 0, oz: 0 }, 0, 400);
     const stand = new THREE.MeshStandardMaterial({ color: 0x7fd3c7, roughness: 0.55 });
-    this.base.material = this.base.material.map((m, i) => (i === 2 ? m : stand));
+    this.base.material = [this.base.material[0], stand];
     this.base.position.y = -200 + H / 2;
     this.scene.add(this.base);
 
     this.makeSnow();
     this.tiles = []; this.falling = []; this.effects = [];
     this.playing = false; this.moving = null;
-    this.prev = { cx: 0, cz: 0, sx: FULL, sz: FULL };
+    this.prev = { cx: 0, cz: 0, sx: FULL, sz: FULL, ox: 0, oz: 0 };
     this.index = 0; this.combo = 0;
 
     this.onDown = (e) => { e.preventDefault(); this.tap(); };
@@ -81,15 +81,25 @@ export class PamiStack {
     if (import.meta.env?.DEV) window.__pamiStack = this;   /* 개발 서버에서만 — 창이 가려져 그리기가 멈출 때 손으로 돌려 확인 */
   }
 
-  /* 한 층 메시: 옆면 4 · 윗면(얼굴 조각) · 아랫면 */
+  /* 한 층 메시: 파미 칼선을 이 층 사각 범위로 자른 모양. 윗면 = 얼굴 그림, 옆면 = 하양 · 옅은 민트 */
   makeTile(t, index, height = H) {
-    const geo = new THREE.BoxGeometry(t.sx, height, t.sz);
+    const ox = t.ox || 0, oz = t.oz || 0;
+    const poly = clipRect(this.head.map(([x, z]) => [x + ox, z + oz]), t.cx - t.sx / 2, t.cx + t.sx / 2, t.cz - t.sz / 2, t.cz + t.sz / 2);
+    let geo;
+    if (poly.length >= 3) {
+      const shape = new THREE.Shape(poly.map(([x, z]) => new THREE.Vector2(x - t.cx, z - t.cz)));
+      geo = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 1 });
+      geo.rotateX(Math.PI / 2);          // 모양 (x, y) → 바닥 (x, z), 윗면이 y = 0, 아래로 height
+      geo.translate(0, height / 2, 0);
+    } else {
+      geo = new THREE.BufferGeometry();
+    }
     const top = this.faceTex.clone();
     top.needsUpdate = true;
-    placeTop(top, t);
-    const topMat = new THREE.MeshStandardMaterial({ map: top, roughness: 0.62 });
+    fitTop(top, t);
+    const topMat = new THREE.MeshStandardMaterial({ map: top, roughness: 0.5 });
     const side = this.sideMats[index % this.sideMats.length];
-    const m = new THREE.Mesh(geo, [side, side, topMat, side, side, side]);
+    const m = new THREE.Mesh(geo, [topMat, side]);
     m.position.set(t.cx, index * H, t.cz);
     m.castShadow = true; m.receiveShadow = true;
     m.userData.topMat = topMat;
@@ -124,7 +134,7 @@ export class PamiStack {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    this.camScale = Math.min(1.9, Math.max(1, 0.95 / this.camera.aspect));
+    this.camScale = 0.78 * Math.min(1.9, Math.max(1, 0.95 / this.camera.aspect));   // 파미 칼선은 네모보다 작아 보여 조금 당김
     this.setWatch(this.watch.y, true);
   }
 
@@ -144,7 +154,7 @@ export class PamiStack {
     this.effects.forEach((e) => { this.scene.remove(e.mesh); e.mesh.geometry.dispose(); e.mesh.material.dispose(); });
     if (this.moving) { this.scene.remove(this.moving.mesh); this.disposeMesh(this.moving.mesh); }
     this.tiles = []; this.falling = []; this.effects = []; this.moving = null;
-    this.prev = { cx: 0, cz: 0, sx: FULL, sz: FULL };
+    this.prev = { cx: 0, cz: 0, sx: FULL, sz: FULL, ox: 0, oz: 0 };
     this.index = 0; this.combo = 0;
     this.setWatch(0);
     this.playing = true;
@@ -157,6 +167,7 @@ export class PamiStack {
     const axis = this.index % 2 === 0 ? "x" : "z";
     const t = { ...this.prev };
     t[axis === "x" ? "cx" : "cz"] = -RANGE;
+    t.ox = this.prev.ox + (t.cx - this.prev.cx); t.oz = this.prev.oz + (t.cz - this.prev.cz);   // 얼굴도 같이 밀려 있음
     const mesh = this.makeTile(t, this.index);
     this.scene.add(mesh);
     this.moving = { mesh, axis, dir: 1, t };
@@ -167,17 +178,18 @@ export class PamiStack {
     if (!this.playing || !this.moving) return;
     const { mesh } = this.moving;
     const r = cutTile(this.prev, { cx: mesh.position.x, cz: mesh.position.z });
+    const shift = { ox: this.prev.ox + (mesh.position.x - this.prev.cx), oz: this.prev.oz + (mesh.position.z - this.prev.cz) };
     this.scene.remove(mesh); this.disposeMesh(mesh); this.moving = null;
     if (r.miss) {
       /* 통째로 떨어뜨리고 끝 */
-      const t = { ...this.prev, cx: mesh.position.x, cz: mesh.position.z };
+      const t = { ...this.prev, cx: mesh.position.x, cz: mesh.position.z, ...shift };
       this.drop(t, this.index, 1);
       this.playing = false;
       const floors = this.index - 1;
       setTimeout(() => this.cb.onOver?.(floors), 1000);
       return;
     }
-    let placed = r.placed;
+    let placed = r.perfect ? { ...r.placed } : { ...r.placed, ...shift };
     if (r.perfect) {
       this.combo += 1;
       placed = grow(placed, this.combo);
@@ -185,7 +197,7 @@ export class PamiStack {
       this.cb.onPerfect?.(this.combo);
     } else {
       this.combo = 0;
-      this.drop(r.piece, this.index, 0);
+      this.drop({ ...r.piece, ...shift }, this.index, 0);
     }
     const tile = this.makeTile(placed, this.index);
     this.scene.add(tile); this.tiles.push(tile);
@@ -222,8 +234,6 @@ export class PamiStack {
         mesh.position[axis] = Math.sign(mesh.position[axis]) * RANGE;
         this.moving.dir *= -1;
       }
-      const tt = this.moving.t; tt.cx = mesh.position.x; tt.cz = mesh.position.z;
-      placeTop(mesh.userData.topMat.map, tt);
     }
     for (let i = this.falling.length - 1; i >= 0; i--) {
       const f = this.falling[i];
