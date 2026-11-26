@@ -77,7 +77,7 @@ const STRINGS = {
     "zone.식품·음료": "식품 · 음료",
     "zone.브랜드존": "브랜드 존",
     "zone.브랜드": "건강기능식품 브랜드",
-    "zone.프로모션": "이벤트존",
+    "zone.프로모션": "이벤트 존",
     "zone.기타": "기타",
     "searchPlaceholder": "상품명, 브랜드, 성분 검색",
     "brandSearch": "브랜드명 검색",
@@ -158,7 +158,7 @@ const STRINGS = {
     "tabBrand": "브랜드",
     "mapB": "B · 브랜드 · 간식",
     "mapDrink": "음료",
-    "mapEvent": "이벤트존",
+    "mapEvent": "이벤트 존",
     "mapCheckout": "계산대",
     "mapA": "A · 건강기능식품",
     "mapAsub": "비타민 · 유산균 · 홍삼",
@@ -718,9 +718,12 @@ export function t(lang, key, vars) {
  * 찾고, 없으면 한국어 이름을 씁니다.
  * 예전에는 랙 번호로 이름을 찾아서, 매대를 옮기자(2026-09-18) 건강기능식품
  * 목록에 「펫 미용」 이 뜨고 콘드로이친 매대가 「모래·패드」 로 불렸습니다. */
+/* 원장 이름 「이벤트존」 은 화면에서 띄어 쓴다(2026-11-27 사용자 「이벤트존 → 이벤트 존 전부」) — 원장 이름은 그대로(목록 잇기 열쇠) */
+export const dispName = (s) => String(s ?? "").replace(/이벤트존/g, "이벤트 존");
+
 export function catLabel(lang, cat) {
   if (!cat) return "";
-  if (lang === "ko") return cat.name;
+  if (lang === "ko") return dispName(cat.name);
   const k = "cat." + cat.id;
   const v = t(lang, k);
   return v && v !== k ? v : cat.name;
@@ -730,7 +733,7 @@ export function markLabel(lang, kind) {
   /* 집기 이름은 배치 정본에서 옵니다. 번역이 없으면 정본 이름을 그대로 씁니다. */
   const key = "mark." + kind;
   const v = t(lang, key);
-  return v === key ? kind : v;
+  return dispName(v === key ? kind : v);
 }
 
 export function zoneLabel(lang, zoneId) {
