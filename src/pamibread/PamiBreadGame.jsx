@@ -2,10 +2,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { INK, SUB, LINE, SOFT, MINT } from "../ui.jsx";
 import { createGame, setFilling, serve, trayCount, stampsFor, FILLINGS, STAMP_MAX, STAMP_EVERY, TRAY_MAX, ROUND } from "./tycoon.js";
 import pamiHi from "../pamitop/pami-hi.webp";
+import Guest from "./Guest.jsx";
 
 /* 파미빵 타이쿤 — 60초 동안 파미 얼굴 틀에 빵을 구워 손님에게 파는 게임. 3D 굽기판(three.js)은 이 화면을 열 때만 받아 온다.
  * 판 개수 3개마다 스탬프 하나(최대 5). 스탬프는 직원이 봉투 겉에 찍는다 — 키오스크는 개수만 보여 준다. */
-const LOOKS = [["#F6C9A8", "#E2574C"], ["#F3D2B5", "#2D373D"], ["#EBC09E", "#01C0A4"], ["#F7D7BE", "#F2A93B"]];
 const FILL_DOT = { 팥: "#5B2A1E", 슈크림: "#F2CF6B" };
 const won = (n) => n.toLocaleString("ko-KR") + "원";
 
@@ -18,7 +18,7 @@ const CSS = `
 .pt-bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
 .pt-bar i{display:block;height:100%;background:#fff;border-radius:4px}
 .pt-money{font-size:17px;font-weight:600;text-align:right;min-width:92px}
-.pt-guests{position:relative;z-index:2;height:176px;display:flex;gap:10px;padding:18px 14px 0;align-items:flex-start}
+.pt-guests{position:relative;z-index:2;height:196px;display:flex;gap:10px;padding:18px 14px 0;align-items:flex-start}
 .pt-guest{flex:1;max-width:33.3%;display:flex;flex-direction:column;align-items:center;cursor:pointer;animation:ptIn .35s ease-out}
 @keyframes ptIn{0%{transform:translateY(24px);opacity:0}100%{transform:none;opacity:1}}
 .pt-guest.shake{animation:ptShake .35s}
@@ -27,11 +27,7 @@ const CSS = `
 .pt-bubble:after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-7px;border:7px solid transparent;border-bottom:0;border-top-color:#fff}
 .pt-bubble.ok{outline:3px solid ${MINT}}
 .pt-ord{display:flex;align-items:center;gap:4px;font-size:15px;font-weight:600;color:${INK};white-space:nowrap}
-.pt-face{width:62px;height:62px;border-radius:50%;margin-top:12px;position:relative;box-shadow:inset 0 -6px 0 rgba(0,0,0,.08)}
-.pt-face:before,.pt-face:after{content:"";position:absolute;top:26px;width:7px;height:9px;border-radius:50%;background:#2D373D}
-.pt-face:before{left:19px}.pt-face:after{right:19px}
-.pt-face b{position:absolute;left:6px;right:6px;top:-6px;height:20px;border-radius:12px 12px 4px 4px}
-.pt-face.mad:before,.pt-face.mad:after{height:4px;top:28px;border-radius:2px}
+.pt-guest svg{margin-top:8px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.25))}
 .pt-pat{width:70px;height:6px;border-radius:3px;background:rgba(255,255,255,.18);margin-top:8px;overflow:hidden}
 .pt-pat i{display:block;height:100%;border-radius:3px}
 .pt-pay{position:absolute;z-index:4;left:0;right:0;text-align:center;font-size:24px;font-weight:600;color:#A7E4DD;text-shadow:0 2px 10px rgba(0,0,0,.4);pointer-events:none;animation:ptPay .9s ease-out forwards}
@@ -150,7 +146,6 @@ export default function PamiBreadGame({ onExit }) {
           {playing && g.customers.map((cu) => {
             const ok = FILLINGS.every((f) => trayCount(g, f) >= cu.order[f]);
             const left = cu.patience / cu.max;
-            const [skin, hat] = LOOKS[cu.look];
             return (
               <div key={cu.id + (shake?.id === cu.id ? "-" + shake.k : "")} className={"pt-guest" + (shake?.id === cu.id ? " shake" : "")}
                 onPointerDown={(e) => { e.preventDefault(); serve(g, cu.id); }} role="button" aria-label={`손님 ${cu.id} 에게 건네기`}>
@@ -159,7 +154,7 @@ export default function PamiBreadGame({ onExit }) {
                     <span key={f} className="pt-ord"><i className="pt-dot" style={{ background: FILL_DOT[f], boxShadow: "none" }} />{f} {cu.order[f]}</span>
                   ))}
                 </div>
-                <div className={"pt-face" + (left < 0.3 ? " mad" : "")} style={{ background: skin }}><b style={{ background: hat }} /></div>
+                <Guest look={cu.look} id={cu.id} mood={left < 0.3 ? "mad" : ok ? "happy" : "normal"} />
                 <div className="pt-pat"><i style={{ width: `${left * 100}%`, background: left < 0.3 ? "#FF7A5C" : left < 0.6 ? "#F2CF6B" : "#A7E4DD" }} /></div>
               </div>
             );

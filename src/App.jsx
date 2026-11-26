@@ -16,6 +16,7 @@ import FloorPlan, { routeSteps, ORIGIN_NAME } from "./FloorPlan.jsx";
 import PromoBanner, { PromoSlides } from "./PromoBanner.jsx";
 import PamiTopGame from "./pamitop/PamiTopGame.jsx";
 import PamiBreadGame from "./pamibread/PamiBreadGame.jsx";
+import Arcade from "./Arcade.jsx";
 import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
 import { STORE } from "./store.js";
@@ -531,16 +532,6 @@ export default function KioskApp() {
   const renderHome = () => (
     <div style={{ padding:`16px ${PAD}px 24px` }}>
       <PromoBanner bleed={PAD} onPress={(p) => (p.view === "world" && STORE === "hanam") ? navTo("world") : navTo("promo", { promo: p })}/>
-      <button type="button" onClick={() => navTo("pamibread")} aria-label="파미빵 타이쿤 시작"
-        style={{ width:"100%", marginTop:12, padding:"14px 16px", borderRadius:12, border:"1px solid #E2E5E8", background:"#FFFFFF", textAlign:"left", cursor:"pointer", fontSize:15, color:"#2D373D" }}>
-        <b style={{ fontWeight:600 }}>파미빵 타이쿤</b>
-        <span style={{ display:"block", fontSize:13, color:"#626E7C", marginTop:4 }}>60초 동안 파미빵을 구워 팔면 스탬프</span>
-      </button>
-      <button type="button" onClick={() => navTo("pamitop")} aria-label="파미탑 시작"
-        style={{ width:"100%", marginTop:12, padding:"14px 16px", borderRadius:12, border:"1px solid #E2E5E8", background:"#FFFFFF", textAlign:"left", cursor:"pointer", fontSize:15, color:"#2D373D" }}>
-        <b style={{ fontWeight:600 }}>파미탑</b>
-        <span style={{ display:"block", fontSize:13, color:"#626E7C", marginTop:4 }}>파미빵을 높이 쌓으면 스탬프</span>
-      </button>
 
       <div style={{ marginBottom:GAP, position:"relative" }}>
         <SearchBar value={searchQ} onChange={setSearchQ} placeholder={t(lang,"searchPlaceholder")}/>
@@ -580,10 +571,11 @@ export default function KioskApp() {
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
           {/* 이벤트는 키오스크 안 진행 중 이벤트 목록으로(2026-11-19 사용자 「자세히 링크를 이벤트 페이지로」) — 홈페이지 event.html 은 이 지점 행사만 따로 못 보여 줬다 */}
           {/* 홈페이지도 키오스크 안에서(site) — 통째로 넘어가면 매장 기기가 돌아올 길이 없었다(2026-11-19) */}
+          {/* 게임 둘(파미빵 타이쿤 · 파미탑)은 아케이드 한 칸으로 묶어 한 줄(2026-11-26 사용자 「아케이드로 하나로 묶어 더보기에」) */}
           {/* 하남은 파마스퀘어 월드(3D) 칸을 맨 위 한 줄로 — 아래 탭 「홈」으로 나와도 다시 들어갈 길(2026-11-22 사용자 「다시 메타버스로 돌아갈 수가 없어」) */}
-          {[...(WORLD_STORES.includes(STORE) ? [["🌏","gateWorld","gateWorldSub","world"]] : []), ["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
+          {[...(WORLD_STORES.includes(STORE) ? [["🌏","gateWorld","gateWorldSub","world"]] : []), ["🕹️","gateArcade","gateArcadeSub","arcade"], ["🎟️","gateEvent","gateEventSub","events"],["🌐","gateSite","gateSiteSub","site"]].map(([em,k,sk,pg]) => (
             <div key={k} className="ui-tile" role="button" onClick={() => navTo(pg)}
-              style={{ gridColumn: pg === "world" ? "1 / -1" : undefined, display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
+              style={{ gridColumn: (pg === "world" || pg === "arcade") ? "1 / -1" : undefined, display:"flex", alignItems:"center", gap:10, padding:"12px 12px", border:"1px solid #E2E5E8", borderRadius:10, background:"#FFFFFF", cursor:"pointer", minWidth:0 }}>
               <span aria-hidden="true" style={{ fontSize:24, lineHeight:1, flexShrink:0 }}>{em}</span>
               <span style={{ minWidth:0 }}>
                 <span style={{ display:"block", fontSize:14, fontWeight:600, color:"#2D373D", lineHeight:1.4 }}>{t(lang,k)}</span>
@@ -874,6 +866,7 @@ export default function KioskApp() {
     site: t(lang,"gateSite"),
     pamitop: "파미탑",
     pamibread: "파미빵 타이쿤",
+    arcade: t(lang,"gateArcade"),
     world: t(lang,"gateWorld"),   /* 월드 화면 머리 제목(2026-11-25 사용자 「메인 헤더에 파마스퀘어 월드」) */
   };
 
@@ -894,6 +887,7 @@ export default function KioskApp() {
       case "promo": return <div style={{ padding: "0 0 32px" }}><PromoSlides promo={cur.promo} /></div>;
       case "pamitop": return <PamiTopGame onExit={goBack} />;
       case "pamibread": return <PamiBreadGame onExit={goBack} />;
+      case "arcade": return <Arcade onOpen={(pg) => navTo(pg)} />;
       default: return renderHome();
     }
   };
