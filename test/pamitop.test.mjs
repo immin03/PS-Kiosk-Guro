@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cutTile, grow, stampsFor, speedFor, FULL, STAMP_MAX } from "../src/pamitop/cut.js";
+import { cutTile, grow, stampsFor, speedFor, spawnSide, floorPoints, earnsShield, FULL, STAMP_MAX } from "../src/pamitop/cut.js";
 
 const base = { cx: 0, cz: 0, sx: FULL, sz: FULL };
 
@@ -56,4 +56,28 @@ test("파미 칼선 — 첫 층 안에 들어오고, 반을 자르면 넓이도 
   const half = area(clipRect(head, 0, 50, -50, 50));
   assert.ok(full > 4000 && half > full * 0.3 && half < full * 0.7);
   assert.equal(clipRect(head, 60, 90, -50, 50).length, 0);
+});
+
+test("속도 — 10층마다 한 단계, 260 에서 멈춤", () => {
+  assert.equal(speedFor(0), 140); assert.equal(speedFor(9), 140);
+  assert.equal(speedFor(10), 170); assert.equal(speedFor(25), 200);
+  assert.equal(speedFor(200), 260);
+});
+
+test("나오는 쪽 — 20층 전엔 한쪽, 그 뒤엔 무작위", () => {
+  assert.equal(spawnSide(5, 0.1), -1); assert.equal(spawnSide(19, 0.1), -1);
+  assert.equal(spawnSide(20, 0.1), 1); assert.equal(spawnSide(20, 0.9), -1);
+});
+
+test("점수 — 층 1점 + 퍼펙트 연속 보너스(최대 5)", () => {
+  assert.equal(floorPoints(false, 0), 1);
+  assert.equal(floorPoints(true, 1), 2);
+  assert.equal(floorPoints(true, 9), 6);
+});
+
+test("실드 — 퍼펙트 5연속마다, 이미 있으면 안 쌓임", () => {
+  assert.equal(earnsShield(4, false), false);
+  assert.equal(earnsShield(5, false), true);
+  assert.equal(earnsShield(5, true), false);
+  assert.equal(earnsShield(10, false), true);
 });

@@ -31,6 +31,6 @@ for (const [game, mod] of [["파미빵 타이쿤", tycoon], ["파미탑", cut]])
 }
 
 test("문서 속도 식 = speedFor", () => {
-  assert.match(doc, /min\(260, 140 \+ index × 3\)/);
-  for (const i of [0, 10, 40, 100]) assert.equal(cut.speedFor(i), Math.min(260, 140 + i * 3));
+  assert.match(doc, /min\(260, 140 \+ 30 × floor\(index ÷ 10\)\)/);
+  for (const i of [0, 9, 10, 40, 100]) assert.equal(cut.speedFor(i), Math.min(260, 140 + 30 * Math.floor(i / 10)));
 });

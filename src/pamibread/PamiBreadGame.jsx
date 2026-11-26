@@ -1,11 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { INK, SUB, LINE, SOFT, MINT } from "../ui.jsx";
-import { createGame, setFilling, serve, trayCount, stampsFor, FILLINGS, STAMP_MAX, STAMP_EVERY, TRAY_MAX, ROUND } from "./tycoon.js";
+import { createGame, setFilling, serve, trayCount, stampsFor, comboMult, FILLINGS, STAMP_MAX, STAMP_WON, TRAY_MAX, ROUND, HEARTS, HEAT_AT, BURN_COST, COMBO_1 } from "./tycoon.js";
 import pamiHi from "../pamitop/pami-hi.webp";
 import Guest from "./Guest.jsx";
 
 /* 파미빵 타이쿤 — 60초 동안 파미 얼굴 틀에 빵을 구워 손님에게 파는 게임. 3D 굽기판(three.js)은 이 화면을 열 때만 받아 온다.
- * 판 개수 3개마다 스탬프 하나(최대 5). 스탬프는 직원이 봉투 겉에 찍는다 — 키오스크는 개수만 보여 준다. */
+ * 매출 5,000원마다 스탬프 하나(최대 5). 스탬프는 직원이 봉투 겉에 찍는다 — 키오스크는 개수만 보여 준다. 규칙은 docs/arcade-rules.md */
 const FILL_DOT = { 팥: "#5B2A1E", 슈크림: "#F2CF6B" };
 const won = (n) => n.toLocaleString("ko-KR") + "원";
 
@@ -18,6 +18,12 @@ const CSS = `
 .pt-bar{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
 .pt-bar i{display:block;height:100%;background:#fff;border-radius:4px}
 .pt-money{font-size:17px;font-weight:600;text-align:right;min-width:92px}
+.pt-hearts{display:flex;gap:3px}
+.pt-hearts svg{display:block}
+.pt-combo{position:absolute;z-index:3;right:14px;top:66px;padding:4px 10px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-size:14px;font-weight:600;pointer-events:none}
+.pt-combo b{color:#A7E4DD;font-weight:600}
+.pt-vip{position:absolute;top:-12px;left:50%;transform:translateX(-50%);padding:1px 8px;border-radius:9px;background:#F2A93B;color:#fff;font-size:12px;font-weight:600;letter-spacing:.04em}
+.pt-bubble.vip{box-shadow:0 0 0 3px #F2A93B,0 6px 18px rgba(0,0,0,.25)}
 .pt-guests{position:relative;z-index:2;height:196px;display:flex;gap:10px;padding:18px 14px 0;align-items:flex-start}
 .pt-guest{flex:1;max-width:33.3%;display:flex;flex-direction:column;align-items:center;cursor:pointer;animation:ptIn .35s ease-out}
 @keyframes ptIn{0%{transform:translateY(24px);opacity:0}100%{transform:none;opacity:1}}
@@ -53,7 +59,7 @@ const CSS = `
 .pt-steps{margin:14px 0 0;padding:0;list-style:none;text-align:left;display:flex;flex-direction:column;gap:8px}
 .pt-steps li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.45;color:${INK};word-break:keep-all}
 .pt-steps b{flex:none;width:24px;height:24px;border-radius:50%;background:${SOFT};font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
-.pt-sum{display:flex;justify-content:center;gap:28px;margin:14px 0 2px}
+.pt-sum{display:flex;justify-content:center;gap:22px;margin:14px 0 2px}
 .pt-sum div{display:flex;flex-direction:column;gap:2px}
 .pt-sum span{font-size:13px;color:${SUB}}
 .pt-sum strong{font-size:22px;font-weight:600;color:${INK}}
@@ -65,7 +71,11 @@ const CSS = `
 .pt-stamps i.on{background:${MINT};border-color:${MINT}}
 `;
 
-const TOAST = { wait: "아직 덜 익었어요", full: "쟁반이 꽉 찼어요. 손님에게 먼저 건네요", short: "쟁반에 빵이 모자라요", burn: "앗, 탔어요! 눌러서 버려요", leave: "손님이 기다리다 갔어요" };
+const TOAST = { wait: "아직 덜 익었어요", full: "쟁반이 꽉 찼어요. 손님에게 먼저 건네요", short: "쟁반에 빵이 모자라요", burn: `앗, 탔어요! 재료비 ${BURN_COST}원`, leave: "손님이 기다리다 갔어요. 하트 하나 잃었어요", heat: "불이 세졌어요! 더 빨리 익어요" };
+
+function Heart({ on }) {
+  return <svg width="22" height="20" viewBox="0 0 22 20" aria-hidden="true"><path d="M11 19 C4 13.5 1 10 1 6.2 1 3.2 3.4 1 6.2 1 8.3 1 10 2.3 11 4 12 2.3 13.7 1 15.8 1 18.6 1 21 3.2 21 6.2 21 10 18 13.5 11 19Z" fill={on ? "#FF7A6B" : "rgba(255,255,255,.18)"} /></svg>;
+}
 
 export default function PamiBreadGame({ onExit }) {
   const stageRef = useRef(null);
@@ -98,7 +108,7 @@ export default function PamiBreadGame({ onExit }) {
       for (const e of evs) {
         if (TOAST[e.type]) setToast({ text: TOAST[e.type], k: Date.now() + Math.random() });
         if (e.type === "short") setShake({ id: e.id, k: Date.now() });
-        if (e.type === "serve") setPays((p) => [...p.slice(-3), { id: e.id, pay: e.pay, k: Date.now() + Math.random() }]);
+        if (e.type === "serve") setPays((p) => [...p.slice(-3), { id: e.id, pay: e.pay, mult: comboMult(e.combo), vip: e.vip, k: Date.now() + Math.random() }]);
         if (e.type === "over") setTimeout(() => alive && setPhase("over"), 600);
       }
       setTick((x) => x + 1);
@@ -129,7 +139,7 @@ export default function PamiBreadGame({ onExit }) {
 
   const g = gameRef.current;
   const playing = phase === "play" && g;
-  const stamps = g ? stampsFor(g.sold) : 0;
+  const stamps = g ? stampsFor(g.money) : 0;
   const pick = (f) => { if (g) { setFilling(g, f); setTick((x) => x + 1); } };
 
   return (
@@ -140,8 +150,10 @@ export default function PamiBreadGame({ onExit }) {
         <div className="pt-top">
           <span className={"pt-time" + (g && g.left < 10 && phase === "play" ? " low" : "")}>{g ? Math.ceil(g.left) : ROUND}</span>
           <span className="pt-bar"><i style={{ width: `${g ? (g.left / ROUND) * 100 : 100}%` }} /></span>
+          <span className="pt-hearts" aria-label={`하트 ${g ? g.hearts : HEARTS}개`}>{Array.from({ length: HEARTS }, (_, i) => <Heart key={i} on={i < (g ? g.hearts : HEARTS)} />)}</span>
           <span className="pt-money">{won(g ? g.money : 0)}</span>
         </div>
+        {playing && g.combo >= 2 && <div className="pt-combo">연속 {g.combo}{comboMult(g.combo) > 1 && <> <b>×{comboMult(g.combo)}</b></>}</div>}
 
         <div className="pt-guests">
           {playing && g.customers.map((cu) => {
@@ -150,7 +162,8 @@ export default function PamiBreadGame({ onExit }) {
             return (
               <div key={cu.id + (shake?.id === cu.id ? "-" + shake.k : "")} className={"pt-guest" + (shake?.id === cu.id ? " shake" : "")}
                 onPointerDown={(e) => { e.preventDefault(); serve(g, cu.id); }} role="button" aria-label={`손님 ${cu.id} 에게 건네기`}>
-                <div className={"pt-bubble" + (ok ? " ok" : "")}>
+                <div className={"pt-bubble" + (ok ? " ok" : "") + (cu.vip ? " vip" : "")}>
+                  {cu.vip && <span className="pt-vip">VIP ×2</span>}
                   {FILLINGS.filter((f) => cu.order[f] > 0).map((f) => (
                     <span key={f} className="pt-ord"><i className="pt-dot" style={{ background: FILL_DOT[f], boxShadow: "none" }} />{f} {cu.order[f]}</span>
                   ))}
@@ -160,7 +173,7 @@ export default function PamiBreadGame({ onExit }) {
               </div>
             );
           })}
-          {pays.map((p) => <div key={p.k} className="pt-pay" style={{ top: 40 }}>+{won(p.pay)}</div>)}
+          {pays.map((p) => <div key={p.k} className="pt-pay" style={{ top: 40 }}>+{won(p.pay)}{p.mult > 1 ? ` ×${p.mult}` : ""}</div>)}
         </div>
 
         <div className="pt-grill" ref={grillRef}>
@@ -184,12 +197,14 @@ export default function PamiBreadGame({ onExit }) {
           <div className="pt-card">
             <img className="pt-pami" src={pamiHi} alt="" />
             <h2>파미빵 타이쿤</h2>
-            <p>{ROUND}초 동안 파미빵을 구워 팔아요. {STAMP_EVERY}개 팔 때마다 스탬프 하나!</p>
+            <p>{ROUND}초 동안 파미빵을 구워 팔아요. 매출 {won(STAMP_WON)}마다 스탬프 하나!</p>
             <ol className="pt-steps">
               <li><b>1</b>속(팥, 슈크림)을 고르고 빈 틀을 눌러 반죽을 부어요</li>
               <li><b>2</b>테두리가 민트로 빛나면 눌러서 뒤집어요</li>
               <li><b>3</b>한 번 더 민트일 때 눌러 쟁반에 담아요</li>
               <li><b>4</b>주문만큼 담기면 손님을 눌러 건네요</li>
+              <li><b>!</b>손님을 놓치면 하트를 잃어요. 하트 {HEARTS}개를 다 잃으면 끝</li>
+              <li><b>!</b>잘 구운 빵을 {COMBO_1}개 이어 팔면 연속 보너스, VIP 손님은 두 배. {HEAT_AT}초 뒤엔 불이 세져요</li>
             </ol>
             <div className="pt-btns"><button type="button" className="pt-btn main" onClick={start}>시작하기</button></div>
           </div>
@@ -198,15 +213,16 @@ export default function PamiBreadGame({ onExit }) {
         {phase === "over" && g && (
           <div className="pt-card">
             <img className="pt-pami" src={pamiHi} alt="" />
-            <h2>{g.sold}개 팔았어요</h2>
+            <h2>{g.end === "hearts" ? "손님을 세 번 놓쳤어요" : `${g.sold}개 팔았어요`}</h2>
             <div className="pt-sum">
-              <div><span>매출</span><strong>{won(g.money)}</strong></div>
+              <div><span>점수(매출)</span><strong>{won(g.money)}</strong></div>
               <div><span>잘 구운 빵</span><strong>{g.perfectSold}개</strong></div>
+              <div><span>최고 연속</span><strong>{g.bestCombo}</strong></div>
             </div>
             <div className="pt-stamps" aria-label={`스탬프 ${stamps}개`}>
               {Array.from({ length: STAMP_MAX }, (_, i) => <i key={i} className={i < stamps ? "on" : ""} />)}
             </div>
-            <p>{stamps > 0 ? "이 화면을 직원에게 보여 주세요. 봉투 겉에 스탬프를 찍어 드려요." : `${STAMP_EVERY}개부터 스탬프를 받을 수 있어요. 한 번 더 해 볼까요?`}</p>
+            <p>{stamps > 0 ? "이 화면을 직원에게 보여 주세요. 봉투 겉에 스탬프를 찍어 드려요." : `매출 ${won(STAMP_WON)}부터 스탬프를 받을 수 있어요. 한 번 더 해 볼까요?`}</p>
             <div className="pt-btns">
               <button type="button" className="pt-btn" onClick={onExit}>나가기</button>
               <button type="button" className="pt-btn main" onClick={start}>다시 하기</button>

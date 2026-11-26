@@ -4,7 +4,7 @@
  *   층마다 칼선 다각형을 사각 범위로 잘라 만들고, 얼굴 그림은 그 층에 붙어 함께 움직인다(어긋난 만큼 얼굴도 잘림). 잘린 조각은 떨어짐,
  * 퍼펙트 연속이면 다시 넓어짐, 눈, 그림자, 터치(pointerdown), 컨테이너 크기에 맞춤, 시작 · 끝 콜백. */
 import * as THREE from "three";
-import { cutTile, grow, speedFor, FULL } from "./cut.js";
+import { cutTile, grow, speedFor, spawnSide, floorPoints, earnsShield, FULL } from "./cut.js";
 import { drawFace } from "./faceTexture.js";
 import { towerHead, clipRect } from "./pamiShape.js";
 
@@ -155,22 +155,24 @@ export class PamiStack {
     if (this.moving) { this.scene.remove(this.moving.mesh); this.disposeMesh(this.moving.mesh); }
     this.tiles = []; this.falling = []; this.effects = []; this.moving = null;
     this.prev = { cx: 0, cz: 0, sx: FULL, sz: FULL, ox: 0, oz: 0 };
-    this.index = 0; this.combo = 0;
+    this.index = 0; this.combo = 0; this.score = 0; this.shield = false;
     this.setWatch(0);
     this.playing = true;
-    this.cb.onScore?.(0);
+    this.cb.onScore?.(0, 0);
+    this.cb.onShield?.(false);
     this.spawnMoving();
   }
 
-  spawnMoving() {
-    this.index += 1;
+  spawnMoving(again = false) {
+    if (!again) this.index += 1;
     const axis = this.index % 2 === 0 ? "x" : "z";
     const t = { ...this.prev };
-    t[axis === "x" ? "cx" : "cz"] = -RANGE;
+    const side = spawnSide(this.index, Math.random());
+    t[axis === "x" ? "cx" : "cz"] = side * RANGE;
     t.ox = this.prev.ox + (t.cx - this.prev.cx); t.oz = this.prev.oz + (t.cz - this.prev.cz);   // 얼굴도 같이 밀려 있음
     const mesh = this.makeTile(t, this.index);
     this.scene.add(mesh);
-    this.moving = { mesh, axis, dir: 1, t };
+    this.moving = { mesh, axis, dir: -side, t };
   }
 
   /* 누르면 내려놓기 */
@@ -181,12 +183,19 @@ export class PamiStack {
     const shift = { ox: this.prev.ox + (mesh.position.x - this.prev.cx), oz: this.prev.oz + (mesh.position.z - this.prev.cz) };
     this.scene.remove(mesh); this.disposeMesh(mesh); this.moving = null;
     if (r.miss) {
-      /* 통째로 떨어뜨리고 끝 */
+      /* 통째로 떨어뜨림. 실드가 있으면 쓰고 같은 층을 다시, 없으면 끝 */
       const t = { ...this.prev, cx: mesh.position.x, cz: mesh.position.z, ...shift };
       this.drop(t, this.index, 1);
+      this.combo = 0;
+      if (this.shield) {
+        this.shield = false;
+        this.cb.onShield?.(false, "used");
+        this.spawnMoving(true);
+        return;
+      }
       this.playing = false;
-      const floors = this.index - 1;
-      setTimeout(() => this.cb.onOver?.(floors), 1000);
+      const floors = this.index - 1, score = this.score;
+      setTimeout(() => this.cb.onOver?.(floors, score), 1000);
       return;
     }
     let placed = r.perfect ? { ...r.placed } : { ...r.placed, ...shift };
@@ -195,6 +204,7 @@ export class PamiStack {
       placed = grow(placed, this.combo);
       this.spawnRing(this.prev);
       this.cb.onPerfect?.(this.combo);
+      if (earnsShield(this.combo, this.shield)) { this.shield = true; this.cb.onShield?.(true, "got"); }
     } else {
       this.combo = 0;
       this.drop({ ...r.piece, ...shift }, this.index, 0);
@@ -202,7 +212,8 @@ export class PamiStack {
     const tile = this.makeTile(placed, this.index);
     this.scene.add(tile); this.tiles.push(tile);
     this.prev = placed;
-    this.cb.onScore?.(this.index);
+    this.score += floorPoints(r.perfect, this.combo);
+    this.cb.onScore?.(this.index, this.score);
     this.setWatch(this.index * H);
     this.spawnMoving();
   }
