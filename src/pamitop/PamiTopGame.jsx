@@ -16,7 +16,8 @@ const CSS = `
 .pb-peek{z-index:2;position:absolute;right:-16px;bottom:-6px;width:92px!important;max-width:none!important;height:auto;pointer-events:none;transition:transform .25s}
 .pb-peek.cheer{animation:pbCheer .5s ease-out}
 @keyframes pbCheer{0%{transform:translateY(0)}40%{transform:translateY(-22px) rotate(-6deg)}100%{transform:translateY(0)}}
-.pb-card{z-index:3;position:absolute;left:20px;right:20px;bottom:20px;background:#fff;border-radius:20px;padding:22px 20px 20px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.pb-dim{position:absolute;inset:0;z-index:3;background:rgba(6,24,28,.5)}
+.pb-card{z-index:4;position:absolute;left:20px;right:20px;bottom:20px;background:#fff;border-radius:20px;padding:22px 20px 20px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.25)}
 .pb-card .pb-pami{display:block;width:84px!important;max-width:none!important;height:auto;margin:-72px auto 6px}
 .pb-card h2{margin:0;font-size:24px;font-weight:600;color:${INK}}
 .pb-card p{margin:8px 0 0;font-size:15px;line-height:1.6;color:${SUB};word-break:keep-all}
@@ -83,6 +84,7 @@ export default function PamiTopGame({ onExit }) {
         {phase === "play" && pop && <div key={pop.k} className="pb-pop">{pop.c > 1 ? `퍼펙트 ${pop.c}연속` : "퍼펙트"}</div>}
         {phase === "play" && <img key={cheer} className={"pb-peek" + (cheer ? " cheer" : "")} src={pamiPeek} alt="" />}
 
+        {phase !== "play" && <div className="pb-dim" />}   {/* 안내 카드 뒤 딤(2026-11-26 사용자 「뒤에 딤드 넣어」) */}
         {phase === "ready" && (
           <div className="pb-card">
             <img className="pb-pami" src={pamiHi} alt="" />

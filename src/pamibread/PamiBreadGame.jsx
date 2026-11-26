@@ -45,6 +45,7 @@ const CSS = `
 .pt-bread{display:inline-block;position:relative;width:24px;height:19px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#FAD99A,#D9984D);vertical-align:middle}
 .pt-bread:before,.pt-bread:after{content:"";position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:#E3A85C}
 .pt-bread:before{left:0}.pt-bread:after{right:0}
+.pt-dim{position:absolute;inset:0;z-index:4;background:rgba(10,16,22,.55)}
 .pt-card{z-index:5;position:absolute;left:20px;right:20px;bottom:24px;background:#fff;border-radius:20px;padding:22px 20px 20px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.3)}
 .pt-card .pt-pami{display:block;width:84px!important;max-width:none!important;height:auto;margin:-72px auto 6px}
 .pt-card h2{margin:0;font-size:24px;font-weight:600;color:${INK}}
@@ -178,6 +179,7 @@ export default function PamiBreadGame({ onExit }) {
           </div>
         </div>
 
+        {phase !== "play" && <div className="pt-dim" />}   {/* 안내 카드 뒤 딤(2026-11-26 사용자 「뒤에 딤드 넣어」) */}
         {phase === "ready" && (
           <div className="pt-card">
             <img className="pt-pami" src={pamiHi} alt="" />
