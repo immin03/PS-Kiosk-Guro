@@ -352,8 +352,9 @@ export default function KioskApp() {
   );
   /* ?tab=search · map · guide 로 열면 그 탭에서 시작(2026-11-17) — 건강 가이드 바닥 탭이 키오스크 탭으로 넘어올 때 쓴다 */
   const TAB0 = (() => { const v = new URLSearchParams(window.location.search).get("tab"); return ["home","search","guide","map"].includes(v) ? v : "home"; })();
-  /* ?view=events 로 열면 진행 중 이벤트 목록부터 — 뒤로 가기는 시작 탭으로(2026-11-19) */
-  const [nav, setNav] = useState(() => { const v = new URLSearchParams(window.location.search).get("view"); return v === "events" || (v === "world" && WORLD_STORES.includes(STORE)) ? [{ page:TAB0 }, { page:v }] : [{ page:TAB0 }]; });
+  /* ?view=events 로 열면 진행 중 이벤트 목록부터 — 뒤로 가기는 시작 탭으로(2026-11-19).
+     ?view=arcade · pamibread · pamitop 은 아케이드와 게임 하나로 바로(PS-OS 고객 화면 미리보기, 2026-11-26) */
+  const [nav, setNav] = useState(() => { const v = new URLSearchParams(window.location.search).get("view"); return ["events","arcade","pamibread","pamitop"].includes(v) || (v === "world" && WORLD_STORES.includes(STORE)) ? [{ page:TAB0 }, { page:v }] : [{ page:TAB0 }]; });
   const cur = nav[nav.length - 1];
   /* 75" 판: 지금 화면을 바깥에 알린다(매장 지도면 판이 가로로 넓어진다) */
   useEffect(() => { if (INNER) toShell({ page: cur.page }); }, [cur.page]);
