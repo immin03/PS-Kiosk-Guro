@@ -19,6 +19,15 @@ export function serverOn(loc = typeof location !== "undefined" ? location : null
   return /(^|\.)phamasquare\.com$/.test(loc.hostname);
 }
 
+/* 여러 손님이 같이 쓰는 매장 기기인가 — 기기 주소에 ?did= 가 붙고(탭에 기억, usage.js 와 같은 값), 75" 판 안은 ?inner.
+ * 매장 기기면 끝 화면에 QR(손님 휴대폰으로 가져가기), 손님 휴대폰이면 그 자리에서 바로 「랭킹에 올리기」 */
+export function sharedDevice(loc = typeof location !== "undefined" ? location : null, session = (() => { try { return sessionStorage; } catch (e) { return null; } })()) {
+  if (!loc) return false;
+  const q = new URLSearchParams(loc.search);
+  if (q.has("inner") || q.get("did")) return true;
+  try { return !!(session && session.getItem("ps_did")); } catch (e) { return false; }
+}
+
 async function rpc(fn, body, fetchFn = fetch) {
   const r = await fetchFn(RPC + fn, {
     method: "POST",
