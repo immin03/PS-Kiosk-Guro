@@ -21,6 +21,12 @@ const CSS = `
 .pb-dim{position:absolute;inset:0;z-index:3;background:rgba(6,24,28,.5)}
 .pb-card{z-index:4;position:absolute;left:20px;right:20px;bottom:20px;background:#fff;border-radius:20px;padding:22px 20px 20px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.25)}
 .pb-card .pb-pami{display:block;width:84px!important;max-width:none!important;height:auto;margin:-72px auto 6px}
+.pb-rules{margin:14px 0 0;padding:14px 0 0;border-top:1px solid ${LINE};display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;text-align:left}
+.pb-rules div{display:flex;gap:10px;align-items:flex-start}
+.pb-card .pb-rules p{margin:0}
+.pb-rules i{flex:none;width:34px;height:34px;border-radius:50%;background:${SOFT};display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:600;color:${INK}}
+.pb-rules b{display:block;font-size:15px;font-weight:600;color:${INK};line-height:1.35}
+.pb-rules span{display:block;margin-top:2px;font-size:14px;line-height:1.4;color:${SUB};word-break:keep-all}
 .pb-card h2{margin:0;font-size:24px;font-weight:600;color:${INK}}
 .pb-card p{margin:8px 0 0;font-size:15px;line-height:1.6;color:${SUB};word-break:keep-all}
 .pb-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
@@ -111,7 +117,12 @@ export default function PamiTopGame({ onExit }) {
             <img className="pb-pami" src={pamiHi} alt="" />
             <h2>파미탑</h2>
             <p>움직이는 파미가 아래 파미와 겹칠 때 화면을 누르세요.<br />어긋난 만큼 잘려요. {STAMP_EVERY}층마다 스탬프 하나!</p>
-            <p>딱 맞추면 퍼펙트, 이어 맞출수록 점수가 더 붙어요. 퍼펙트 {SHIELD_AFTER}연속이면 실드로 한 번 버틸 수 있어요. {SPEED_EVERY}층마다 빨라지고 {RANDOM_DIR_AT}층부터는 어느 쪽에서 나올지 몰라요.</p>
+            <div className="pb-rules">
+              <div><i style={{ fontSize: 20 }}>+</i><p><b>퍼펙트</b><span>이어 맞출수록 점수 더</span></p></div>
+              <div><i><svg width="16" height="18" viewBox="0 0 18 20" aria-hidden="true"><path d="M9 1 L17 4 V10 C17 14.5 13.5 17.8 9 19 C4.5 17.8 1 14.5 1 10 V4 Z" fill="#A7E4DD" stroke={INK} strokeWidth="1.6" /></svg></i><p><b>실드</b><span>{SHIELD_AFTER}연속이면 한 번 버텨요</span></p></div>
+              <div><i>{SPEED_EVERY}층</i><p><b>점점 빨라져요</b><span>{SPEED_EVERY}층마다 한 단계씩</span></p></div>
+              <div><i>{RANDOM_DIR_AT}층</i><p><b>방향이 바뀌어요</b><span>나오는 쪽이 무작위</span></p></div>
+            </div>
             <div className="pb-btns"><button type="button" className="pb-btn main" onClick={start}>시작하기</button></div>
           </div>
         )}

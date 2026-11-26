@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { INK, SUB, LINE, SOFT, MINT } from "../ui.jsx";
-import { createGame, setFilling, serve, trayCount, stampsFor, comboMult, FILLINGS, STAMP_MAX, STAMP_WON, TRAY_MAX, ROUND, HEARTS, HEAT_AT, BURN_COST, COMBO_1 } from "./tycoon.js";
+import { createGame, setFilling, serve, trayCount, stampsFor, comboMult, FILLINGS, STAMP_MAX, STAMP_WON, TRAY_MAX, ROUND, HEARTS, HEAT_AT, BURN_COST, COMBO_1, COMBO_2 } from "./tycoon.js";
 import pamiHi from "../pamitop/pami-hi.webp";
 import Guest from "./Guest.jsx";
 import ScoreSave from "../arcade/ScoreSave.jsx";
@@ -59,6 +59,13 @@ const CSS = `
 .pt-card p{margin:8px 0 0;font-size:15px;line-height:1.6;color:${SUB};word-break:keep-all}
 .pt-steps{margin:14px 0 0;padding:0;list-style:none;text-align:left;display:flex;flex-direction:column;gap:8px}
 .pt-steps li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.45;color:${INK};word-break:keep-all}
+.pt-rules{margin:14px 0 0;padding:14px 0 0;border-top:1px solid ${LINE};display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;text-align:left}
+.pt-rules div{display:flex;gap:10px;align-items:flex-start}
+.pt-card .pt-rules p{margin:0}
+.pt-rules svg{width:18px;height:16px}
+.pt-rules i{flex:none;width:34px;height:34px;border-radius:50%;background:${SOFT};display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:600;color:${INK}}
+.pt-rules b{display:block;font-size:15px;font-weight:600;color:${INK};line-height:1.35}
+.pt-rules span{display:block;margin-top:2px;font-size:14px;line-height:1.4;color:${SUB};word-break:keep-all}
 .pt-steps b{flex:none;width:24px;height:24px;border-radius:50%;background:${SOFT};font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
 .pt-sum{display:flex;justify-content:center;gap:22px;margin:14px 0 2px}
 .pt-sum div{display:flex;flex-direction:column;gap:2px}
@@ -198,15 +205,19 @@ export default function PamiBreadGame({ onExit }) {
           <div className="pt-card">
             <img className="pt-pami" src={pamiHi} alt="" />
             <h2>파미빵 타이쿤</h2>
-            <p>{ROUND}초 동안 파미빵을 구워 팔아요. 매출 {won(STAMP_WON)}마다 스탬프 하나!</p>
+            <p>{ROUND}초 동안 파미빵을 구워 팔아요.<br />매출 {won(STAMP_WON)}마다 스탬프 하나!</p>
             <ol className="pt-steps">
-              <li><b>1</b>속(팥, 슈크림)을 고르고 빈 틀을 눌러 반죽을 부어요</li>
+              <li><b>1</b>속을 고르고 빈 틀을 눌러 반죽을 부어요</li>
               <li><b>2</b>테두리가 민트로 빛나면 눌러서 뒤집어요</li>
               <li><b>3</b>한 번 더 민트일 때 눌러 쟁반에 담아요</li>
               <li><b>4</b>주문만큼 담기면 손님을 눌러 건네요</li>
-              <li><b>!</b>손님을 놓치면 하트를 잃어요. 하트 {HEARTS}개를 다 잃으면 끝</li>
-              <li><b>!</b>잘 구운 빵을 {COMBO_1}개 이어 팔면 연속 보너스, VIP 손님은 두 배. {HEAT_AT}초 뒤엔 불이 세져요</li>
             </ol>
+            <div className="pt-rules">
+              <div><i><Heart on /></i><p><b>하트 {HEARTS}개</b><span>놓치면 하나씩 잃어요</span></p></div>
+              <div><i>×1.5</i><p><b>연속 보너스</b><span>{COMBO_1}연속 ×1.2<br />{COMBO_2}연속 ×1.5</span></p></div>
+              <div><i>VIP</i><p><b>VIP 손님</b><span>두 배, 대신 빨리 가요</span></p></div>
+              <div><i>{HEAT_AT}초</i><p><b>센 불</b><span>빨리 익고 금방 타요</span></p></div>
+            </div>
             <div className="pt-btns"><button type="button" className="pt-btn main" onClick={start}>시작하기</button></div>
           </div>
         )}
