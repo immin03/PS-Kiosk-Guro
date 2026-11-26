@@ -16,8 +16,10 @@
     "check:racks": "node scripts/sync-racks.mjs --check"
   },
   "dependencies": {
+    "qrcode-generator": "^2.0.4",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
