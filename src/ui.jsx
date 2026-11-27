@@ -20,16 +20,19 @@ export const PAD = 20;   /* 화면 좌우 */
 export const UI_CSS = `
 .ui-row{position:relative;isolation:isolate}
 .ui-row.is-go::before{content:"";position:absolute;inset:0 -10px;border-radius:8px;background:${SOFT};opacity:0;transition:opacity .15s;z-index:-1;pointer-events:none}
-.ui-tile,.ui-chip,.ui-btn2{transition:border-color .15s}
+.ui-tile,.ui-chip,.ui-btn2{transition:border-color .15s,color .15s}
 @media (hover:hover){
   .ui-row.is-go:hover::before{opacity:.6}
   .ui-tile:hover,.ui-chip.is-go:hover,.ui-btn2:hover{border-color:${MINT}!important}
+  .ui-btn2:hover{color:${MINT}!important}
   .ui-chip.is-go:hover{color:${MINT}!important}
   .ui-btn1:hover{filter:brightness(.95)}
   .ui-seg button[aria-pressed="false"]:hover{color:${INK}}
 }
 /* 터치 화면엔 호버가 없어 누를 때도 같은 민트 테두리(2026-11-18 사용자 「호버 디자인이 사라졌다」) */
 .ui-tile:active,.ui-chip.is-go:active,.ui-btn2:active{border-color:${MINT}!important}
+/* 보조 버튼은 테두리와 글자가 같이 민트로(2026-11-27 사용자 「호버 전부 민트로」) */
+.ui-btn2:active{color:${MINT}!important}
 @media (hover:hover){.ui-tile:hover .ui-chev{transform:translateX(2px)}}
 .ui-swipe{scrollbar-width:none}.ui-swipe::-webkit-scrollbar{display:none}
 `;
