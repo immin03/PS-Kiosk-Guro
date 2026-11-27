@@ -936,8 +936,8 @@ export default function KioskApp() {
       .kiosk-swipe::-webkit-scrollbar{display:none}
       ${UI_CSS}
       .kiosk-chip{transition:border-color .15s,color .15s}
-      .kiosk-map-btn{transition:border-color .15s}
-      @media (hover:hover){.kiosk-map-btn:not(:disabled):hover{border-color:#01C0A4!important}.kiosk-zone-row:hover span:nth-child(2){color:#01C0A4}}
+      .kiosk-map-btn{transition:border-color .15s,color .15s}
+      @media (hover:hover){.kiosk-map-btn:not(:disabled):hover{border-color:#01C0A4!important;color:#01C0A4!important}.kiosk-zone-row:hover span:nth-child(2){color:#01C0A4}}
       @media (hover:hover){.kiosk-chip:hover{border-color:${C.pri}!important}}
       .kiosk-search:focus-within{border-color:#01C0A4!important}
       .kiosk-input::placeholder{color:#98A2AE!important}
