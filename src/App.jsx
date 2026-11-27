@@ -18,6 +18,7 @@ import PromoDetail from "./PromoDetail.jsx";
 import PamiTopGame from "./pamitop/PamiTopGame.jsx";
 import PamiBreadGame from "./pamibread/PamiBreadGame.jsx";
 import Arcade from "./arcade/Arcade.jsx";
+import PhoneHandoff, { canWebGL } from "./arcade/PhoneHandoff.jsx";
 import EventsList from "./EventsPage.jsx";
 import SiteFrame from "./SiteFrame.jsx";
 import { STORE } from "./store.js";
@@ -889,11 +890,13 @@ export default function KioskApp() {
       case "guide": return <GuideFrame path={cur.path || GUIDE_PAGES.home} lang={lang} nonce={cur.nonce || 0} />;
       case "location": return renderLocation();
       case "site": return <SiteFrame src={SITE} title={t(lang,"gateSite")} />;
-      case "world": return <SiteFrame src={WORLD} title="PHAMA SQUARE WORLD" />;
+      /* 3D 를 못 그리는 기기면 게임 · 월드 대신 휴대폰으로 넘기는 QR(2026-11-27, src/arcade/PhoneHandoff.jsx) */
+      case "world": return canWebGL() ? <SiteFrame src={WORLD} title="PHAMA SQUARE WORLD" /> : <PhoneHandoff url={WORLD} name={t(lang,"gateWorld")} onExit={goBack} />;
       case "events": return <EventsList onOpen={(p) => navTo("promo", { promo: p })} emptyText={t(lang,"eventsEmpty")} />;
       case "promo": return <PromoDetail promo={cur.promo} lang={lang} onMap={() => tabTo("map")} />;
-      case "pamitop": return <PamiTopGame onExit={goBack} />;
-      case "pamibread": return <PamiBreadGame onExit={goBack} />;
+      case "pamitop": case "pamibread":
+        if (!canWebGL()) return <PhoneHandoff url={`https://kiosk.phamasquare.com/${STORE}/?view=${cur.page}`} name={PAGE_TITLES[cur.page]} onExit={goBack} />;
+        return cur.page === "pamitop" ? <PamiTopGame onExit={goBack} /> : <PamiBreadGame onExit={goBack} />;
       case "arcade": return <Arcade onOpen={(pg) => navTo(pg)} />;
       default: return renderHome();
     }
